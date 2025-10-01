@@ -119,9 +119,11 @@
             const data = new FormData(submissionForm);
 
             fetch(APPS_SCRIPT_URL, {
-                method: submissionForm.method,
-                body: data
-            })
+               // O fetch usa o método padrão POST ao receber o FormData
+fetch(APPS_SCRIPT_URL, {
+    method: 'POST', // Está implícito, mas é POST
+    body: data 
+})
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Erro de rede ou servidor Apps Script.');
