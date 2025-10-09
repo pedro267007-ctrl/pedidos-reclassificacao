@@ -238,33 +238,60 @@
             }
         }
 
-        function filterAndPopulateLine(currentLevel, lineId) {
-            const currentSelect = document.getElementById(`nivel${currentLevel}-${lineId}`);
-            const nextLevel = currentLevel + 1;
-            const selectedValue = currentSelect.value;
-            
-            // Limpa e desativa todos os níveis seguintes (Níveis 2 a 5)
-            for (let i = nextLevel; i <= 5; i++) {
-                const nextSelect = document.getElementById(`nivel${i}-${lineId}`);
-                nextSelect.innerHTML = `<option value="" disabled selected>Nível ${i}</option>`;
-                nextSelect.disabled = true;
-            }
+       // Remova o 'required' de todos os <select name="nivel..."> no HTML!
+// ...
 
-            if (!selectedValue) return;
+// ... (Resto do seu código JS)
 
-            // Encontra e popula o próximo seletor
-            const nextSelect = document.getElementById(`nivel${nextLevel}-${lineId}`);
-            if (nextSelect) {
-                const nextOptions = allOptionsData
-                    .filter(row => row[currentLevel - 1] === selectedValue)
-                    .map(row => row[currentLevel]);
-                
-                populateSelect(nextSelect, nextOptions, `Nível ${currentLevel}`);
-                nextSelect.disabled = false;
-            }
-        }
+function filterAndPopulateLine(currentLevel, lineId) {
+    const currentSelect = document.getElementById(`nivel${currentLevel}-${lineId}`);
+    const nextLevel = currentLevel + 1;
+    const selectedValue = currentSelect.value;
+    
+    // --- 1. Limpa e desativa todos os níveis seguintes ---
+    for (let i = nextLevel; i <= 5; i++) {
+        const nextSelect = document.getElementById(`nivel${i}-${lineId}`);
+        nextSelect.innerHTML = `<option value="" disabled selected>Nível ${i}</option>`;
+        nextSelect.disabled = true;
+    }
 
+    if (!selectedValue) {
+        // Se o usuário desmarcar o nível atual, ele não precisa ser um filtro para o próximo
+        // Mas se ele desmarcou o Nível 1, não há como filtrar mais nada.
+        return; 
+    }
 
+    // --- 2. Coleta a Cadeia de Filtros ---
+    // Cria um array de valores selecionados até o nível anterior ao que estamos populando.
+    const selectedChain = [];
+    for (let i = 1; i <= currentLevel; i++) {
+        const select = document.getElementById(`nivel${i}-${lineId}`);
+        // Se o valor estiver vazio, interrompe a cadeia de filtro, pois não há como ir adiante
+        if (!select.value) break; 
+        selectedChain.push(select.value);
+    }
+    
+    // O próximo nível a ser populado.
+    const nextSelect = document.getElementById(`nivel${nextLevel}-${lineId}`);
+    if (!nextSelect) return; 
+
+    // --- 3. Aplica o Filtro Múltiplo ---
+    let filteredOptions = allOptionsData;
+    
+    // Filtra a matriz completa (allOptionsData) usando TODOS os valores da selectedChain
+    for (let i = 0; i < selectedChain.length; i++) {
+        const filterValue = selectedChain[i];
+        const filterIndex = i; // Coluna na matriz (0 para Nível 1, 1 para Nível 2, etc.)
+
+        filteredOptions = filteredOptions.filter(row => row[filterIndex] === filterValue);
+    }
+    
+    // Pega as opções para o PRÓXIMO NÍVEL (nextLevel - 1 é o índice da coluna)
+    const nextOptions = filteredOptions.map(row => row[nextLevel - 1]);
+    
+    populateSelect(nextSelect, nextOptions, `Nível ${nextLevel}`);
+    nextSelect.disabled = false;
+}
         // =======================================================================
         // LÓGICA DE CARREGAMENTO INICIAL
         // =======================================================================
