@@ -386,3 +386,81 @@
     </script>
 </body>
 </html>
+// =======================================================================
+// NOVA FUNÇÃO: Coleta e estrutura os dados de rateio em um array JSON
+// =======================================================================
+function collectRateioData() {
+    const rateioLines = document.querySelectorAll('#rateio-container .rateio-item');
+    const rateioData = [];
+
+    rateioLines.forEach(line => {
+        const data = {};
+        data.nivel1 = line.querySelector('select[name="nivel1"]').value || '';
+        data.nivel2 = line.querySelector('select[name="nivel2"]').value || '';
+        data.nivel3 = line.querySelector('select[name="nivel3"]').value || '';
+        data.nivel4 = line.querySelector('select[name="nivel4"]').value || '';
+        data.nivel5 = line.querySelector('select[name="nivel5"]').value || '';
+        data.centro = line.querySelector('input[name="centro"]').value || '';
+        data.valorRateio = parseFloat(line.querySelector('input[name="valorRateio"]').value) || 0;
+        
+        rateioData.push(data);
+    });
+    
+    return JSON.stringify(rateioData);
+}
+
+// =======================================================================
+// LÓGICA DE ENVIO DO FORMULÁRIO (doPost) - MODIFICADA PARA ENVIAR JSON
+// Substitua o seu submissionForm.addEventListener("submit" ...
+// =======================================================================
+submissionForm.addEventListener("submit", async function(event) {
+    event.preventDefault(); 
+    const submitButton = submissionForm.querySelector('button.btn-submit');
+
+    // ⚠️ Validação de Soma (Mantida e Recomendada)
+    const valorTotalDoc = parseFloat(document.getElementById('valorTotal').value) || 0;
+    const rateioInputs = document.querySelectorAll('input[name="valorRateio"]');
+    let somaRateio = 0;
+    rateioInputs.forEach(input => {
+        somaRateio += parseFloat(input.value) || 0;
+    });
+
+    if (Math.abs(valorTotalDoc - somaRateio) > 0.01) {
+        showMessage('error', `Erro de Rateio: O Valor Total do Documento (${valorTotalDoc.toFixed(2)}) não corresponde à soma dos rateios (${somaRateio.toFixed(2)}).`);
+        return;
+    }
+
+    submitButton.disabled = true;
+    submitButton.textContent = 'Enviando Pedido...';
+    showMessage('loading', 'Processando sua solicitação...');
+    
+    // NOVO MÉTODO: Coleta todos os campos e anexa o JSON do rateio
+    const formData = new FormData(submissionForm);
+    formData.append('rateioJson', collectRateioData()); // Adiciona o JSON do rateio
+    
+    try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+            method: 'POST', 
+            body: formData 
+        });
+        // ... (o resto do bloco try/catch/finally permanece o mesmo)
+        // ... (certifique-se de que a parte de sucesso/erro está correta)
+        const responseData = await response.json();
+
+        if (responseData && responseData.result === "success") {
+            showMessage('success', `Sucesso! Seu pedido foi registrado. ID do Documento: #${responseData.id}.`);
+            submissionForm.reset(); 
+            rateioContainer.innerHTML = ''; 
+            loadOptionsAndFixedLists(); 
+        } else {
+            throw new Error(responseData.error || "Resposta inesperada do servidor Apps Script.");
+        }
+
+    } catch (error) {
+        console.error('Erro:', error);
+        showMessage('error', "Ops! Houve um erro no envio. Verifique a URL do Apps Script e o console do navegador.");
+    } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Enviar Pedido de Reclassificação';
+    }
+});
