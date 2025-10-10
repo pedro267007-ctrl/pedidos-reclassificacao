@@ -16,10 +16,11 @@
         header { background-color: var(--primary-color); color: white; padding: 20px 0; text-align: center; margin-bottom: 30px; }
         .container { max-width: 1200px; margin: auto; padding: 30px; background: white; border-radius: 6px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
         h2 { color: var(--primary-color); border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 25px; font-size: 1.5em; }
-        .section-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px; }
+        /* GRID MUDOU PARA 4 COLUNAS POR CAUSA DO NOVO CAMPO EMAIL */
+        .section-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; } 
         .input-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.95em; color: #555; }
-        input[type="text"], input[type="number"], select, textarea { 
+        input[type="text"], input[type="number"], input[type="email"], select, textarea, input[type="file"] { 
             width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; 
             transition: border-color 0.3s; font-size: 1em;
         }
@@ -29,7 +30,7 @@
         /* ESTILOS DA SEÇÃO DE RATEIO (EM LINHA) */
         .rateio-header { display: flex; font-weight: 600; margin-bottom: 10px; padding: 0 10px; color: var(--primary-color); font-size: 0.9em;}
         .rateio-header div { flex-grow: 1; margin-right: 10px; }
-        .rateio-header .header-center, .rateio-header .header-valor { flex: 0 0 100px; } /* Ajuste de largura para inputs */
+        .rateio-header .header-center, .rateio-header .header-valor { flex: 0 0 100px; } 
         .rateio-header .header-remover { flex: 0 0 30px; } 
 
         .rateio-item { display: flex; gap: 10px; margin-bottom: 15px; border: 1px solid #eee; padding: 10px; border-radius: 4px; align-items: center; }
@@ -61,7 +62,7 @@
     </header>
 
     <div class="container">
-        <form id="submission-form" enctype="multipart/form-data">
+        <form id="submission-form" enctype="multipart/form-data"> 
             
             <h2>1. Dados do Solicitante e Documento</h2>
             <div class="section-grid">
@@ -70,11 +71,15 @@
                     <input type="text" id="solicitante" name="solicitante" required>
                 </div>
                 <div class="input-group">
+                    <label for="emailSolicitante">E-mail do Solicitante:</label>
+                    <input type="email" id="emailSolicitante" name="emailSolicitante" required>
+                </div>
+                <div class="input-group">
                     <label for="parceiro">Nome do Parceiro:</label>
                     <input type="text" id="parceiro" name="parceiro" required>
                 </div>
                 <div class="input-group">
-                    <label for="docNumero">Nº do Documento:</label>
+                    <label for="docNumero">Nº do Documento/Histórico:</label>
                     <input type="text" id="docNumero" name="docNumero" required>
                 </div>
                 <div class="input-group">
@@ -116,10 +121,14 @@
             <input type="hidden" id="numRateios" name="numRateios" value="0">
 
 
-            <h2>3. Justificativa</h2>
+            <h2>3. Descrição e Anexos</h2>
             <div class="input-group">
-                <label for="justificativa">Justificativa Detalhada da Reclassificação:</label>
+                <label for="justificativa">Descrição Detalhada da Reclassificação:</label>
                 <textarea id="justificativa" name="justificativa" rows="4" required></textarea>
+            </div>
+            <div class="input-group">
+                <label for="fileUpload">Anexar Documentos/Fotos (Opcional):</label>
+                <input type="file" id="fileUpload" name="fileUpload" multiple>
             </div>
             
             <button type="submit" class="btn-submit">Enviar Pedido de Reclassificação</button>
@@ -330,7 +339,6 @@
                 data.nivel4 = line.querySelector('select[name="nivel4"]').value || '';
                 data.nivel5 = line.querySelector('select[name="nivel5"]').value || '';
                 
-                // Aqui está a coleta de CENTRO e VALOR (Corrigida e garantida)
                 const centroInput = line.querySelector('input[name="centro"]');
                 const valorInput = line.querySelector('input[name="valorRateio"]');
 
@@ -344,13 +352,13 @@
         }
         
         // =======================================================================
-        // FUNÇÃO 2: LÓGICA DE ENVIO DO FORMULÁRIO (doPost) - AGORA USANDO JSON
+        // FUNÇÃO 2: LÓGICA DE ENVIO DO FORMULÁRIO (doPost) - AGORA TRATANDO ARQUIVOS
         // =======================================================================
         submissionForm.addEventListener("submit", async function(event) {
             event.preventDefault(); 
             const submitButton = submissionForm.querySelector('button.btn-submit');
 
-            // ⚠️ Validação de Soma (Mantida e Recomendada)
+            // ⚠️ Validação de Soma 
             const valorTotalDoc = parseFloat(document.getElementById('valorTotal').value) || 0;
             const rateioInputs = document.querySelectorAll('input[name="valorRateio"]');
             let somaRateio = 0;
@@ -365,7 +373,7 @@
 
             submitButton.disabled = true;
             submitButton.textContent = 'Enviando Pedido...';
-            showMessage('loading', 'Processando sua solicitação...');
+            showMessage('loading', 'Processando sua solicitação (incluindo anexos, se houver)...');
             
             // NOVO MÉTODO: Coleta todos os campos e anexa o JSON do rateio
             const formData = new FormData(submissionForm);
@@ -373,24 +381,23 @@
             // Adiciona o JSON do rateio (que será lido pelo doPost)
             formData.append('rateioJson', collectRateioData()); 
             
-            // Remove os campos de rateio individuais que estão vazios para evitar poluir o Apps Script
-            for (let i = 1; i <= 5; i++) {
-                formData.delete(`nivel${i}`);
-            }
-            formData.delete('centro');
-            formData.delete('valorRateio');
-
+            // Remove os campos de rateio individuais vazios para evitar poluir o Apps Script
+            const rateioLineFields = ['nivel1', 'nivel2', 'nivel3', 'nivel4', 'nivel5', 'centro', 'valorRateio'];
+            rateioLineFields.forEach(name => formData.delete(name));
+            formData.delete('numRateios'); // Remove o campo hidden desnecessário para o Apps Script
+            
             try {
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST', 
-                    body: formData 
+                    body: formData // FormData é usado para enviar arquivos
                 });
 
                 if (!response.ok) { throw new Error('Erro de rede ou servidor Apps Script.'); }
                 const responseData = await response.json();
 
                 if (responseData && responseData.result === "success") {
-                    showMessage('success', `Sucesso! Seu pedido foi registrado. ID do Documento: #${responseData.id}.`);
+                    // Mensagem de sucesso atualizada
+                    showMessage('success', `✅ Sucesso! Seu pedido foi registrado. ID do Documento: **#${responseData.id}**. Seus anexos foram salvos.`);
                     submissionForm.reset(); 
                     rateioContainer.innerHTML = ''; 
                     loadOptionsAndFixedLists(); 
@@ -400,7 +407,7 @@
 
             } catch (error) {
                 console.error('Erro:', error);
-                showMessage('error', "Ops! Houve um erro no envio. Verifique a URL do Apps Script e o console do navegador.");
+                showMessage('error', "Ops! Houve um erro no envio. Verifique a URL do Apps Script, o Deploy e o console do navegador.");
             } finally {
                 submitButton.disabled = false;
                 submitButton.textContent = 'Enviar Pedido de Reclassificação';
@@ -408,7 +415,7 @@
         });
 
         // =======================================================================
-        // INICIALIZAÇÃO E EVENTOS (Este bloco já existia, certifique-se que está no final)
+        // INICIALIZAÇÃO E EVENTOS
         // =======================================================================
         document.getElementById('add-rateio-line').addEventListener('click', createRateioLine);
         document.addEventListener('DOMContentLoaded', loadOptionsAndFixedLists);
