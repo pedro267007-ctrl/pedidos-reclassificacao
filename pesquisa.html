@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Status</title>
+    <style>
+        :root {
+            --primary-color: #005A9C;
+            --secondary-color: #F7F7F7;
+            --text-color: #333;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: var(--secondary-color); color: var(--text-color); }
+        .container { max-width: 1200px; margin: auto; padding: 30px; background: white; border-radius: 6px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+        h1 { color: var(--primary-color); border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 25px; font-size: 1.8em; }
+        input[type="text"] { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; transition: border-color 0.3s; font-size: 1em; }
+        button { background-color: var(--primary-color); color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; font-weight: bold; transition: background-color 0.3s; }
+        button:hover:not(:disabled) { background-color: #004580; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 30px; }
+        .search-box input { flex-grow: 1; }
+        .message-box { margin-top: 20px; padding: 15px; border-radius: 4px; font-weight: 600; display: none; }
+        .error { background-color: #f8d7da; color: var(--error-color); border: 1px solid #f5c6cb; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; font-size: 1.2em; color: var(--primary-color); display: none; }
+        
+        /* Resultados da Tabela */
+        .results-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9em; }
+        .results-table th, .results-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        .results-table th { background-color: var(--primary-color); color: white; font-weight: 600; }
+        .results-table tr:hover { background-color: #f1f1f1; }
+        .status-Pendente { color: orange; font-weight: bold; }
+        .status-Aprovado { color: var(--success-color); font-weight: bold; }
+        .status-Rejeitado { color: var(--error-color); font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="loading-overlay" class="loading-overlay">Buscando...</div>
+    
+    <?!= createNavBar('search'); ?> 
+
+    <div class="container">
+        <header>
+            <h1>Consulta de Status de Reclassificação</h1>
+        </header>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Digite o ID (ex: 12345) ou o nome do Solicitante">
+            <button id="searchButton">Buscar</button>
+        </div>
+
+        <div id="results-message" class="message-box"></div>
+        
+        <div id="results-container">
+            </div>
+    </div>
+
+    <script>
+        // =======================================================================
+        // 🛑 COPIE O SEU URL DA WEB APP DO APPS SCRIPT AQUI
+        // (Use o mesmo URL que está no seu index.html)
+        // =======================================================================
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8H2P6Mur5XroK3kvtuXVppW4-utOEZ4eXm080vLonQwrPey2YhAXBK_50hZl1gqLL/exec';
+        
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const resultsContainer = document.getElementById('results-container');
+        const resultsMessage = document.getElementById('results-message');
+        const loadingOverlay = document.getElementById("loading-overlay");
+
+        function showMessage(type, message) {
+            resultsMessage.style.display = 'block';
+            resultsMessage.className = `message-box ${type}`;
+            resultsMessage.innerHTML = message;
+        }
+
+        function displayResults(data) {
+            resultsContainer.innerHTML = '';
+            resultsMessage.style.display = 'none';
+
+            if (data.length === 0) {
+                showMessage('error', 'Nenhum resultado encontrado. Tente refinar sua busca.');
+                return;
+            }
+
+            let tableHtml = `
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Solicitante</th>
+                            <th>Competência</th>
+                            <th>Valor Total (R$)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            data.forEach(item => {
+                // Remove caracteres não alfanuméricos do status para usar em classes CSS
+                const statusClass = item.status ? item.status.replace(/[^a-zA-Z0-9]/g, '') : 'Pendente'; 
+                tableHtml += `
+                    <tr>
+                        <td>**#${item.id}**</td>
+                        <td>${item.solicitante}</td>
+                        <td>${item.competencia}</td>
+                        <td>R$ ${(item.valorTotal || 0).toFixed(2)}</td>
+                        <td class="status-${statusClass}">${item.status}</td>
+                    </tr>
+                `;
+            });
+
+            tableHtml += '</tbody></table>';
+            resultsContainer.innerHTML = tableHtml;
+        }
+
+
+        async function handleSearch() {
+            const query = searchInput.value.trim();
+            if (query.length < 3) {
+                showMessage('error', 'Por favor, digite pelo menos 3 caracteres para buscar (ID ou Solicitante).');
+                resultsContainer.innerHTML = '';
+                return;
+            }
+
+            loadingOverlay.style.display = 'flex';
+            searchButton.disabled = true;
+
+            try {
+                // Ação 'search_requests' é tratada pela sua função doGet no Apps Script
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=search_requests&query=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                if (data.result === 'success') {
+                    displayResults(data.data);
+                } else {
+                    showMessage('error', `Erro ao buscar dados: ${data.error || 'Resposta inválida.'}`);
+                }
+
+            } catch (error) {
+                console.error('Erro de busca:', error);
+                showMessage('error', 'Falha na conexão com o Apps Script. Verifique a URL e o Deploy.');
+            } finally {
+                loadingOverlay.style.display = 'none';
+                searchButton.disabled = false;
+            }
+        }
+
+        // Event Listeners
+        searchButton.addEventListener('click', handleSearch);
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Impede o envio do formulário padrão (se houver)
+                handleSearch();
+            }
+        });
+    </script>
+</body>
+</html>
