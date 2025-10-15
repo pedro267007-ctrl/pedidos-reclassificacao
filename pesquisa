@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <title>Consulta de Rateios</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+    .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h2 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+    input[type="text"] { width: 70%; padding: 10px; margin-right: 10px; border: 1px solid #ccc; border-radius: 4px; }
+    button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
+    #loading { text-align: center; margin-top: 20px; display: none; }
+    #resultsTable { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    #resultsTable th, #resultsTable td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    #resultsTable th { background-color: #f2f2f2; }
+    .no-results { text-align: center; color: #888; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🔎 Pesquisar Solicitações</h2>
+    
+    <div id="searchForm">
+      <input type="text" id="searchInput" placeholder="Digite ID, Solicitante ou E-mail">
+      <button onclick="searchRequests()">Buscar</button>
+    </div>
+
+    <div id="loading">Carregando resultados...</div>
+    
+    <div id="resultsContainer">
+      </div>
+
+  </div>
+
+  <script>
+    // Função para chamar o Apps Script
+    function searchRequests() {
+      const query = document.getElementById('searchInput').value.trim();
+      const loadingDiv = document.getElementById('loading');
+      const container = document.getElementById('resultsContainer');
+
+      if (query.length < 3) {
+        container.innerHTML = `<p class="no-results">Por favor, digite pelo menos 3 caracteres para buscar.</p>`;
+        return;
+      }
+      
+      loadingDiv.style.display = 'block';
+      container.innerHTML = ''; 
+
+      google.script.run
+        .withSuccessHandler(displayResults)
+        .withFailureHandler(handleError)
+        .searchRequests({query: query});
+    }
+
+    // Função que recebe e exibe os resultados
+    function displayResults(response) {
+      const loadingDiv = document.getElementById('loading');
+      const container = document.getElementById('resultsContainer');
+      loadingDiv.style.display = 'none';
+
+      if (response.result === "success" && response.data.length > 0) {
+        let html = '<table id="resultsTable"><thead><tr>';
+        html += '<th>ID</th><th>Solicitante</th><th>Valor Total</th><th>Competência</th><th>Status</th>';
+        html += '</tr></thead><tbody>';
+
+        response.data.forEach(item => {
+          html += `
+            <tr>
+              <td>${item.id}</td>
+              <td>${item.solicitante}</td>
+              <td>R$ ${parseFloat(item.valorTotal).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              <td>${item.competencia}</td>
+              <td>${item.status}</td>
+            </tr>
+          `;
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      } else {
+        container.innerHTML = `<p class="no-results">Nenhuma solicitação encontrada para o termo digitado.</p>`;
+      }
+    }
+
+    // Função para lidar com erros
+    function handleError(error) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('resultsContainer').innerHTML = `<p style="color:red;">Erro na busca: ${error.message}</p>`;
+      console.error(error);
+    }
+  </script>
+</body>
+</html>
