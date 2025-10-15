@@ -13,11 +13,11 @@
             --error-color: #dc3545;
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: var(--secondary-color); color: var(--text-color); }
-        header { background-color: var(--primary-color); color: white; padding: 20px 0; text-align: center; margin-bottom: 30px; }
         .container { max-width: 1200px; margin: auto; padding: 30px; background: white; border-radius: 6px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-        h2 { color: var(--primary-color); border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 25px; font-size: 1.5em; }
-        /* GRID MUDOU PARA 4 COLUNAS POR CAUSA DO NOVO CAMPO EMAIL */
-        .section-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; } 
+        h1, h2 { color: var(--primary-color); }
+        h1 { text-align: center; font-size: 2em; margin-bottom: 20px; }
+        h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 25px; font-size: 1.5em; }
+        .section-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px; }
         .input-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.95em; color: #555; }
         input[type="text"], input[type="number"], input[type="email"], select, textarea, input[type="file"] { 
@@ -26,44 +26,35 @@
         }
         input:focus, select:focus, textarea:focus { border-color: var(--primary-color); outline: none; }
         textarea { resize: vertical; min-height: 100px; }
-        
-        /* ESTILOS DA SEÇÃO DE RATEIO (EM LINHA) */
-        .rateio-header { display: flex; font-weight: 600; margin-bottom: 10px; padding: 0 10px; color: var(--primary-color); font-size: 0.9em;}
-        .rateio-header div { flex-grow: 1; margin-right: 10px; }
-        .rateio-header .header-center, .rateio-header .header-valor { flex: 0 0 100px; } 
-        .rateio-header .header-remover { flex: 0 0 30px; } 
-
+        .rateio-header { display: flex; font-weight: 600; margin-bottom: 10px; padding: 0 10px; color: var(--primary-color); font-size: 0.9em; align-items: center; }
+        .rateio-header div { flex: 1 1 0; margin-right: 10px; }
+        .rateio-header .header-center, .rateio-header .header-valor { flex: 0 0 120px; }
+        .rateio-header .header-remover { flex: 0 0 40px; }
         .rateio-item { display: flex; gap: 10px; margin-bottom: 15px; border: 1px solid #eee; padding: 10px; border-radius: 4px; align-items: center; }
-        .rateio-item select, .rateio-item input { flex-grow: 1; }
-        .rateio-item .select-container { flex-grow: 1; }
-        
-        .rateio-item .input-center { flex: 0 0 100px; }
-        .rateio-item .input-valor { flex: 0 0 100px; }
-
+        .rateio-item .select-container, .rateio-item .input-center, .rateio-item .input-valor { flex: 1 1 0; }
+        .rateio-item .input-center, .rateio-item .input-valor { min-width: 120px; }
+        .btn-add-line, .btn-submit { color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; font-weight: bold; transition: background-color 0.3s; padding: 12px 25px; }
         .btn-add-line { background-color: #5cb85c; margin-top: 15px; }
         .btn-add-line:hover { background-color: #4cae4c; }
-        .btn-remove-line { background-color: #dc3545; color: white; padding: 8px 10px; border: none; border-radius: 4px; cursor: pointer; flex: 0 0 30px;}
+        .btn-submit { background-color: var(--primary-color); width: 100%; margin-top: 25px; }
+        .btn-submit:disabled { background-color: #a4c4db; cursor: not-allowed; }
+        .btn-submit:hover:not(:disabled) { background-color: #004580; }
+        .btn-remove-line { background-color: #dc3545; color: white; padding: 8px 10px; border: none; border-radius: 4px; cursor: pointer; flex: 0 0 40px; }
         .btn-remove-line:hover { background-color: #c9303d; }
-
-        button.btn-submit { background-color: var(--primary-color); color: white; padding: 12px 25px; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; font-weight: bold; transition: background-color 0.3s; width: 100%; margin-top: 25px;}
-        button.btn-submit:disabled { background-color: #a4c4db; cursor: not-allowed; }
-        button.btn-submit:hover:not(:disabled) { background-color: #004580; }
-
-        .message-box { margin-top: 20px; padding: 15px; border-radius: 4px; font-weight: 600; display: none; }
-        .success { background-color: #d4edda; color: var(--success-color); border: 1px solid #c3e6cb; }
-        .error { background-color: #f8d7da; color: var(--error-color); border: 1px solid #f5c6cb; }
+        .message-box { margin-top: 20px; padding: 15px; border-radius: 4px; font-weight: 600; display: none; text-align: center; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
         .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; font-size: 1.2em; color: var(--primary-color); display: none; }
     </style>
 </head>
 <body>
-    <div id="loading-overlay" class="loading-overlay">Carregando Opções de Conta...</div>
-    <header>
-        <h1>Formulário de Reclassificação de Centro/Conta</h1>
-    </header>
+    <div id="loading-overlay" class="loading-overlay">Carregando...</div>
+    
+    <?!= createNavBar('form'); ?> 
 
     <div class="container">
-        <form id="submission-form" enctype="multipart/form-data"> 
-            
+        <h1>Formulário de Reclassificação de Centro/Conta</h1>
+        <form id="submission-form" enctype="multipart/form-data">
             <h2>1. Dados do Solicitante e Documento</h2>
             <div class="section-grid">
                 <div class="input-group">
@@ -83,7 +74,7 @@
                     <input type="text" id="docNumero" name="docNumero" required>
                 </div>
                 <div class="input-group">
-                    <label for="valorTotal">Valor Total do Documento (Cheio):</label>
+                    <label for="valorTotal">Valor Total do Documento (R$):</label>
                     <input type="number" step="0.01" id="valorTotal" name="valorTotal" required>
                 </div>
                 <div class="input-group">
@@ -101,29 +92,16 @@
             </div>
 
             <h2>2. Detalhamento e Rateio da Conta</h2>
-            
             <div class="rateio-header">
-                <div style="flex-grow: 2;">Nível 1</div>
-                <div style="flex-grow: 2;">Nível 2</div>
-                <div style="flex-grow: 2;">Nível 3</div>
-                <div style="flex-grow: 2;">Nível 4</div>
-                <div style="flex-grow: 2;">Nível 5</div>
-                <div class="header-center">Centro</div>
-                <div class="header-valor">Valor Rateado</div>
-                <div class="header-remover"></div>
+                <div>Nível 1</div> <div>Nível 2</div> <div>Nível 3</div> <div>Nível 4</div> <div>Nível 5</div>
+                <div class="header-center">Centro</div> <div class="header-valor">Valor (R$)</div> <div class="header-remover"></div>
             </div>
-            
-            <div id="rateio-container">
-                </div>
-            
-            <button type="button" class="btn-add-line" id="add-rateio-line">Fazer Rateio (Adicionar Linha)</button>
-            
-            <input type="hidden" id="numRateios" name="numRateios" value="0">
-
+            <div id="rateio-container"></div>
+            <button type="button" class="btn-add-line" id="add-rateio-line">+ Adicionar Linha de Rateio</button>
 
             <h2>3. Descrição e Anexos</h2>
             <div class="input-group">
-                <label for="justificativa">Descrição Detalhada da Reclassificação:</label>
+                <label for="justificativa">Descrição Detalhada:</label>
                 <textarea id="justificativa" name="justificativa" rows="4" required></textarea>
             </div>
             <div class="input-group">
@@ -137,27 +115,17 @@
     </div>
 
     <script>
-        // =======================================================================
-        // 🛑 COLE O SEU URL DA WEB APP DO APPS SCRIPT AQUI
-        // =======================================================================
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8H2P6Mur5XroK3kvtuXVppW4-utOEZ4eXm080vLonQwrPey2YhAXBK_50hZl1gqLL/exec'; 
-        
-        // Variáveis de Controle
+        const APPS_SCRIPT_URL = '<?= ScriptApp.getService().getUrl() ?>';
         const submissionForm = document.getElementById("submission-form");
         const formMessage = document.getElementById("form-message");
         const loadingOverlay = document.getElementById("loading-overlay");
         const rateioContainer = document.getElementById('rateio-container');
-        let allOptionsData = []; // Matriz completa da aba 'Opcoes'
+        let allOptionsData = [];
 
-        // Mapeamento dos Seletores Fixos
         const fixedSelects = {
             'Competência': document.getElementById('competencia'),
             'Área Destino': document.getElementById('areaDestino') 
         };
-
-        // =======================================================================
-        // FUNÇÕES UTILITÁRIAS
-        // =======================================================================
 
         function showMessage(type, message) {
             formMessage.style.display = 'block';
@@ -166,9 +134,8 @@
         }
 
         function populateSelect(selectElement, options, initialText = 'Selecione') {
-            selectElement.innerHTML = `<option value="" selected>${initialText}</option>`; // Removido 'disabled'
-            const uniqueOptions = [...new Set(options.filter(Boolean))]; 
-            
+            selectElement.innerHTML = `<option value="">${initialText}</option>`;
+            const uniqueOptions = [...new Set(options.filter(Boolean))];
             uniqueOptions.forEach(option => {
                 const opt = document.createElement('option');
                 opt.value = option;
@@ -178,260 +145,150 @@
             selectElement.disabled = (uniqueOptions.length === 0);
         }
 
-        // =======================================================================
-        // LÓGICA DE CASCATA E RATEIO
-        // =======================================================================
-
         function createRateioLine() {
-            const lineId = Date.now(); // ID único para a linha
+            const lineId = Date.now();
             const div = document.createElement('div');
             div.className = 'rateio-item';
             div.id = `line-${lineId}`;
             
             let html = '';
-            
-            // Cria os 5 seletores em cascata
             for (let i = 1; i <= 5; i++) {
-                html += `
-                    <div class="select-container">
-                        <select 
-                            name="nivel${i}" 
-                            id="nivel${i}-${lineId}" 
-                            disabled 
-                            data-level="${i}" 
-                            data-line-id="${lineId}"
-                        >
-                            <option value="">Carregando Níveis...</option>
-                        </select>
-                    </div>
-                `;
+                html += `<div class="select-container"><select name="nivel${i}" id="nivel${i}-${lineId}" disabled data-level="${i}"><option value="">Nível ${i}</option></select></div>`;
             }
 
-            // Campos de Input Manual (Centro e Valor)
             html += `
-                <div class="input-center">
-                    <input type="text" name="centro" placeholder="Centro" required>
-                </div>
-                <div class="input-valor">
-                    <input type="number" step="0.01" name="valorRateio" placeholder="Valor" required>
-                </div>
-            `;
-
-            // Botão de Remover
-            html += `
-                <button type="button" class="btn-remove-line" onclick="removeRateioLine('${div.id}')">X</button>
+                <div class="input-center"><input type="text" name="centro" placeholder="Centro" required></div>
+                <div class="input-valor"><input type="number" step="0.01" name="valorRateio" placeholder="Valor" required></div>
+                <button type="button" class="btn-remove-line" data-line-id="${lineId}">X</button>
             `;
 
             div.innerHTML = html;
             rateioContainer.appendChild(div);
 
-            // 1. Inicializa o Nível 1 desta nova linha
             const nivel1Select = document.getElementById(`nivel1-${lineId}`);
             const nivel1Options = allOptionsData.map(row => row[0]);
             populateSelect(nivel1Select, nivel1Options, 'Nível 1');
             nivel1Select.disabled = false;
 
-            // 2. Adiciona os Event Listeners de CASCATA para esta nova linha
             for (let i = 1; i <= 4; i++) {
-                const currentSelect = document.getElementById(`nivel${i}-${lineId}`);
-                currentSelect.addEventListener('change', () => filterAndPopulateLine(i, lineId));
+                document.getElementById(`nivel${i}-${lineId}`).addEventListener('change', () => filterAndPopulateLine(i, lineId));
             }
+            div.querySelector('.btn-remove-line').addEventListener('click', () => removeRateioLine(lineId));
         }
 
-        // Remove a linha do DOM
         function removeRateioLine(lineId) {
-            const line = document.getElementById(lineId);
-            if (line) {
-                rateioContainer.removeChild(line);
-            }
+            const line = document.getElementById(`line-${lineId}`);
+            if (line) line.remove();
         }
         
-        // FUNÇÃO DE FILTRO TOTALMENTE DEPENDENTE
         function filterAndPopulateLine(currentLevel, lineId) {
-            const currentSelect = document.getElementById(`nivel${currentLevel}-${lineId}`);
             const nextLevel = currentLevel + 1;
-            const selectedValue = currentSelect.value;
-            
-            // --- 1. Limpa e desativa todos os níveis seguintes ---
             for (let i = nextLevel; i <= 5; i++) {
                 const nextSelect = document.getElementById(`nivel${i}-${lineId}`);
-                nextSelect.innerHTML = `<option value="" selected>Nível ${i}</option>`;
+                nextSelect.innerHTML = `<option value="">Nível ${i}</option>`;
                 nextSelect.disabled = true;
             }
 
-            // --- 2. Coleta a Cadeia de Filtros ---
             const selectedChain = [];
             for (let i = 1; i <= currentLevel; i++) {
                 const select = document.getElementById(`nivel${i}-${lineId}`);
-                selectedChain.push(select.value); 
+                if (!select.value) {
+                    return; // Interrompe se um nível intermediário for desmarcado
+                }
+                selectedChain.push(select.value);
             }
             
             const nextSelect = document.getElementById(`nivel${nextLevel}-${lineId}`);
-            if (!nextSelect) return; 
+            if (!nextSelect) return;
 
-            // --- 3. Aplica o Filtro Múltiplo ---
-            let filteredOptions = allOptionsData;
-            
-            for (let i = 0; i < currentLevel; i++) {
-                const filterValue = selectedChain[i];
-                const filterIndex = i;
-
-                if (filterValue) {
-                    filteredOptions = filteredOptions.filter(row => row[filterIndex] === filterValue);
-                }
-            }
+            let filteredOptions = allOptionsData.filter(row => {
+                return selectedChain.every((selectedValue, index) => row[index] === selectedValue);
+            });
             
             const nextOptions = filteredOptions.map(row => row[nextLevel - 1]);
-            
             populateSelect(nextSelect, nextOptions, `Nível ${nextLevel}`);
-            nextSelect.disabled = false;
         }
-
-
-        // =======================================================================
-        // LÓGICA DE CARREGAMENTO INICIAL
-        // =======================================================================
 
         async function loadOptionsAndFixedLists() {
             loadingOverlay.style.display = 'flex';
             try {
                 const response = await fetch(`${APPS_SCRIPT_URL}?action=get_options`);
                 const data = await response.json();
-
                 if (data.result === 'success') {
-                    allOptionsData = data.cascadingOptions; 
-
+                    allOptionsData = data.cascadingOptions;
                     for (const header in fixedSelects) {
-                        const options = data.fixedLists[header] || [];
-                        if (fixedSelects[header]) {
-                            populateSelect(fixedSelects[header], options, `Selecione a ${header}`);
-                            fixedSelects[header].disabled = false;
-                        }
+                        populateSelect(fixedSelects[header], data.fixedLists[header] || [], `Selecione a ${header}`);
                     }
-
-                    if (rateioContainer.children.length === 0) {
-                        createRateioLine();
-                    }
-                    
+                    if (rateioContainer.children.length === 0) createRateioLine();
                 } else {
-                    showMessage('error', `Erro ao carregar opções: ${data.error || 'Resposta inválida do servidor.'}`);
+                    showMessage('error', `Erro ao carregar opções: ${data.error || 'Resposta inválida.'}`);
                 }
             } catch (error) {
-                console.error('Erro ao carregar opções:', error);
-                showMessage('error', 'Falha na conexão com o Apps Script. Verifique a URL e o Deploy.');
+                console.error('Erro:', error);
+                showMessage('error', 'Falha na conexão. Verifique a URL e o Deploy.');
             } finally {
                 loadingOverlay.style.display = 'none';
             }
         }
 
-        // =======================================================================
-        // FUNÇÃO 1: Coleta e estrutura os dados de rateio em um array JSON
-        // =======================================================================
         function collectRateioData() {
-            const rateioLines = document.querySelectorAll('#rateio-container .rateio-item');
             const rateioData = [];
-
-            rateioLines.forEach(line => {
-                const data = {};
-                data.nivel1 = line.querySelector('select[name="nivel1"]').value || '';
-                data.nivel2 = line.querySelector('select[name="nivel2"]').value || '';
-                data.nivel3 = line.querySelector('select[name="nivel3"]').value || '';
-                data.nivel4 = line.querySelector('select[name="nivel4"]').value || '';
-                data.nivel5 = line.querySelector('select[name="nivel5"]').value || '';
-                
-                const centroInput = line.querySelector('input[name="centro"]');
-                const valorInput = line.querySelector('input[name="valorRateio"]');
-
-                data.centro = centroInput ? centroInput.value.trim() : ''; 
-                data.valorRateio = valorInput ? parseFloat(valorInput.value) || 0 : 0;
-                
-                rateioData.push(data);
+            document.querySelectorAll('#rateio-container .rateio-item').forEach(line => {
+                rateioData.push({
+                    nivel1: line.querySelector('select[name="nivel1"]').value || '',
+                    nivel2: line.querySelector('select[name="nivel2"]').value || '',
+                    nivel3: line.querySelector('select[name="nivel3"]').value || '',
+                    nivel4: line.querySelector('select[name="nivel4"]').value || '',
+                    nivel5: line.querySelector('select[name="nivel5"]').value || '',
+                    centro: line.querySelector('input[name="centro"]').value.trim() || '',
+                    valorRateio: parseFloat(line.querySelector('input[name="valorRateio"]').value) || 0
+                });
             });
-            
             return JSON.stringify(rateioData);
         }
-        
-        // =======================================================================
-        // FUNÇÃO 2: LÓGICA DE ENVIO DO FORMULÁRIO (doPost) - AGORA TRATANDO ARQUIVOS
-        // =======================================================================
-        submissionForm.addEventListener("submit", async function(event) {
-            event.preventDefault(); 
-            const submitButton = submissionForm.querySelector('button.btn-submit');
 
-            // ⚠️ Validação de Soma 
+        submissionForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const submitButton = this.querySelector('button.btn-submit');
+            
             const valorTotalDoc = parseFloat(document.getElementById('valorTotal').value) || 0;
-            const rateioInputs = document.querySelectorAll('input[name="valorRateio"]');
             let somaRateio = 0;
-            rateioInputs.forEach(input => {
-                somaRateio += parseFloat(input.value) || 0;
-            });
+            document.querySelectorAll('input[name="valorRateio"]').forEach(input => somaRateio += parseFloat(input.value) || 0);
 
             if (Math.abs(valorTotalDoc - somaRateio) > 0.01) {
-                showMessage('error', `Erro de Rateio: O Valor Total do Documento (${valorTotalDoc.toFixed(2)}) não corresponde à soma dos rateios (${somaRateio.toFixed(2)}).`);
+                showMessage('error', `A soma dos rateios (R$ ${somaRateio.toFixed(2)}) não corresponde ao Valor Total (R$ ${valorTotalDoc.toFixed(2)}).`);
                 return;
             }
 
             submitButton.disabled = true;
-            submitButton.textContent = 'Enviando Pedido...';
-            showMessage('loading', 'Processando sua solicitação (incluindo anexos, se houver)...');
+            loadingOverlay.style.display = 'flex';
             
-            // NOVO MÉTODO: Coleta todos os campos e anexa o JSON do rateio
-            const formData = new FormData(submissionForm);
-            
-            // Adiciona o JSON do rateio (que será lido pelo doPost)
-            formData.append('rateioJson', collectRateioData()); 
-            
-            // Remove os campos de rateio individuais vazios para evitar poluir o Apps Script
-            const rateioLineFields = ['nivel1', 'nivel2', 'nivel3', 'nivel4', 'nivel5', 'centro', 'valorRateio'];
-            rateioLineFields.forEach(name => formData.delete(name));
-            formData.delete('numRateios'); // Remove o campo hidden desnecessário para o Apps Script
+            const formData = new FormData(this);
+            formData.append('rateioJson', collectRateioData());
+            ['nivel1','nivel2','nivel3','nivel4','nivel5','centro','valorRateio'].forEach(name => formData.delete(name));
             
             try {
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST', 
-                    body: formData // FormData é usado para enviar arquivos
-                });
-
-                if (!response.ok) { throw new Error('Erro de rede ou servidor Apps Script.'); }
-                const responseData = await response.json();
-
-                if (responseData && responseData.result === "success") {
-                    // Mensagem de sucesso atualizada
-                    showMessage('success', `✅ Sucesso! Seu pedido foi registrado. ID do Documento: **#${responseData.id}**. Seus anexos foram salvos.`);
-                    submissionForm.reset(); 
-                    rateioContainer.innerHTML = ''; 
-                    loadOptionsAndFixedLists(); 
+                const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: formData });
+                const data = await response.json();
+                if (data.result === "success") {
+                    showMessage('success', `✅ Sucesso! Pedido **#${data.id}** registrado.`);
+                    this.reset();
+                    rateioContainer.innerHTML = '';
+                    createRateioLine();
                 } else {
-                    throw new Error(responseData.error || "Resposta inesperada do servidor Apps Script.");
+                    throw new Error(data.error || "Erro inesperado do servidor.");
                 }
-
             } catch (error) {
-                console.error('Erro:', error);
-                showMessage('error', "Ops! Houve um erro no envio. Verifique a URL do Apps Script, o Deploy e o console do navegador.");
+                console.error('Erro no envio:', error);
+                showMessage('error', `Ops! Houve um erro no envio: ${error.message}`);
             } finally {
                 submitButton.disabled = false;
-                submitButton.textContent = 'Enviar Pedido de Reclassificação';
+                loadingOverlay.style.display = 'none';
             }
         });
 
-        // =======================================================================
-        // INICIALIZAÇÃO E EVENTOS
-        // =======================================================================
         document.getElementById('add-rateio-line').addEventListener('click', createRateioLine);
         document.addEventListener('DOMContentLoaded', loadOptionsAndFixedLists);
-
     </script>
 </body>
 </html>
-<body>
-    <div id="loading-overlay" class="loading-overlay">Carregando Opções de Conta...</div>
-    
-    <?!= createNavBar('form'); ?> 
-    
-    <header>
-        <h1>Formulário de Reclassificação de Centro/Conta</h1>
-    </header>
-...
-    <body>
-    <div id="loading-overlay" class="loading-overlay">Carregando Opções de Conta...</div>
-    <header>
