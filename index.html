@@ -53,6 +53,65 @@
         .success { background-color: #d4edda; color: var(--success-color); border: 1px solid #c3e6cb; }
         .error { background-color: #f8d7da; color: var(--error-color); border: 1px solid #f5c6cb; }
         .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; font-size: 1.2em; color: var(--primary-color); display: none; }
+
+        /* NOVO CSS para a seção de busca e rastreamento */
+        .search-container {
+            max-width: 1200px; /* Mantém o tamanho do container principal */
+            margin-top: 0; /* Ajusta a margem para ficar junto ao header */
+            margin-bottom: 30px;
+            padding: 30px; /* Usa o padding padrão */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Mantém o sombreamento */
+        }
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #searchQuery {
+            flex-grow: 1;
+            padding: 10px;
+        }
+        #btnSearch {
+            background-color: var(--success-color);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        #btnSearch:hover {
+            background-color: #1e7e34;
+        }
+        .results-table-container {
+            margin-top: 20px;
+            /* Remove a borda para usar o padding do container */
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .results-table th, .results-table td {
+            border: 1px solid #eee;
+            padding: 10px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+        .results-table th {
+            background-color: #f1f1f1;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        .results-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        #searchPlaceholder {
+            text-align: center;
+            color: #888;
+            padding: 15px;
+        }
+        /* FIM NOVO CSS */
     </style>
 </head>
 <body>
@@ -61,6 +120,17 @@
         <h1>Formulário de Reclassificação de Centro/Conta</h1>
     </header>
 
+    <div class="container search-container">
+        <h2>4. Rastreamento de Pedidos</h2>
+        <div class="search-bar">
+            <input type="text" id="searchQuery" placeholder="Pesquisar por ID ou Solicitante..." />
+            <button type="button" id="btnSearch">Buscar Pedidos</button>
+        </div>
+        
+        <div id="searchResults" class="results-table-container">
+            <p id="searchPlaceholder">Use o campo acima para buscar pedidos pelo ID (ex: 12345) ou pelo nome do solicitante.</p>
+        </div>
+    </div>
     <div class="container">
         <form id="submission-form" enctype="multipart/form-data"> 
             
@@ -413,6 +483,98 @@
                 submitButton.textContent = 'Enviar Pedido de Reclassificação';
             }
         });
+
+        // =======================================================================
+        // LÓGICA DE BUSCA E RASTREAMENTO (Seção 4) - NOVO CÓDIGO AQUI
+        // =======================================================================
+        const btnSearch = document.getElementById('btnSearch');
+        const searchQueryInput = document.getElementById('searchQuery');
+        const searchResultsDiv = document.getElementById('searchResults');
+
+        btnSearch.addEventListener('click', handleSearch);
+        searchQueryInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSearch();
+            }
+        });
+
+        async function handleSearch() {
+            const query = searchQueryInput.value.trim();
+
+            if (query.length < 3) {
+                searchResultsDiv.innerHTML = '<p class="error message-box">Digite pelo menos **3 caracteres** (ID ou Nome) para buscar.</p>';
+                return;
+            }
+
+            btnSearch.disabled = true;
+            btnSearch.textContent = 'Buscando...';
+            searchResultsDiv.innerHTML = '<p id="searchPlaceholder">Aguarde, pesquisando no sistema...</p>';
+
+            try {
+                // Chama a função search_requests no Apps Script
+                const url = `${APPS_SCRIPT_URL}?action=search_requests&query=${encodeURIComponent(query)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.result === 'success') {
+                    renderSearchResults(data.data);
+                } else {
+                    searchResultsDiv.innerHTML = `<p class="error message-box">Erro: ${data.error || 'Falha ao buscar dados.'}</p>`;
+                }
+
+            } catch (error) {
+                console.error('Erro na busca:', error);
+                searchResultsDiv.innerHTML = '<p class="error message-box">Falha na conexão com o Apps Script ou erro de rede.</p>';
+            } finally {
+                btnSearch.disabled = false;
+                btnSearch.textContent = 'Buscar Pedidos';
+            }
+        }
+
+        function renderSearchResults(results) {
+            if (results.length === 0) {
+                searchResultsDiv.innerHTML = '<p id="searchPlaceholder">Nenhum pedido encontrado com este critério.</p>';
+                return;
+            }
+
+            let html = '<table class="results-table">';
+            html += `
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Solicitante</th>
+                        <th>Competência</th>
+                        <th>Valor Total</th>
+                        <th>Status (V)</th>
+                        <th>Progresso (Z)</th>
+                        <th>Quem Faz (AA)</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+            results.forEach(item => {
+                // Formatação de valor para Real Brasileiro
+                const valorFormatado = (parseFloat(item.valorTotal) || 0).toFixed(2).replace('.', ',');
+
+                html += `
+                    <tr>
+                        <td><strong>#${item.id}</strong></td>
+                        <td>${item.solicitante}</td>
+                        <td>${item.competencia}</td>
+                        <td>R$ ${valorFormatado}</td>
+                        <td>${item.status}</td>
+                        <td>${item.progresso || 'N/A'}</td>
+                        <td>${item.quemFaz || 'N/A'}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            searchResultsDiv.innerHTML = html;
+        }
+
 
         // =======================================================================
         // INICIALIZAÇÃO E EVENTOS
