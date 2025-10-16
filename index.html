@@ -485,7 +485,7 @@
         });
 
         // =======================================================================
-        // LÓGICA DE BUSCA E RASTREAMENTO (Seção 4) - NOVO CÓDIGO AQUI
+        // LÓGICA DE BUSCA E RASTREAMENTO (Seção 4) - CÓDIGO MODIFICADO ABAIXO
         // =======================================================================
         const btnSearch = document.getElementById('btnSearch');
         const searchQueryInput = document.getElementById('searchQuery');
@@ -532,6 +532,7 @@
             }
         }
 
+        // 🧠 FUNÇÃO MODIFICADA: Remove Progresso, Adiciona Quem Faz (Z) e Descrição (W)
         function renderSearchResults(results) {
             if (results.length === 0) {
                 searchResultsDiv.innerHTML = '<p id="searchPlaceholder">Nenhum pedido encontrado com este critério.</p>';
@@ -547,8 +548,8 @@
                         <th>Competência</th>
                         <th>Valor Total</th>
                         <th>Status (V)</th>
-                        <th>Progresso (Z)</th>
-                        <th>Quem Faz (AA)</th>
+                        <th>Quem Está Fazendo (Z)</th> 
+                        <th>Descrição / Justificativa (W)</th> 
                     </tr>
                 </thead>
                 <tbody>
@@ -565,8 +566,8 @@
                         <td>${item.competencia}</td>
                         <td>R$ ${valorFormatado}</td>
                         <td>${item.status}</td>
-                        <td>${item.progresso || 'N/A'}</td>
                         <td>${item.quemFaz || 'N/A'}</td>
+                        <td>${item.descricao || 'N/A'}</td>
                     </tr>
                 `;
             });
