@@ -16,7 +16,6 @@
         header { background-color: var(--primary-color); color: white; padding: 20px 0; text-align: center; margin-bottom: 30px; }
         .container { max-width: 1200px; margin: auto; padding: 30px; background: white; border-radius: 6px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
         h2 { color: var(--primary-color); border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 25px; font-size: 1.5em; }
-        /* GRID MUDOU PARA 4 COLUNAS POR CAUSA DO NOVO CAMPO EMAIL */
         .section-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; } 
         .input-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.95em; color: #555; }
@@ -27,25 +26,17 @@
         input:focus, select:focus, textarea:focus { border-color: var(--primary-color); outline: none; }
         textarea { resize: vertical; min-height: 100px; }
         
-        /* ESTILOS DA SEÇÃO DE RATEIO (EM LINHA) */
-        /* Ajuste do CSS para a nova estrutura de 3 colunas (Nível 1, Centro, Valor) */
         .rateio-header { display: flex; font-weight: 600; margin-bottom: 10px; padding: 0 10px; color: var(--primary-color); font-size: 0.9em;}
-        .rateio-header div { flex-grow: 1; margin-right: 10px; }
-        
-        /* Novos tamanhos para a estrutura Nível 1, Centro, Valor */
-        .rateio-header div[style*="flex-grow: 4;"] { flex-grow: 4; } 
+        .rateio-header div { flex: 1; margin-right: 10px; }
         .rateio-header .header-valor { flex: 0 0 100px; } 
         .rateio-header .header-remover { flex: 0 0 30px; } 
 
         .rateio-item { display: flex; gap: 10px; margin-bottom: 15px; border: 1px solid #eee; padding: 10px; border-radius: 4px; align-items: center; }
-        .rateio-item select, .rateio-item input { flex-grow: 1; }
+        .rateio-item .select-container, .rateio-item input { flex: 1; }
         
-        .rateio-item .select-container[style*="flex-grow: 4;"] { flex-grow: 4; }
-
         .rateio-item .input-valor { flex: 0 0 100px; }
-        /* Fim dos ajustes de Rateio */
 
-        .btn-add-line { background-color: #5cb85c; margin-top: 15px; }
+        .btn-add-line { background-color: #5cb85c; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; margin-top: 15px; font-weight: bold; }
         .btn-add-line:hover { background-color: #4cae4c; }
         .btn-remove-line { background-color: #dc3545; color: white; padding: 8px 10px; border: none; border-radius: 4px; cursor: pointer; flex: 0 0 30px;}
         .btn-remove-line:hover { background-color: #c9303d; }
@@ -59,80 +50,24 @@
         .error { background-color: #f8d7da; color: var(--error-color); border: 1px solid #f5c6cb; }
         .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; font-size: 1.2em; color: var(--primary-color); display: none; }
 
-        /* NOVO CSS para a seção de busca e rastreamento */
-        .search-container {
-            max-width: 1200px;
-            margin-top: 0; 
-            margin-bottom: 30px;
-            padding: 30px; 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
-        }
-        .search-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        #searchQuery {
-            flex-grow: 1;
-            padding: 10px;
-        }
-        #btnSearch {
-            background-color: var(--success-color);
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-        #btnSearch:hover {
-            background-color: #1e7e34;
-        }
-        .results-table-container {
-            margin-top: 20px;
-        }
-        .results-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .results-table th, .results-table td {
-            border: 1px solid #eee;
-            padding: 10px;
-            text-align: left;
-            font-size: 0.9em;
-        }
-        .results-table th {
-            background-color: #f1f1f1;
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-        .results-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        #searchPlaceholder {
-            text-align: center;
-            color: #888;
-            padding: 15px;
-        }
-        /* FIM NOVO CSS */
+        .search-container { max-width: 1200px; margin-top: 0; margin-bottom: 30px; padding: 30px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+        .search-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+        #searchQuery { flex-grow: 1; padding: 10px; }
+        #btnSearch { background-color: var(--success-color); color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background-color 0.3s; }
+        #btnSearch:hover { background-color: #1e7e34; }
+        .results-table-container { margin-top: 20px; }
+        .results-table { width: 100%; border-collapse: collapse; }
+        .results-table th, .results-table td { border: 1px solid #eee; padding: 10px; text-align: left; font-size: 0.9em; }
+        .results-table th { background-color: #f1f1f1; color: var(--primary-color); font-weight: 600; }
+        .results-table tr:nth-child(even) { background-color: #f9f9f9; }
+        #searchPlaceholder { text-align: center; color: #888; padding: 15px; }
         
-        /* 🎨 NOVO CSS PARA STATUS (Cores e Tags) 🎨 */
-        .status-tag {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            font-weight: 700;
-            white-space: nowrap;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-        }
-        .status-pendente { background-color: #ffc107; color: #333; } /* Amarelo */
-        .status-em_andamento { background-color: #17a2b8; color: white; } /* Azul Claro/Ciano */
-        .status-finalizado { background-color: #28a745; color: white; } /* Verde */
-        .status-duvida_enviada { background-color: #fd7e14; color: white; } /* Laranja */
-        .status-nao_encontrado { background-color: #6c757d; color: white; } /* Cinza (para qualquer outro status) */
-        /* FIM CSS STATUS */
+        .status-tag { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 0.85em; font-weight: 700; white-space: nowrap; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); }
+        .status-pendente { background-color: #ffc107; color: #333; }
+        .status-em_andamento { background-color: #17a2b8; color: white; }
+        .status-finalizado { background-color: #28a745; color: white; }
+        .status-duvida_enviada { background-color: #fd7e14; color: white; }
+        .status-nao_encontrado { background-color: #6c757d; color: white; }
     </style>
 </head>
 <body>
@@ -147,9 +82,8 @@
             <input type="text" id="searchQuery" placeholder="Pesquisar por ID ou Solicitante..." />
             <button type="button" id="btnSearch">Buscar Pedidos</button>
         </div>
-        
         <div id="searchResults" class="results-table-container">
-            <p id="searchPlaceholder">Use o campo acima para buscar pedidos pelo ID (ex: 12345) ou pelo nome do solicitante.</p>
+            <p id="searchPlaceholder">Use o campo acima para buscar pedidos.</p>
         </div>
     </div>
     <div class="container">
@@ -194,20 +128,19 @@
             <h2>2. Detalhamento e Rateio da Conta</h2>
             
             <div class="rateio-header">
-                <div style="flex-grow: 4;">Nível 1 (Área)</div>
-                <div style="flex-grow: 4;">Centro</div>
+                <div>Nível 1 (Área)</div>
+                <div>Nível 2</div>
+                <div>Nível 3</div>
+                <div>Nível 4</div>
+                <div>Centro</div>
                 <div class="header-valor">Valor Rateado</div>
                 <div class="header-remover"></div>
             </div>
             
-            <div id="rateio-container">
-            </div>
+            <div id="rateio-container"></div>
             
             <button type="button" class="btn-add-line" id="add-rateio-line">Fazer Rateio (Adicionar Linha)</button>
             
-            <input type="hidden" id="numRateios" name="numRateios" value="0">
-
-
             <h2>3. Descrição e Anexos</h2>
             <div class="input-group">
                 <label for="justificativa">Descrição Detalhada da Reclassificação:</label>
@@ -229,23 +162,17 @@
         // =======================================================================
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8H2P6Mur5XroK3kvtuXVppW4-utOEZ4eXm080vLonQwrPey2YhAXBK_50hZl1gqLL/exec'; 
         
-        // Variáveis de Controle
+        // Variáveis de Controle Globais
         const submissionForm = document.getElementById("submission-form");
         const formMessage = document.getElementById("form-message");
         const loadingOverlay = document.getElementById("loading-overlay");
         const rateioContainer = document.getElementById('rateio-container');
-        let allOptionsData = []; // Matriz completa da aba 'Opcoes'
-
-        // Mapeamento dos Seletores Fixos
-        const fixedSelects = {
-            'Competência': document.getElementById('competencia'),
-            'Área Destino': document.getElementById('areaDestino') 
-        };
+        let cascadingOptionsData = []; // Matriz da aba 'Opcoes' para N1-N4
+        let centroData = []; // Matriz da aba 'centros' para N1->Centro
 
         // =======================================================================
         // FUNÇÕES UTILITÁRIAS
         // =======================================================================
-
         function showMessage(type, message) {
             formMessage.style.display = 'block';
             formMessage.className = `message-box ${type}`;
@@ -253,8 +180,8 @@
         }
 
         function populateSelect(selectElement, options, initialText = 'Selecione') {
-            selectElement.innerHTML = `<option value="" selected>${initialText}</option>`; // Removido 'disabled'
-            const uniqueOptions = [...new Set(options.filter(Boolean))]; 
+            selectElement.innerHTML = `<option value="" disabled selected>${initialText}</option>`;
+            const uniqueOptions = [...new Set(options.filter(Boolean))].sort();
             
             uniqueOptions.forEach(option => {
                 const opt = document.createElement('option');
@@ -262,114 +189,107 @@
                 opt.textContent = option;
                 selectElement.appendChild(opt);
             });
-            selectElement.disabled = (uniqueOptions.length === 0);
+            selectElement.disabled = (uniqueOptions.length === 0 && initialText !== 'Selecione');
         }
 
         // =======================================================================
-        // LÓGICA DE CASCATA E RATEIO - NOVO CÓDIGO
+        // LÓGICA DE CASCATA E RATEIO
         // =======================================================================
-
         function createRateioLine() {
-            const lineId = Date.now(); // ID único para a linha
+            const lineId = Date.now();
             const div = document.createElement('div');
             div.className = 'rateio-item';
             div.id = `line-${lineId}`;
             
-            let html = '';
-            
-            // NOVO: Apenas o Seletor Nível 1 (Área)
-            html += `
-                <div class="select-container" style="flex-grow: 4;">
-                    <select 
-                        name="nivel1" 
-                        id="nivel1-${lineId}" 
-                        data-line-id="${lineId}"
-                        required
-                    >
-                        <option value="">Carregando Nível 1...</option>
-                    </select>
+            let html = `
+                <div class="select-container">
+                    <select name="nivel1" id="nivel1-${lineId}" data-level="1" required></select>
                 </div>
-            `;
-
-            // NOVO: Seletor de Centro (dependente do Nível 1)
-            html += `
-                <div class="select-container" style="flex-grow: 4;">
-                    <select 
-                        name="centro" 
-                        id="centro-${lineId}" 
-                        data-line-id="${lineId}"
-                        required
-                        disabled
-                    >
-                        <option value="">Selecione o Nível 1 primeiro</option>
-                    </select>
+                <div class="select-container">
+                    <select name="nivel2" id="nivel2-${lineId}" data-level="2" required disabled><option value="">Selecione N1</option></select>
                 </div>
-            `;
-
-            // Campo de Input Valor
-            html += `
+                <div class="select-container">
+                    <select name="nivel3" id="nivel3-${lineId}" data-level="3" required disabled><option value="">Selecione N2</option></select>
+                </div>
+                <div class="select-container">
+                    <select name="nivel4" id="nivel4-${lineId}" data-level="4" required disabled><option value="">Selecione N3</option></select>
+                </div>
+                <div class="select-container">
+                    <select name="centro" id="centro-${lineId}" required disabled><option value="">Selecione N1</option></select>
+                </div>
                 <div class="input-valor">
                     <input type="number" step="0.01" name="valorRateio" placeholder="Valor" required>
                 </div>
-            `;
-
-            // Botão de Remover
-            html += `
-                <button type="button" class="btn-remove-line" onclick="removeRateioLine('${div.id}')">X</button>
+                <button type="button" class="btn-remove-line" onclick="this.parentElement.remove()">X</button>
             `;
 
             div.innerHTML = html;
             rateioContainer.appendChild(div);
 
-            // 1. Inicializa o Nível 1 desta nova linha
-            const nivel1Select = document.getElementById(`nivel1-${lineId}`);
-            // Nível 1 está na Coluna 1 (Índice 0) da matriz allOptionsData
-            const nivel1Options = allOptionsData.map(row => row[0]); 
-            populateSelect(nivel1Select, nivel1Options, 'Nível 1');
-            nivel1Select.disabled = false;
+            // Popula Nível 1
+            const nivel1Select = div.querySelector('select[name="nivel1"]');
+            const nivel1Options = [...new Set(cascadingOptionsData.map(row => row[0]))];
+            populateSelect(nivel1Select, nivel1Options, 'Selecione Nível 1');
 
-            // 2. Adiciona o Event Listener de CASCATA para o NÍVEL 1
-            nivel1Select.addEventListener('change', () => filterAndPopulateLine(lineId));
+            // Adiciona listeners para a cascata
+            nivel1Select.addEventListener('change', () => {
+                updateCascadingSelects(lineId, 1); // Filtra N2
+                filterCentroForRow(lineId); // Filtra o Centro
+            });
+            div.querySelector('select[name="nivel2"]').addEventListener('change', () => updateCascadingSelects(lineId, 2));
+            div.querySelector('select[name="nivel3"]').addEventListener('change', () => updateCascadingSelects(lineId, 3));
         }
 
-        // Remove a linha do DOM
-        function removeRateioLine(lineId) {
-            const line = document.getElementById(lineId);
-            if (line) {
-                rateioContainer.removeChild(line);
+        function updateCascadingSelects(lineId, currentLevel) {
+            const nextLevel = currentLevel + 1;
+            if (nextLevel > 4) return; // Não há Nível 5
+
+            // Reseta os níveis seguintes
+            for (let i = nextLevel; i <= 4; i++) {
+                const selectToReset = document.getElementById(`nivel${i}-${lineId}`);
+                selectToReset.innerHTML = `<option value="">Selecione N${i-1}</option>`;
+                selectToReset.disabled = true;
             }
-        }
 
-        // FUNÇÃO DE FILTRO SIMPLIFICADA (Nível 1 -> Centro)
-        function filterAndPopulateLine(lineId) {
+            // Coleta a cadeia de filtros (N1, N2, etc.)
+            const selectedChain = [];
+            for (let i = 1; i <= currentLevel; i++) {
+                selectedChain.push(document.getElementById(`nivel${i}-${lineId}`).value);
+            }
+            
+            // Filtra as opções
+            let filteredOptions = cascadingOptionsData;
+            selectedChain.forEach((value, index) => {
+                if (value) {
+                    filteredOptions = filteredOptions.filter(row => row[index] === value);
+                }
+            });
+
+            const nextOptions = [...new Set(filteredOptions.map(row => row[currentLevel]))];
+            const nextSelect = document.getElementById(`nivel${nextLevel}-${lineId}`);
+            populateSelect(nextSelect, nextOptions, `Selecione Nível ${nextLevel}`);
+        }
+        
+        function filterCentroForRow(lineId) {
             const nivel1Select = document.getElementById(`nivel1-${lineId}`);
             const centroSelect = document.getElementById(`centro-${lineId}`);
             const selectedNivel1 = nivel1Select.value;
-            
-            // Zera o seletor de Centro
-            centroSelect.innerHTML = `<option value="" selected>Selecione o Centro</option>`;
+
+            centroSelect.innerHTML = '<option value="">Selecione N1</option>';
             centroSelect.disabled = true;
 
-            if (!selectedNivel1) {
-                return; // Não faz nada se o Nível 1 não foi selecionado
+            if (selectedNivel1) {
+                // Filtra a matriz 'centroData' [ [area, centro], [area, centro] ]
+                const filteredCentros = centroData
+                    .filter(row => row[0] === selectedNivel1) // Filtra pela Área/N1
+                    .map(row => row[1]); // Pega apenas o nome do Centro
+                populateSelect(centroSelect, filteredCentros, 'Selecione o Centro');
             }
-
-            // 1. Filtra a Matriz 'allOptionsData' apenas pelo Nível 1 (Índice 0)
-            let filteredOptions = allOptionsData.filter(row => row[0] === selectedNivel1);
-            
-            // 2. Mapeia para pegar apenas os Centros (que estão na Coluna 2 / Índice 1 da aba Opcoes)
-            const centroOptions = filteredOptions.map(row => row[1]).filter(Boolean); 
-            
-            // 3. Popula o seletor de Centro
-            populateSelect(centroSelect, centroOptions, 'Selecione o Centro');
-            centroSelect.disabled = false;
         }
-
 
         // =======================================================================
         // LÓGICA DE CARREGAMENTO INICIAL
         // =======================================================================
-
         async function loadOptionsAndFixedLists() {
             loadingOverlay.style.display = 'flex';
             try {
@@ -377,121 +297,93 @@
                 const data = await response.json();
 
                 if (data.result === 'success') {
-                    // allOptionsData tem [Nível 1, Centro, Nível 2, Nível 3, ...]
-                    allOptionsData = data.cascadingOptions; 
+                    cascadingOptionsData = data.cascadingOptions;
+                    centroData = data.centroData;
 
-                    for (const header in fixedSelects) {
-                        const options = data.fixedLists[header] || [];
-                        if (fixedSelects[header]) {
-                            populateSelect(fixedSelects[header], options, `Selecione a ${header}`);
-                            fixedSelects[header].disabled = false;
+                    const fixedLists = data.fixedLists;
+                    for (const header in fixedLists) {
+                        const selectElement = document.getElementById(header.toLowerCase().replace(' ', '')); // Ex: 'Área Destino' -> 'areadestino'
+                        if (selectElement) {
+                            populateSelect(selectElement, fixedLists[header], `Selecione a ${header}`);
+                            selectElement.disabled = false;
                         }
                     }
-
                     if (rateioContainer.children.length === 0) {
                         createRateioLine();
                     }
-                    
                 } else {
-                    showMessage('error', `Erro ao carregar opções: ${data.error || 'Resposta inválida do servidor.'}`);
+                    showMessage('error', `Erro ao carregar opções: ${data.error}`);
                 }
             } catch (error) {
-                console.error('Erro ao carregar opções:', error);
-                showMessage('error', 'Falha na conexão com o Apps Script. Verifique a URL e o Deploy.');
+                showMessage('error', 'Falha na conexão. Verifique a URL do Apps Script e o Deploy.');
             } finally {
                 loadingOverlay.style.display = 'none';
             }
         }
 
         // =======================================================================
-        // FUNÇÃO 1: Coleta e estrutura os dados de rateio em um array JSON (AJUSTADA)
+        // LÓGICA DE COLETA E ENVIO
         // =======================================================================
         function collectRateioData() {
             const rateioLines = document.querySelectorAll('#rateio-container .rateio-item');
             const rateioData = [];
-
             rateioLines.forEach(line => {
-                const data = {};
-                // Captura Nível 1
-                data.nivel1 = line.querySelector('select[name="nivel1"]').value || '';
-                
-                // Níveis 2, 3, 4 e 5 são vazios
-                data.nivel2 = '';
-                data.nivel3 = '';
-                data.nivel4 = '';
-                data.nivel5 = '';
-
-                // Captura Centro do NOVO seletor
-                const centroInput = line.querySelector('select[name="centro"]');
-                const valorInput = line.querySelector('input[name="valorRateio"]');
-
-                data.centro = centroInput ? centroInput.value.trim() : ''; 
-                data.valorRateio = valorInput ? parseFloat(valorInput.value) || 0 : 0;
-                
+                const data = {
+                    nivel1: line.querySelector('select[name="nivel1"]').value || '',
+                    nivel2: line.querySelector('select[name="nivel2"]').value || '',
+                    nivel3: line.querySelector('select[name="nivel3"]').value || '',
+                    nivel4: line.querySelector('select[name="nivel4"]').value || '',
+                    centro: line.querySelector('select[name="centro"]').value || '',
+                    valorRateio: parseFloat(line.querySelector('input[name="valorRateio"]').value) || 0
+                };
                 rateioData.push(data);
             });
-            
             return JSON.stringify(rateioData);
         }
         
-        // =======================================================================
-        // FUNÇÃO 2: LÓGICA DE ENVIO DO FORMULÁRIO (doPost)
-        // =======================================================================
         submissionForm.addEventListener("submit", async function(event) {
             event.preventDefault(); 
             const submitButton = submissionForm.querySelector('button.btn-submit');
 
-            // ⚠️ Validação de Soma 
             const valorTotalDoc = parseFloat(document.getElementById('valorTotal').value) || 0;
-            const rateioInputs = document.querySelectorAll('input[name="valorRateio"]');
             let somaRateio = 0;
-            rateioInputs.forEach(input => {
+            document.querySelectorAll('input[name="valorRateio"]').forEach(input => {
                 somaRateio += parseFloat(input.value) || 0;
             });
 
             if (Math.abs(valorTotalDoc - somaRateio) > 0.01) {
-                showMessage('error', `Erro de Rateio: O Valor Total do Documento (${valorTotalDoc.toFixed(2)}) não corresponde à soma dos rateios (${somaRateio.toFixed(2)}).`);
+                showMessage('error', `Erro de Rateio: O Valor Total (${valorTotalDoc.toFixed(2)}) não corresponde à soma dos rateios (${somaRateio.toFixed(2)}).`);
                 return;
             }
 
             submitButton.disabled = true;
-            submitButton.textContent = 'Enviando Pedido...';
-            showMessage('loading', 'Processando sua solicitação (incluindo anexos, se houver)...');
+            submitButton.textContent = 'Enviando...';
+            showMessage('loading', 'Processando solicitação...');
             
-            // NOVO MÉTODO: Coleta todos os campos e anexa o JSON do rateio
             const formData = new FormData(submissionForm);
-            
-            // Adiciona o JSON do rateio (que será lido pelo doPost)
             formData.append('rateioJson', collectRateioData()); 
             
-            // Remove os campos de rateio individuais vazios para evitar poluir o Apps Script
-            // Apenas Nível 1 e Centro precisam ser removidos pois agora são seletores.
-            const rateioLineFields = ['nivel1', 'nivel2', 'nivel3', 'nivel4', 'nivel5', 'centro', 'valorRateio']; 
-            rateioLineFields.forEach(name => formData.delete(name));
-            formData.delete('numRateios'); // Remove o campo hidden desnecessário para o Apps Script
+            // Limpa campos individuais para não serem enviados
+            ['nivel1', 'nivel2', 'nivel3', 'nivel4', 'centro', 'valorRateio'].forEach(name => formData.delete(name));
             
             try {
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST', 
-                    body: formData // FormData é usado para enviar arquivos
+                    body: formData
                 });
-
-                if (!response.ok) { throw new Error('Erro de rede ou servidor Apps Script.'); }
+                if (!response.ok) throw new Error('Erro de rede ou servidor.');
                 const responseData = await response.json();
 
                 if (responseData && responseData.result === "success") {
-                    // Mensagem de sucesso atualizada
-                    showMessage('success', `✅ Sucesso! Seu pedido foi registrado. ID do Documento: **#${responseData.id}**. Seus anexos foram salvos.`);
+                    showMessage('success', `✅ Sucesso! Pedido registrado. ID do Documento: <strong>#${responseData.id}</strong>.`);
                     submissionForm.reset(); 
                     rateioContainer.innerHTML = ''; 
-                    loadOptionsAndFixedLists(); 
+                    createRateioLine();
                 } else {
-                    throw new Error(responseData.error || "Resposta inesperada do servidor Apps Script.");
+                    throw new Error(responseData.error || "Resposta inesperada.");
                 }
-
             } catch (error) {
-                console.error('Erro:', error);
-                showMessage('error', "Ops! Houve um erro no envio. Verifique a URL do Apps Script, o Deploy e o console do navegador.");
+                showMessage('error', `Ops! Houve um erro no envio. Verifique a URL e o Deploy.`);
             } finally {
                 submitButton.disabled = false;
                 submitButton.textContent = 'Enviar Pedido de Reclassificação';
@@ -499,80 +391,60 @@
         });
 
         // =======================================================================
-        // LÓGICA DE BUSCA E RASTREAMENTO (Seção 4)
+        // LÓGICA DE BUSCA E RASTREAMENTO
         // =======================================================================
         const btnSearch = document.getElementById('btnSearch');
         const searchQueryInput = document.getElementById('searchQuery');
         const searchResultsDiv = document.getElementById('searchResults');
 
         btnSearch.addEventListener('click', handleSearch);
-        searchQueryInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                handleSearch();
-            }
-        });
+        searchQueryInput.addEventListener('keypress', e => { if (e.key === 'Enter') { e.preventDefault(); handleSearch(); }});
 
         async function handleSearch() {
             const query = searchQueryInput.value.trim();
-
             if (query.length < 3) {
-                searchResultsDiv.innerHTML = '<p class="error message-box">Digite pelo menos **3 caracteres** (ID ou Nome) para buscar.</p>';
+                searchResultsDiv.innerHTML = '<p class="error message-box">Digite pelo menos 3 caracteres.</p>';
                 return;
             }
 
             btnSearch.disabled = true;
             btnSearch.textContent = 'Buscando...';
-            searchResultsDiv.innerHTML = '<p id="searchPlaceholder">Aguarde, pesquisando no sistema...</p>';
+            searchResultsDiv.innerHTML = '<p id="searchPlaceholder">Aguarde, pesquisando...</p>';
 
             try {
-                // Chama a função search_requests no Apps Script
                 const url = `${APPS_SCRIPT_URL}?action=search_requests&query=${encodeURIComponent(query)}`;
                 const response = await fetch(url);
                 const data = await response.json();
-
                 if (data.result === 'success') {
                     renderSearchResults(data.data);
                 } else {
-                    searchResultsDiv.innerHTML = `<p class="error message-box">Erro: ${data.error || 'Falha ao buscar dados.'}</p>`;
+                    searchResultsDiv.innerHTML = `<p class="error message-box">Erro: ${data.error}.</p>`;
                 }
-
             } catch (error) {
-                console.error('Erro na busca:', error);
-                searchResultsDiv.innerHTML = '<p class="error message-box">Falha na conexão com o Apps Script ou erro de rede.</p>';
+                searchResultsDiv.innerHTML = '<p class="error message-box">Falha na conexão.</p>';
             } finally {
                 btnSearch.disabled = false;
                 btnSearch.textContent = 'Buscar Pedidos';
             }
         }
         
-        // 🧠 NOVA FUNÇÃO: Mapeia o status para emoji e cor
         function getStatusInfo(status) {
-            // Normaliza o status (remove acentos, espaços e transforma em lowercase)
             const s = status ? status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, '_') : 'nao_encontrado';
-            
             switch (s) {
-                case 'pendente':
-                    return { emoji: '⏳', class: 'status-pendente', label: 'Pendente' };
-                case 'em_andamento':
-                    return { emoji: '⚙️', class: 'status-em_andamento', label: 'Em Andamento' };
-                case 'finalizado':
-                    return { emoji: '✅', class: 'status-finalizado', label: 'Finalizado' };
+                case 'pendente': return { emoji: '⏳', class: 'status-pendente', label: 'Pendente' };
+                case 'em_andamento': return { emoji: '⚙️', class: 'status-em_andamento', label: 'Em Andamento' };
+                case 'finalizado': return { emoji: '✅', class: 'status-finalizado', label: 'Finalizado' };
                 case 'duvida_enviada_no_email_do_solicitante':
-                case 'duvida_enviada': // Adicionando uma variação mais curta para segurança
-                    return { emoji: '📧', class: 'status-duvida_enviada', label: 'Dúvida Enviada' };
-                default:
-                    return { emoji: '❓', class: 'status-nao_encontrado', label: status || 'Status Indefinido' };
+                case 'duvida_enviada': return { emoji: '📧', class: 'status-duvida_enviada', label: 'Dúvida Enviada' };
+                default: return { emoji: '❓', class: 'status-nao_encontrado', label: status || 'Indefinido' };
             }
         }
 
-        // 🧠 FUNÇÃO MODIFICADA: Renderiza resultados com tags de status e novo cabeçalho
         function renderSearchResults(results) {
             if (results.length === 0) {
-                searchResultsDiv.innerHTML = '<p id="searchPlaceholder">Nenhum pedido encontrado com este critério.</p>';
+                searchResultsDiv.innerHTML = '<p id="searchPlaceholder">Nenhum pedido encontrado.</p>';
                 return;
             }
-
             let html = '<table class="results-table">';
             html += `
                 <thead>
@@ -580,47 +452,37 @@
                         <th>ID</th>
                         <th>Solicitante</th>
                         <th>Competência (MM/AAAA)</th> <th>Valor Total</th>
-                        <th>Status (U)</th>
-                        <th>Quem Está Fazendo (Y)</th> 
-                        <th>Descrição / Justificativa (V)</th> 
+                        <th>Status</th>
+                        <th>Quem Faz</th> 
+                        <th>Descrição</th> 
                     </tr>
                 </thead>
                 <tbody>
             `;
-
             results.forEach(item => {
-                // Formatação de valor para Real Brasileiro
-                const valorFormatado = (parseFloat(item.valorTotal) || 0).toFixed(2).replace('.', ',');
-                const statusInfo = getStatusInfo(item.status); // Pega as informações de status e formatação
-
+                const valorFormatado = (parseFloat(item.valorTotal) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                const statusInfo = getStatusInfo(item.status);
                 html += `
                     <tr>
                         <td><strong>#${item.id}</strong></td>
                         <td>${item.solicitante}</td>
                         <td>${item.competencia}</td>
-                        <td>R$ ${valorFormatado}</td>
-                        <td>
-                            <span class="status-tag ${statusInfo.class}">
-                                ${statusInfo.emoji} ${statusInfo.label}
-                            </span>
-                        </td>
+                        <td>${valorFormatado}</td>
+                        <td><span class="status-tag ${statusInfo.class}">${statusInfo.emoji} ${statusInfo.label}</span></td>
                         <td>${item.quemFaz || 'N/A'}</td>
                         <td>${item.descricao || 'N/A'}</td>
                     </tr>
                 `;
             });
-
             html += '</tbody></table>';
             searchResultsDiv.innerHTML = html;
         }
-
 
         // =======================================================================
         // INICIALIZAÇÃO E EVENTOS
         // =======================================================================
         document.getElementById('add-rateio-line').addEventListener('click', createRateioLine);
         document.addEventListener('DOMContentLoaded', loadOptionsAndFixedLists);
-
     </script>
 </body>
 </html>
