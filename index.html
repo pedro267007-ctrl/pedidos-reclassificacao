@@ -55,14 +55,14 @@
         #searchQuery { flex-grow: 1; padding: 10px; }
         #btnSearch { background-color: var(--success-color); color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background-color 0.3s; }
         #btnSearch:hover { background-color: #1e7e34; }
-        .results-table-container { margin-top: 20px; }
+        .results-table-container { margin-top: 20px; overflow-x: auto; }
         .results-table { width: 100%; border-collapse: collapse; }
         .results-table th, .results-table td { border: 1px solid #eee; padding: 10px; text-align: left; font-size: 0.9em; }
         .results-table th { background-color: #f1f1f1; color: var(--primary-color); font-weight: 600; }
         .results-table tr:nth-child(even) { background-color: #f9f9f9; }
         #searchPlaceholder { text-align: center; color: #888; padding: 15px; }
         
-        .status-tag { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 0.85em; font-weight: 700; white-space: nowrap; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); }
+        .status-tag { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 0.85em; font-weight: 700; white-space: nowrap; }
         .status-pendente { background-color: #ffc107; color: #333; }
         .status-em_andamento { background-color: #17a2b8; color: white; }
         .status-finalizado { background-color: #28a745; color: white; }
@@ -157,22 +157,15 @@
     </div>
 
     <script>
-        // =======================================================================
-        // 🛑 COLE O SEU URL DA WEB APP DO APPS SCRIPT AQUI
-        // =======================================================================
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8H2P6Mur5XroK3kvtuXVppW4-utOEZ4eXm080vLonQwrPey2YhAXBK_50hZl1gqLL/exec'; 
         
-        // Variáveis de Controle Globais
         const submissionForm = document.getElementById("submission-form");
         const formMessage = document.getElementById("form-message");
         const loadingOverlay = document.getElementById("loading-overlay");
         const rateioContainer = document.getElementById('rateio-container');
-        let cascadingOptionsData = []; // Matriz da aba 'Opcoes' para N1-N4
-        let centroData = []; // Matriz da aba 'centros' para N1->Centro
+        let cascadingOptionsData = [];
+        let centroData = [];
 
-        // =======================================================================
-        // FUNÇÕES UTILITÁRIAS
-        // =======================================================================
         function showMessage(type, message) {
             formMessage.style.display = 'block';
             formMessage.className = `message-box ${type}`;
@@ -182,59 +175,39 @@
         function populateSelect(selectElement, options, initialText = 'Selecione') {
             selectElement.innerHTML = `<option value="" disabled selected>${initialText}</option>`;
             const uniqueOptions = [...new Set(options.filter(Boolean))].sort();
-            
             uniqueOptions.forEach(option => {
                 const opt = document.createElement('option');
                 opt.value = option;
                 opt.textContent = option;
                 selectElement.appendChild(opt);
             });
-            selectElement.disabled = (uniqueOptions.length === 0 && initialText !== 'Selecione');
+            selectElement.disabled = (uniqueOptions.length === 0 && !selectElement.multiple);
         }
 
-        // =======================================================================
-        // LÓGICA DE CASCATA E RATEIO
-        // =======================================================================
         function createRateioLine() {
             const lineId = Date.now();
             const div = document.createElement('div');
             div.className = 'rateio-item';
             div.id = `line-${lineId}`;
             
-            let html = `
-                <div class="select-container">
-                    <select name="nivel1" id="nivel1-${lineId}" data-level="1" required></select>
-                </div>
-                <div class="select-container">
-                    <select name="nivel2" id="nivel2-${lineId}" data-level="2" required disabled><option value="">Selecione N1</option></select>
-                </div>
-                <div class="select-container">
-                    <select name="nivel3" id="nivel3-${lineId}" data-level="3" required disabled><option value="">Selecione N2</option></select>
-                </div>
-                <div class="select-container">
-                    <select name="nivel4" id="nivel4-${lineId}" data-level="4" required disabled><option value="">Selecione N3</option></select>
-                </div>
-                <div class="select-container">
-                    <select name="centro" id="centro-${lineId}" required disabled><option value="">Selecione N1</option></select>
-                </div>
-                <div class="input-valor">
-                    <input type="number" step="0.01" name="valorRateio" placeholder="Valor" required>
-                </div>
+            div.innerHTML = `
+                <div class="select-container"><select name="nivel1" id="nivel1-${lineId}" data-level="1" required></select></div>
+                <div class="select-container"><select name="nivel2" id="nivel2-${lineId}" data-level="2" disabled><option value="">Selecione N1</option></select></div>
+                <div class="select-container"><select name="nivel3" id="nivel3-${lineId}" data-level="3" disabled><option value="">Selecione N2</option></select></div>
+                <div class="select-container"><select name="nivel4" id="nivel4-${lineId}" data-level="4" disabled><option value="">Selecione N3</option></select></div>
+                <div class="select-container"><select name="centro" id="centro-${lineId}" required disabled><option value="">Selecione N1</option></select></div>
+                <div class="input-valor"><input type="number" step="0.01" name="valorRateio" placeholder="Valor" required></div>
                 <button type="button" class="btn-remove-line" onclick="this.parentElement.remove()">X</button>
             `;
-
-            div.innerHTML = html;
             rateioContainer.appendChild(div);
 
-            // Popula Nível 1
             const nivel1Select = div.querySelector('select[name="nivel1"]');
             const nivel1Options = [...new Set(cascadingOptionsData.map(row => row[0]))];
             populateSelect(nivel1Select, nivel1Options, 'Selecione Nível 1');
 
-            // Adiciona listeners para a cascata
             nivel1Select.addEventListener('change', () => {
-                updateCascadingSelects(lineId, 1); // Filtra N2
-                filterCentroForRow(lineId); // Filtra o Centro
+                updateCascadingSelects(lineId, 1);
+                filterCentroForRow(lineId);
             });
             div.querySelector('select[name="nivel2"]').addEventListener('change', () => updateCascadingSelects(lineId, 2));
             div.querySelector('select[name="nivel3"]').addEventListener('change', () => updateCascadingSelects(lineId, 3));
@@ -242,22 +215,21 @@
 
         function updateCascadingSelects(lineId, currentLevel) {
             const nextLevel = currentLevel + 1;
-            if (nextLevel > 4) return; // Não há Nível 5
+            if (nextLevel > 4) return;
 
-            // Reseta os níveis seguintes
             for (let i = nextLevel; i <= 4; i++) {
                 const selectToReset = document.getElementById(`nivel${i}-${lineId}`);
-                selectToReset.innerHTML = `<option value="">Selecione N${i-1}</option>`;
-                selectToReset.disabled = true;
+                if (selectToReset) {
+                    selectToReset.innerHTML = `<option value="">Selecione N${i - 1}</option>`;
+                    selectToReset.disabled = true;
+                }
             }
 
-            // Coleta a cadeia de filtros (N1, N2, etc.)
             const selectedChain = [];
             for (let i = 1; i <= currentLevel; i++) {
                 selectedChain.push(document.getElementById(`nivel${i}-${lineId}`).value);
             }
             
-            // Filtra as opções
             let filteredOptions = cascadingOptionsData;
             selectedChain.forEach((value, index) => {
                 if (value) {
@@ -267,7 +239,9 @@
 
             const nextOptions = [...new Set(filteredOptions.map(row => row[currentLevel]))];
             const nextSelect = document.getElementById(`nivel${nextLevel}-${lineId}`);
-            populateSelect(nextSelect, nextOptions, `Selecione Nível ${nextLevel}`);
+            if (nextSelect) {
+                populateSelect(nextSelect, nextOptions, `Selecione Nível ${nextLevel}`);
+            }
         }
         
         function filterCentroForRow(lineId) {
@@ -279,17 +253,14 @@
             centroSelect.disabled = true;
 
             if (selectedNivel1) {
-                // Filtra a matriz 'centroData' [ [area, centro], [area, centro] ]
                 const filteredCentros = centroData
-                    .filter(row => row[0] === selectedNivel1) // Filtra pela Área/N1
-                    .map(row => row[1]); // Pega apenas o nome do Centro
+                    .filter(row => row[0] === selectedNivel1)
+                    .map(row => row[1]);
                 populateSelect(centroSelect, filteredCentros, 'Selecione o Centro');
             }
         }
 
-        // =======================================================================
-        // LÓGICA DE CARREGAMENTO INICIAL
-        // =======================================================================
+        // ✅ FUNÇÃO CORRIGIDA PARA RESOLVER O BUG DO CARREGAMENTO INFINITO
         async function loadOptionsAndFixedLists() {
             loadingOverlay.style.display = 'flex';
             try {
@@ -299,15 +270,23 @@
                 if (data.result === 'success') {
                     cascadingOptionsData = data.cascadingOptions;
                     centroData = data.centroData;
-
+                    
                     const fixedLists = data.fixedLists;
-                    for (const header in fixedLists) {
-                        const selectElement = document.getElementById(header.toLowerCase().replace(' ', '')); // Ex: 'Área Destino' -> 'areadestino'
-                        if (selectElement) {
-                            populateSelect(selectElement, fixedLists[header], `Selecione a ${header}`);
-                            selectElement.disabled = false;
-                        }
+                    
+                    // Preenche Competência
+                    const competenciaSelect = document.getElementById('competencia');
+                    if (competenciaSelect && fixedLists.competenciaList) {
+                        populateSelect(competenciaSelect, fixedLists.competenciaList, 'Selecione a Competência');
+                        competenciaSelect.disabled = false;
                     }
+                    
+                    // Preenche Área Destino
+                    const areaDestinoSelect = document.getElementById('areaDestino');
+                    if (areaDestinoSelect && fixedLists.areaDestinoList) {
+                        populateSelect(areaDestinoSelect, fixedLists.areaDestinoList, 'Selecione a Área Destino');
+                        areaDestinoSelect.disabled = false;
+                    }
+
                     if (rateioContainer.children.length === 0) {
                         createRateioLine();
                     }
@@ -321,9 +300,6 @@
             }
         }
 
-        // =======================================================================
-        // LÓGICA DE COLETA E ENVIO
-        // =======================================================================
         function collectRateioData() {
             const rateioLines = document.querySelectorAll('#rateio-container .rateio-item');
             const rateioData = [];
@@ -358,12 +334,10 @@
 
             submitButton.disabled = true;
             submitButton.textContent = 'Enviando...';
-            showMessage('loading', 'Processando solicitação...');
             
             const formData = new FormData(submissionForm);
             formData.append('rateioJson', collectRateioData()); 
             
-            // Limpa campos individuais para não serem enviados
             ['nivel1', 'nivel2', 'nivel3', 'nivel4', 'centro', 'valorRateio'].forEach(name => formData.delete(name));
             
             try {
@@ -390,9 +364,6 @@
             }
         });
 
-        // =======================================================================
-        // LÓGICA DE BUSCA E RASTREAMENTO
-        // =======================================================================
         const btnSearch = document.getElementById('btnSearch');
         const searchQueryInput = document.getElementById('searchQuery');
         const searchResultsDiv = document.getElementById('searchResults');
@@ -478,9 +449,6 @@
             searchResultsDiv.innerHTML = html;
         }
 
-        // =======================================================================
-        // INICIALIZAÇÃO E EVENTOS
-        // =======================================================================
         document.getElementById('add-rateio-line').addEventListener('click', createRateioLine);
         document.addEventListener('DOMContentLoaded', loadOptionsAndFixedLists);
     </script>
