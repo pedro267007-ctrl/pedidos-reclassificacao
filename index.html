@@ -56,11 +56,11 @@
 
         /* NOVO CSS para a seção de busca e rastreamento */
         .search-container {
-            max-width: 1200px; /* Mantém o tamanho do container principal */
-            margin-top: 0; /* Ajusta a margem para ficar junto ao header */
+            max-width: 1200px;
+            margin-top: 0; 
             margin-bottom: 30px;
-            padding: 30px; /* Usa o padding padrão */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Mantém o sombreamento */
+            padding: 30px; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
         }
         .search-bar {
             display: flex;
@@ -86,7 +86,6 @@
         }
         .results-table-container {
             margin-top: 20px;
-            /* Remove a borda para usar o padding do container */
         }
         .results-table {
             width: 100%;
@@ -112,6 +111,23 @@
             padding: 15px;
         }
         /* FIM NOVO CSS */
+        
+        /* 🎨 NOVO CSS PARA STATUS (Cores e Tags) 🎨 */
+        .status-tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 700;
+            white-space: nowrap;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .status-pendente { background-color: #ffc107; color: #333; } /* Amarelo */
+        .status-em_andamento { background-color: #17a2b8; color: white; } /* Azul Claro/Ciano */
+        .status-finalizado { background-color: #28a745; color: white; } /* Verde */
+        .status-duvida_enviada { background-color: #fd7e14; color: white; } /* Laranja */
+        .status-nao_encontrado { background-color: #6c757d; color: white; } /* Cinza (para qualquer outro status) */
+        /* FIM CSS STATUS */
     </style>
 </head>
 <body>
@@ -531,8 +547,28 @@
                 btnSearch.textContent = 'Buscar Pedidos';
             }
         }
+        
+        // 🧠 NOVA FUNÇÃO: Mapeia o status para emoji e cor
+        function getStatusInfo(status) {
+            // Normaliza o status (remove acentos, espaços e transforma em lowercase)
+            const s = status ? status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, '_') : 'nao_encontrado';
+            
+            switch (s) {
+                case 'pendente':
+                    return { emoji: '⏳', class: 'status-pendente', label: 'Pendente' };
+                case 'em_andamento':
+                    return { emoji: '⚙️', class: 'status-em_andamento', label: 'Em Andamento' };
+                case 'finalizado':
+                    return { emoji: '✅', class: 'status-finalizado', label: 'Finalizado' };
+                case 'duvida_enviada_no_email_do_solicitante':
+                case 'duvida_enviada': // Adicionando uma variação mais curta para segurança
+                    return { emoji: '📧', class: 'status-duvida_enviada', label: 'Dúvida Enviada' };
+                default:
+                    return { emoji: '❓', class: 'status-nao_encontrado', label: status || 'Status Indefinido' };
+            }
+        }
 
-        // 🧠 FUNÇÃO MODIFICADA: Remove Progresso, Adiciona Quem Faz (Z) e Descrição (W)
+        // 🧠 FUNÇÃO MODIFICADA: Renderiza resultados com tags de status e novo cabeçalho
         function renderSearchResults(results) {
             if (results.length === 0) {
                 searchResultsDiv.innerHTML = '<p id="searchPlaceholder">Nenhum pedido encontrado com este critério.</p>';
@@ -545,8 +581,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Solicitante</th>
-                        <th>Competência</th>
-                        <th>Valor Total</th>
+                        <th>Competência (MM/AAAA)</th> <th>Valor Total</th>
                         <th>Status (V)</th>
                         <th>Quem Está Fazendo (Z)</th> 
                         <th>Descrição / Justificativa (W)</th> 
@@ -558,6 +593,7 @@
             results.forEach(item => {
                 // Formatação de valor para Real Brasileiro
                 const valorFormatado = (parseFloat(item.valorTotal) || 0).toFixed(2).replace('.', ',');
+                const statusInfo = getStatusInfo(item.status); // Pega as informações de status e formatação
 
                 html += `
                     <tr>
@@ -565,7 +601,11 @@
                         <td>${item.solicitante}</td>
                         <td>${item.competencia}</td>
                         <td>R$ ${valorFormatado}</td>
-                        <td>${item.status}</td>
+                        <td>
+                            <span class="status-tag ${statusInfo.class}">
+                                ${statusInfo.emoji} ${statusInfo.label}
+                            </span>
+                        </td>
                         <td>${item.quemFaz || 'N/A'}</td>
                         <td>${item.descricao || 'N/A'}</td>
                     </tr>
