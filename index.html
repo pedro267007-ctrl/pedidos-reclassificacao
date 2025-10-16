@@ -28,17 +28,22 @@
         textarea { resize: vertical; min-height: 100px; }
         
         /* ESTILOS DA SEÇÃO DE RATEIO (EM LINHA) */
+        /* Ajuste do CSS para a nova estrutura de 3 colunas (Nível 1, Centro, Valor) */
         .rateio-header { display: flex; font-weight: 600; margin-bottom: 10px; padding: 0 10px; color: var(--primary-color); font-size: 0.9em;}
         .rateio-header div { flex-grow: 1; margin-right: 10px; }
-        .rateio-header .header-center, .rateio-header .header-valor { flex: 0 0 100px; } 
+        
+        /* Novos tamanhos para a estrutura Nível 1, Centro, Valor */
+        .rateio-header div[style*="flex-grow: 4;"] { flex-grow: 4; } 
+        .rateio-header .header-valor { flex: 0 0 100px; } 
         .rateio-header .header-remover { flex: 0 0 30px; } 
 
         .rateio-item { display: flex; gap: 10px; margin-bottom: 15px; border: 1px solid #eee; padding: 10px; border-radius: 4px; align-items: center; }
         .rateio-item select, .rateio-item input { flex-grow: 1; }
-        .rateio-item .select-container { flex-grow: 1; }
         
-        .rateio-item .input-center { flex: 0 0 100px; }
+        .rateio-item .select-container[style*="flex-grow: 4;"] { flex-grow: 4; }
+
         .rateio-item .input-valor { flex: 0 0 100px; }
+        /* Fim dos ajustes de Rateio */
 
         .btn-add-line { background-color: #5cb85c; margin-top: 15px; }
         .btn-add-line:hover { background-color: #4cae4c; }
@@ -189,18 +194,14 @@
             <h2>2. Detalhamento e Rateio da Conta</h2>
             
             <div class="rateio-header">
-                <div style="flex-grow: 2;">Área</div>
-                <div style="flex-grow: 2;">N2</div>
-                <div style="flex-grow: 2;">N3</div>
-                <div style="flex-grow: 2;">N4</div>
-                <div style="flex-grow: 2;">N5</div>
-                <div class="header-center">Centro</div>
+                <div style="flex-grow: 4;">Nível 1 (Área)</div>
+                <div style="flex-grow: 4;">Centro</div>
                 <div class="header-valor">Valor Rateado</div>
                 <div class="header-remover"></div>
             </div>
             
             <div id="rateio-container">
-                </div>
+            </div>
             
             <button type="button" class="btn-add-line" id="add-rateio-line">Fazer Rateio (Adicionar Linha)</button>
             
@@ -265,7 +266,7 @@
         }
 
         // =======================================================================
-        // LÓGICA DE CASCATA E RATEIO
+        // LÓGICA DE CASCATA E RATEIO - NOVO CÓDIGO
         // =======================================================================
 
         function createRateioLine() {
@@ -276,28 +277,37 @@
             
             let html = '';
             
-            // Cria os 5 seletores em cascata
-            for (let i = 1; i <= 5; i++) {
-                html += `
-                    <div class="select-container">
-                        <select 
-                            name="nivel${i}" 
-                            id="nivel${i}-${lineId}" 
-                            disabled 
-                            data-level="${i}" 
-                            data-line-id="${lineId}"
-                        >
-                            <option value="">Carregando Níveis...</option>
-                        </select>
-                    </div>
-                `;
-            }
-
-            // Campos de Input Manual (Centro e Valor)
+            // NOVO: Apenas o Seletor Nível 1 (Área)
             html += `
-                <div class="input-center">
-                    <input type="text" name="centro" placeholder="Centro" required>
+                <div class="select-container" style="flex-grow: 4;">
+                    <select 
+                        name="nivel1" 
+                        id="nivel1-${lineId}" 
+                        data-line-id="${lineId}"
+                        required
+                    >
+                        <option value="">Carregando Nível 1...</option>
+                    </select>
                 </div>
+            `;
+
+            // NOVO: Seletor de Centro (dependente do Nível 1)
+            html += `
+                <div class="select-container" style="flex-grow: 4;">
+                    <select 
+                        name="centro" 
+                        id="centro-${lineId}" 
+                        data-line-id="${lineId}"
+                        required
+                        disabled
+                    >
+                        <option value="">Selecione o Nível 1 primeiro</option>
+                    </select>
+                </div>
+            `;
+
+            // Campo de Input Valor
+            html += `
                 <div class="input-valor">
                     <input type="number" step="0.01" name="valorRateio" placeholder="Valor" required>
                 </div>
@@ -313,15 +323,13 @@
 
             // 1. Inicializa o Nível 1 desta nova linha
             const nivel1Select = document.getElementById(`nivel1-${lineId}`);
-            const nivel1Options = allOptionsData.map(row => row[0]);
+            // Nível 1 está na Coluna 1 (Índice 0) da matriz allOptionsData
+            const nivel1Options = allOptionsData.map(row => row[0]); 
             populateSelect(nivel1Select, nivel1Options, 'Nível 1');
             nivel1Select.disabled = false;
 
-            // 2. Adiciona os Event Listeners de CASCATA para esta nova linha
-            for (let i = 1; i <= 4; i++) {
-                const currentSelect = document.getElementById(`nivel${i}-${lineId}`);
-                currentSelect.addEventListener('change', () => filterAndPopulateLine(i, lineId));
-            }
+            // 2. Adiciona o Event Listener de CASCATA para o NÍVEL 1
+            nivel1Select.addEventListener('change', () => filterAndPopulateLine(lineId));
         }
 
         // Remove a linha do DOM
@@ -331,46 +339,30 @@
                 rateioContainer.removeChild(line);
             }
         }
-        
-        // FUNÇÃO DE FILTRO TOTALMENTE DEPENDENTE
-        function filterAndPopulateLine(currentLevel, lineId) {
-            const currentSelect = document.getElementById(`nivel${currentLevel}-${lineId}`);
-            const nextLevel = currentLevel + 1;
-            const selectedValue = currentSelect.value;
+
+        // FUNÇÃO DE FILTRO SIMPLIFICADA (Nível 1 -> Centro)
+        function filterAndPopulateLine(lineId) {
+            const nivel1Select = document.getElementById(`nivel1-${lineId}`);
+            const centroSelect = document.getElementById(`centro-${lineId}`);
+            const selectedNivel1 = nivel1Select.value;
             
-            // --- 1. Limpa e desativa todos os níveis seguintes ---
-            for (let i = nextLevel; i <= 5; i++) {
-                const nextSelect = document.getElementById(`nivel${i}-${lineId}`);
-                nextSelect.innerHTML = `<option value="" selected>Nível ${i}</option>`;
-                nextSelect.disabled = true;
+            // Zera o seletor de Centro
+            centroSelect.innerHTML = `<option value="" selected>Selecione o Centro</option>`;
+            centroSelect.disabled = true;
+
+            if (!selectedNivel1) {
+                return; // Não faz nada se o Nível 1 não foi selecionado
             }
 
-            // --- 2. Coleta a Cadeia de Filtros ---
-            const selectedChain = [];
-            for (let i = 1; i <= currentLevel; i++) {
-                const select = document.getElementById(`nivel${i}-${lineId}`);
-                selectedChain.push(select.value); 
-            }
+            // 1. Filtra a Matriz 'allOptionsData' apenas pelo Nível 1 (Índice 0)
+            let filteredOptions = allOptionsData.filter(row => row[0] === selectedNivel1);
             
-            const nextSelect = document.getElementById(`nivel${nextLevel}-${lineId}`);
-            if (!nextSelect) return; 
-
-            // --- 3. Aplica o Filtro Múltiplo ---
-            let filteredOptions = allOptionsData;
+            // 2. Mapeia para pegar apenas os Centros (que estão na Coluna 2 / Índice 1 da aba Opcoes)
+            const centroOptions = filteredOptions.map(row => row[1]).filter(Boolean); 
             
-            for (let i = 0; i < currentLevel; i++) {
-                const filterValue = selectedChain[i];
-                const filterIndex = i;
-
-                if (filterValue) {
-                    filteredOptions = filteredOptions.filter(row => row[filterIndex] === filterValue);
-                }
-            }
-            
-            const nextOptions = filteredOptions.map(row => row[nextLevel - 1]);
-            
-            populateSelect(nextSelect, nextOptions, `Nível ${nextLevel}`);
-            nextSelect.disabled = false;
+            // 3. Popula o seletor de Centro
+            populateSelect(centroSelect, centroOptions, 'Selecione o Centro');
+            centroSelect.disabled = false;
         }
 
 
@@ -385,6 +377,7 @@
                 const data = await response.json();
 
                 if (data.result === 'success') {
+                    // allOptionsData tem [Nível 1, Centro, Nível 2, Nível 3, ...]
                     allOptionsData = data.cascadingOptions; 
 
                     for (const header in fixedSelects) {
@@ -411,7 +404,7 @@
         }
 
         // =======================================================================
-        // FUNÇÃO 1: Coleta e estrutura os dados de rateio em um array JSON
+        // FUNÇÃO 1: Coleta e estrutura os dados de rateio em um array JSON (AJUSTADA)
         // =======================================================================
         function collectRateioData() {
             const rateioLines = document.querySelectorAll('#rateio-container .rateio-item');
@@ -419,13 +412,17 @@
 
             rateioLines.forEach(line => {
                 const data = {};
+                // Captura Nível 1
                 data.nivel1 = line.querySelector('select[name="nivel1"]').value || '';
-                data.nivel2 = line.querySelector('select[name="nivel2"]').value || '';
-                data.nivel3 = line.querySelector('select[name="nivel3"]').value || '';
-                data.nivel4 = line.querySelector('select[name="nivel4"]').value || '';
-                data.nivel5 = line.querySelector('select[name="nivel5"]').value || '';
                 
-                const centroInput = line.querySelector('input[name="centro"]');
+                // Níveis 2, 3, 4 e 5 são vazios
+                data.nivel2 = '';
+                data.nivel3 = '';
+                data.nivel4 = '';
+                data.nivel5 = '';
+
+                // Captura Centro do NOVO seletor
+                const centroInput = line.querySelector('select[name="centro"]');
                 const valorInput = line.querySelector('input[name="valorRateio"]');
 
                 data.centro = centroInput ? centroInput.value.trim() : ''; 
@@ -438,7 +435,7 @@
         }
         
         // =======================================================================
-        // FUNÇÃO 2: LÓGICA DE ENVIO DO FORMULÁRIO (doPost) - AGORA TRATANDO ARQUIVOS
+        // FUNÇÃO 2: LÓGICA DE ENVIO DO FORMULÁRIO (doPost)
         // =======================================================================
         submissionForm.addEventListener("submit", async function(event) {
             event.preventDefault(); 
@@ -468,7 +465,8 @@
             formData.append('rateioJson', collectRateioData()); 
             
             // Remove os campos de rateio individuais vazios para evitar poluir o Apps Script
-            const rateioLineFields = ['nivel1', 'nivel2', 'nivel3', 'nivel4', 'nivel5', 'centro', 'valorRateio'];
+            // Apenas Nível 1 e Centro precisam ser removidos pois agora são seletores.
+            const rateioLineFields = ['nivel1', 'nivel2', 'nivel3', 'nivel4', 'nivel5', 'centro', 'valorRateio']; 
             rateioLineFields.forEach(name => formData.delete(name));
             formData.delete('numRateios'); // Remove o campo hidden desnecessário para o Apps Script
             
@@ -501,7 +499,7 @@
         });
 
         // =======================================================================
-        // LÓGICA DE BUSCA E RASTREAMENTO (Seção 4) - CÓDIGO MODIFICADO ABAIXO
+        // LÓGICA DE BUSCA E RASTREAMENTO (Seção 4)
         // =======================================================================
         const btnSearch = document.getElementById('btnSearch');
         const searchQueryInput = document.getElementById('searchQuery');
@@ -582,9 +580,9 @@
                         <th>ID</th>
                         <th>Solicitante</th>
                         <th>Competência (MM/AAAA)</th> <th>Valor Total</th>
-                        <th>Status (V)</th>
-                        <th>Quem Está Fazendo (Z)</th> 
-                        <th>Descrição / Justificativa (W)</th> 
+                        <th>Status (U)</th>
+                        <th>Quem Está Fazendo (Y)</th> 
+                        <th>Descrição / Justificativa (V)</th> 
                     </tr>
                 </thead>
                 <tbody>
