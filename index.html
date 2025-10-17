@@ -407,7 +407,7 @@
                 case 'finalizado': return { emoji: '✅', class: 'status-finalizado', label: 'Finalizado' };
                 case 'duvida_enviada_no_email_do_solicitante':
                 case 'duvida_enviada': return { emoji: '📧', class: 'status-duvida_enviada', label: 'Dúvida Enviada' };
-                default: return { emoji: '❓', class: 'status-nao_encontrado', label: status || 'Indefinido' };
+                default: return { emoji: '⏳', class: 'status-nao_encontrado', label: status || 'Pendente' };
             }
         }
 
