@@ -4,14 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedido de Reclassificação (Rateio)</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    
     <style>
         :root {
             --primary-color: #005A9C;
             --secondary-color: #F7F7F7;
-            --text-color: #333;
-            --success-color: #28a745;
-            --error-color: #dc3545;
+            /* ... (restante do seu CSS permanece o mesmo) ... */
         }
+        
+        /* ✅ 2. AJUSTE OPCIONAL NO CSS PARA O TOM SELECT */
+        .ts-control {
+            border-radius: 4px !important;
+            padding: 6px 12px !important;
+            border: 1px solid #ccc !important;
+        }
+        .ts-wrapper.focus .ts-control {
+            border-color: var(--primary-color) !important;
+            box-shadow: none !important;
+        }
+
+        /* ... (todo o seu CSS original vem aqui) ... */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: var(--secondary-color); color: var(--text-color); }
         header { background-color: var(--primary-color); color: white; padding: 20px 0; text-align: center; margin-bottom: 30px; }
         .container { max-width: 1200px; margin: auto; padding: 30px; background: white; border-radius: 6px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
@@ -63,11 +78,11 @@
         #searchPlaceholder { text-align: center; color: #888; padding: 15px; }
         
         .status-tag { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 0.85em; font-weight: 700; white-space: nowrap; }
-        .status-pendente { background-color: #ffc107; color: white; }
+        .status-pendente { background-color: #ffc107; color: #333; }
         .status-em_andamento { background-color: #17a2b8; color: white; }
         .status-finalizado { background-color: #28a745; color: white; }
         .status-duvida_enviada { background-color: #fd7e14; color: white; }
-        .status-nao_encontrado { background-color: #ffc107; color: white; }
+        .status-nao_encontrado { background-color: #6c757d; color: white; }
     </style>
 </head>
 <body>
@@ -97,16 +112,16 @@
                 <div class="input-group"><label for="docNumero">Nº do Documento/Histórico:</label><input type="text" id="docNumero" name="docNumero" required></div>
                 <div class="input-group"><label for="valorTotal">Valor Total do Documento (Cheio):</label><input type="number" step="0.01" id="valorTotal" name="valorTotal" required></div>
                 <div class="input-group"><label for="competencia">Competência:</label><select id="competencia" name="competencia" required disabled><option value="">Carregando...</option></select></div>
-                </div>
+            </div>
 
             <h2>2. Detalhamento e Rateio da Conta</h2>
             
             <div class="rateio-header">
-                <div>Natureza</div>
-                <div>Área</div>
-                <div>N3</div>
-                <div>N4</div>
-                <div>N5</div>
+                <div>Nível 1</div>
+                <div>Nível 2 (Área)</div>
+                <div>Nível 3</div>
+                <div>Nível 4</div>
+                <div>Nível 5</div>
                 <div>Centro</div>
                 <div class="header-valor">Valor Rateado</div>
                 <div class="header-remover"></div>
@@ -141,18 +156,29 @@
             formMessage.innerHTML = message;
         }
 
+        // ✅ 3. MODIFICAÇÃO NA FUNÇÃO POPULATESELECT PARA TRABALHAR COM TOM SELECT
         function populateSelect(selectElement, options, initialText = 'Selecione') {
-            selectElement.innerHTML = `<option value="" disabled selected>${initialText}</option>`;
-            const uniqueOptions = [...new Set(options.filter(Boolean))].sort();
-            uniqueOptions.forEach(option => {
-                const opt = document.createElement('option');
-                opt.value = option;
-                opt.textContent = option;
-                selectElement.appendChild(opt);
-            });
-            selectElement.disabled = (uniqueOptions.length === 0 && !selectElement.multiple);
+            // Se o Tom Select já existe, limpa e adiciona novas opções
+            if (selectElement.tomselect) {
+                selectElement.tomselect.clear();
+                selectElement.tomselect.clearOptions();
+                const newOptions = options.map(opt => ({ value: opt, text: opt }));
+                selectElement.tomselect.addOptions(newOptions);
+                selectElement.tomselect.enable();
+            } else { // Se não existe, cria normalmente
+                selectElement.innerHTML = `<option value="" disabled selected>${initialText}</option>`;
+                const uniqueOptions = [...new Set(options.filter(Boolean))].sort();
+                uniqueOptions.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option;
+                    opt.textContent = option;
+                    selectElement.appendChild(opt);
+                });
+            }
+             selectElement.disabled = (options.length === 0);
         }
 
+        // ✅ 4. MODIFICAÇÃO NA FUNÇÃO CREATERATEIOLINE PARA ATIVAR O TOM SELECT
         function createRateioLine() {
             const lineId = Date.now();
             const div = document.createElement('div');
@@ -161,20 +187,29 @@
             
             div.innerHTML = `
                 <div class="select-container"><select name="nivel1" id="nivel1-${lineId}" data-level="1" required></select></div>
-                <div class="select-container"><select name="nivel2" id="nivel2-${lineId}" data-level="2" required disabled><option value="">Selecione N1</option></select></div>
-                <div class="select-container"><select name="nivel3" id="nivel3-${lineId}" data-level="3" required disabled><option value="">Selecione N2</option></select></div>
-                <div class="select-container"><select name="nivel4" id="nivel4-${lineId}" data-level="4" required disabled><option value="">Selecione N3</option></select></div>
-                <div class="select-container"><select name="nivel5" id="nivel5-${lineId}" data-level="5" required disabled><option value="">Selecione N4</option></select></div>
-                <div class="select-container"><select name="centro" id="centro-${lineId}" required disabled><option value="">Selecione N2</option></select></div>
+                <div class="select-container"><select name="nivel2" id="nivel2-${lineId}" data-level="2" required disabled></select></div>
+                <div class="select-container"><select name="nivel3" id="nivel3-${lineId}" data-level="3" required disabled></select></div>
+                <div class="select-container"><select name="nivel4" id="nivel4-${lineId}" data-level="4" required disabled></select></div>
+                <div class="select-container"><select name="nivel5" id="nivel5-${lineId}" data-level="5" required disabled></select></div>
+                <div class="select-container"><select name="centro" id="centro-${lineId}" required disabled></select></div>
                 <div class="input-valor"><input type="number" step="0.01" name="valorRateio" placeholder="Valor" required></div>
                 <button type="button" class="btn-remove-line" onclick="this.parentElement.remove()">X</button>
             `;
             rateioContainer.appendChild(div);
 
+            // Ativa o Tom Select para cada seletor criado
+            const selectors = div.querySelectorAll('select');
+            selectors.forEach(select => {
+                new TomSelect(select, {
+                    placeholder: `Selecione...`
+                });
+            });
+
             const nivel1Select = div.querySelector('select[name="nivel1"]');
             const nivel1Options = [...new Set(cascadingOptionsData.map(row => row[0]))];
             populateSelect(nivel1Select, nivel1Options, 'Selecione Nível 1');
 
+            // Adiciona listeners para a cascata
             nivel1Select.addEventListener('change', () => updateCascadingSelects(lineId, 1));
             const nivel2Select = div.querySelector('select[name="nivel2"]');
             nivel2Select.addEventListener('change', () => {
@@ -189,11 +224,22 @@
             const nextLevel = currentLevel + 1;
             if (nextLevel > 5) return;
 
+            // Reseta os níveis seguintes
             for (let i = nextLevel; i <= 5; i++) {
                 const selectToReset = document.getElementById(`nivel${i}-${lineId}`);
-                if (selectToReset) {
-                    selectToReset.innerHTML = `<option value="">Selecione N${i - 1}</option>`;
-                    selectToReset.disabled = true;
+                if (selectToReset && selectToReset.tomselect) {
+                    selectToReset.tomselect.clear();
+                    selectToReset.tomselect.clearOptions();
+                    selectToReset.tomselect.disable();
+                }
+            }
+             // Reseta o centro se o Nível 2 for alterado
+            if (currentLevel < 2) {
+                const centroSelect = document.getElementById(`centro-${lineId}`);
+                if(centroSelect && centroSelect.tomselect) {
+                    centroSelect.tomselect.clear();
+                    centroSelect.tomselect.clearOptions();
+                    centroSelect.tomselect.disable();
                 }
             }
 
@@ -221,8 +267,11 @@
             const centroSelect = document.getElementById(`centro-${lineId}`);
             const selectedNivel2 = nivel2Select.value;
 
-            centroSelect.innerHTML = '<option value="">Selecione N2 (Área)</option>';
-            centroSelect.disabled = true;
+            if (centroSelect.tomselect) {
+                centroSelect.tomselect.clear();
+                centroSelect.tomselect.clearOptions();
+                centroSelect.tomselect.disable();
+            }
 
             if (selectedNivel2) {
                 const filteredCentros = centroData
@@ -231,8 +280,7 @@
                 populateSelect(centroSelect, filteredCentros, 'Selecione o Centro');
             }
         }
-
-        // ✅ FUNÇÃO CORRIGIDA PARA RESOLVER O BUG DO CARREGAMENTO INFINITO
+        
         async function loadOptionsAndFixedLists() {
             loadingOverlay.style.display = 'flex';
             try {
@@ -249,8 +297,8 @@
                     if (competenciaSelect && fixedLists.competenciaList) {
                         populateSelect(competenciaSelect, fixedLists.competenciaList, 'Selecione a Competência');
                         competenciaSelect.disabled = false;
+                        new TomSelect(competenciaSelect); // Ativa a pesquisa
                     }
-                    // "Área Destino" foi removida, então não há mais código para ela.
 
                     if (rateioContainer.children.length === 0) {
                         createRateioLine();
@@ -265,6 +313,7 @@
             }
         }
 
+        // ... (o restante do seu código JavaScript permanece o mesmo) ...
         function collectRateioData() {
             const rateioLines = document.querySelectorAll('#rateio-container .rateio-item');
             const rateioData = [];
@@ -327,7 +376,6 @@
             }
         });
 
-        // ... (o restante do código de busca e rastreamento permanece o mesmo) ...
         const btnSearch = document.getElementById('btnSearch');
         const searchQueryInput = document.getElementById('searchQuery');
         const searchResultsDiv = document.getElementById('searchResults');
@@ -369,7 +417,7 @@
                 case 'finalizado': return { emoji: '✅', class: 'status-finalizado', label: 'Finalizado' };
                 case 'duvida_enviada_no_email_do_solicitante':
                 case 'duvida_enviada': return { emoji: '📧', class: 'status-duvida_enviada', label: 'Dúvida Enviada' };
-                default: return { emoji: '⏳', class: 'status-pendente', label: status || 'Indefinido' };
+                default: return { emoji: '❓', class: 'status-nao_encontrado', label: status || 'Indefinido' };
             }
         }
 
