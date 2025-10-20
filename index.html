@@ -63,11 +63,11 @@
         #searchPlaceholder { text-align: center; color: #888; padding: 15px; }
         
         .status-tag { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 0.85em; font-weight: 700; white-space: nowrap; }
-        .status-pendente { background-color: #ffc107; color: #333; }
+        .status-pendente { background-color: #ffc107; color: white; }
         .status-em_andamento { background-color: #17a2b8; color: white; }
         .status-finalizado { background-color: #28a745; color: white; }
         .status-duvida_enviada { background-color: #fd7e14; color: white; }
-        .status-nao_encontrado { background-color: #6c757d; color: white; }
+        .status-nao_encontrado { background-color: #ffc107; color: white; }
     </style>
 </head>
 <body>
@@ -97,17 +97,16 @@
                 <div class="input-group"><label for="docNumero">Nº do Documento/Histórico:</label><input type="text" id="docNumero" name="docNumero" required></div>
                 <div class="input-group"><label for="valorTotal">Valor Total do Documento (Cheio):</label><input type="number" step="0.01" id="valorTotal" name="valorTotal" required></div>
                 <div class="input-group"><label for="competencia">Competência:</label><select id="competencia" name="competencia" required disabled><option value="">Carregando...</option></select></div>
-                <div class="input-group"><label for="areaDestino">Área Destino:</label><select id="areaDestino" name="areaDestino" required disabled><option value="">Carregando...</option></select></div>
-            </div>
+                </div>
 
             <h2>2. Detalhamento e Rateio da Conta</h2>
             
             <div class="rateio-header">
-                <div>Nível 1</div>
-                <div>Nível 2 (Área)</div>
-                <div>Nível 3</div>
-                <div>Nível 4</div>
-                <div>Nível 5</div>
+                <div>Natureza</div>
+                <div>Área</div>
+                <div>N3</div>
+                <div>N4</div>
+                <div>N5</div>
                 <div>Centro</div>
                 <div class="header-valor">Valor Rateado</div>
                 <div class="header-remover"></div>
@@ -179,8 +178,8 @@
             nivel1Select.addEventListener('change', () => updateCascadingSelects(lineId, 1));
             const nivel2Select = div.querySelector('select[name="nivel2"]');
             nivel2Select.addEventListener('change', () => {
-                updateCascadingSelects(lineId, 2); // Filtra N3
-                filterCentroForRow(lineId);       // Filtra o Centro
+                updateCascadingSelects(lineId, 2);
+                filterCentroForRow(lineId);
             });
             div.querySelector('select[name="nivel3"]').addEventListener('change', () => updateCascadingSelects(lineId, 3));
             div.querySelector('select[name="nivel4"]').addEventListener('change', () => updateCascadingSelects(lineId, 4));
@@ -233,6 +232,7 @@
             }
         }
 
+        // ✅ FUNÇÃO CORRIGIDA PARA RESOLVER O BUG DO CARREGAMENTO INFINITO
         async function loadOptionsAndFixedLists() {
             loadingOverlay.style.display = 'flex';
             try {
@@ -245,17 +245,12 @@
                     
                     const fixedLists = data.fixedLists;
                     
-                    const idMap = { 'Competência': 'competencia', 'Área Destino': 'areaDestino' };
-                    for (const header in fixedLists) {
-                        const selectId = idMap[header];
-                        if (selectId) {
-                            const selectElement = document.getElementById(selectId);
-                            if (selectElement) {
-                                populateSelect(selectElement, fixedLists[header], `Selecione a ${header}`);
-                                selectElement.disabled = false;
-                            }
-                        }
+                    const competenciaSelect = document.getElementById('competencia');
+                    if (competenciaSelect && fixedLists.competenciaList) {
+                        populateSelect(competenciaSelect, fixedLists.competenciaList, 'Selecione a Competência');
+                        competenciaSelect.disabled = false;
                     }
+                    // "Área Destino" foi removida, então não há mais código para ela.
 
                     if (rateioContainer.children.length === 0) {
                         createRateioLine();
@@ -332,6 +327,7 @@
             }
         });
 
+        // ... (o restante do código de busca e rastreamento permanece o mesmo) ...
         const btnSearch = document.getElementById('btnSearch');
         const searchQueryInput = document.getElementById('searchQuery');
         const searchResultsDiv = document.getElementById('searchResults');
@@ -373,7 +369,7 @@
                 case 'finalizado': return { emoji: '✅', class: 'status-finalizado', label: 'Finalizado' };
                 case 'duvida_enviada_no_email_do_solicitante':
                 case 'duvida_enviada': return { emoji: '📧', class: 'status-duvida_enviada', label: 'Dúvida Enviada' };
-                default: return { emoji: '❓', class: 'status-nao_encontrado', label: status || 'Indefinido' };
+                default: return { emoji: '⏳', class: 'status-pendente', label: status || 'Indefinido' };
             }
         }
 
