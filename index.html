@@ -67,7 +67,7 @@
         .status-em_andamento { background-color: #17a2b8; color: white; }
         .status-finalizado { background-color: #28a745; color: white; }
         .status-duvida_enviada { background-color: #fd7e14; color: white; }
-        .status-nao_encontrado { background-color:#ffc107; color: #333; }
+        .status-nao_encontrado { background-color: #6c757d; color: white; }
     </style>
 </head>
 <body>
@@ -91,47 +91,23 @@
             
             <h2>1. Dados do Solicitante e Documento</h2>
             <div class="section-grid">
-                <div class="input-group">
-                    <label for="solicitante">Solicitante:</label>
-                    <input type="text" id="solicitante" name="solicitante" required>
-                </div>
-                <div class="input-group">
-                    <label for="emailSolicitante">E-mail do Solicitante:</label>
-                    <input type="email" id="emailSolicitante" name="emailSolicitante" required>
-                </div>
-                <div class="input-group">
-                    <label for="parceiro">Nome do Parceiro:</label>
-                    <input type="text" id="parceiro" name="parceiro" required>
-                </div>
-                <div class="input-group">
-                    <label for="docNumero">Nº do Documento/Histórico:</label>
-                    <input type="text" id="docNumero" name="docNumero" required>
-                </div>
-                <div class="input-group">
-                    <label for="valorTotal">Valor Total do Documento (Cheio):</label>
-                    <input type="number" step="0.01" id="valorTotal" name="valorTotal" required>
-                </div>
-                <div class="input-group">
-                    <label for="competencia">Competência:</label>
-                    <select id="competencia" name="competencia" required disabled>
-                        <option value="">Carregando...</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="areaDestino">Área Destino:</label>
-                    <select id="areaDestino" name="areaDestino" required disabled>
-                        <option value="">Carregando...</option>
-                    </select>
-                </div>
+                <div class="input-group"><label for="solicitante">Solicitante:</label><input type="text" id="solicitante" name="solicitante" required></div>
+                <div class="input-group"><label for="emailSolicitante">E-mail do Solicitante:</label><input type="email" id="emailSolicitante" name="emailSolicitante" required></div>
+                <div class="input-group"><label for="parceiro">Nome do Parceiro:</label><input type="text" id="parceiro" name="parceiro" required></div>
+                <div class="input-group"><label for="docNumero">Nº do Documento/Histórico:</label><input type="text" id="docNumero" name="docNumero" required></div>
+                <div class="input-group"><label for="valorTotal">Valor Total do Documento (Cheio):</label><input type="number" step="0.01" id="valorTotal" name="valorTotal" required></div>
+                <div class="input-group"><label for="competencia">Competência:</label><select id="competencia" name="competencia" required disabled><option value="">Carregando...</option></select></div>
+                <div class="input-group"><label for="areaDestino">Área Destino:</label><select id="areaDestino" name="areaDestino" required disabled><option value="">Carregando...</option></select></div>
             </div>
 
             <h2>2. Detalhamento e Rateio da Conta</h2>
             
             <div class="rateio-header">
-                <div>Nível 1 (Área)</div>
-                <div>Nível 2</div>
+                <div>Nível 1</div>
+                <div>Nível 2 (Área)</div>
                 <div>Nível 3</div>
                 <div>Nível 4</div>
+                <div>Nível 5</div>
                 <div>Centro</div>
                 <div class="header-valor">Valor Rateado</div>
                 <div class="header-remover"></div>
@@ -142,14 +118,8 @@
             <button type="button" class="btn-add-line" id="add-rateio-line">Fazer Rateio (Adicionar Linha)</button>
             
             <h2>3. Descrição e Anexos</h2>
-            <div class="input-group">
-                <label for="justificativa">Descrição Detalhada da Reclassificação:</label>
-                <textarea id="justificativa" name="justificativa" rows="4" required></textarea>
-            </div>
-            <div class="input-group">
-                <label for="fileUpload">Anexar Documentos/Fotos (Opcional):</label>
-                <input type="file" id="fileUpload" name="fileUpload" multiple>
-            </div>
+            <div class="input-group"><label for="justificativa">Descrição Detalhada:</label><textarea id="justificativa" name="justificativa" rows="4" required></textarea></div>
+            <div class="input-group"><label for="fileUpload">Anexar Documentos (Opcional):</label><input type="file" id="fileUpload" name="fileUpload" multiple></div>
             
             <button type="submit" class="btn-submit">Enviar Pedido de Reclassificação</button>
             <div id="form-message" class="message-box"></div>
@@ -192,10 +162,11 @@
             
             div.innerHTML = `
                 <div class="select-container"><select name="nivel1" id="nivel1-${lineId}" data-level="1" required></select></div>
-                <div class="select-container"><select name="nivel2" id="nivel2-${lineId}" data-level="2" disabled><option value="">Selecione N1</option></select></div>
-                <div class="select-container"><select name="nivel3" id="nivel3-${lineId}" data-level="3" disabled><option value="">Selecione N2</option></select></div>
-                <div class="select-container"><select name="nivel4" id="nivel4-${lineId}" data-level="4" disabled><option value="">Selecione N3</option></select></div>
-                <div class="select-container"><select name="centro" id="centro-${lineId}" required disabled><option value="">Selecione N1</option></select></div>
+                <div class="select-container"><select name="nivel2" id="nivel2-${lineId}" data-level="2" required disabled><option value="">Selecione N1</option></select></div>
+                <div class="select-container"><select name="nivel3" id="nivel3-${lineId}" data-level="3" required disabled><option value="">Selecione N2</option></select></div>
+                <div class="select-container"><select name="nivel4" id="nivel4-${lineId}" data-level="4" required disabled><option value="">Selecione N3</option></select></div>
+                <div class="select-container"><select name="nivel5" id="nivel5-${lineId}" data-level="5" required disabled><option value="">Selecione N4</option></select></div>
+                <div class="select-container"><select name="centro" id="centro-${lineId}" required disabled><option value="">Selecione N2</option></select></div>
                 <div class="input-valor"><input type="number" step="0.01" name="valorRateio" placeholder="Valor" required></div>
                 <button type="button" class="btn-remove-line" onclick="this.parentElement.remove()">X</button>
             `;
@@ -205,19 +176,21 @@
             const nivel1Options = [...new Set(cascadingOptionsData.map(row => row[0]))];
             populateSelect(nivel1Select, nivel1Options, 'Selecione Nível 1');
 
-            nivel1Select.addEventListener('change', () => {
-                updateCascadingSelects(lineId, 1);
-                filterCentroForRow(lineId);
+            nivel1Select.addEventListener('change', () => updateCascadingSelects(lineId, 1));
+            const nivel2Select = div.querySelector('select[name="nivel2"]');
+            nivel2Select.addEventListener('change', () => {
+                updateCascadingSelects(lineId, 2); // Filtra N3
+                filterCentroForRow(lineId);       // Filtra o Centro
             });
-            div.querySelector('select[name="nivel2"]').addEventListener('change', () => updateCascadingSelects(lineId, 2));
             div.querySelector('select[name="nivel3"]').addEventListener('change', () => updateCascadingSelects(lineId, 3));
+            div.querySelector('select[name="nivel4"]').addEventListener('change', () => updateCascadingSelects(lineId, 4));
         }
 
         function updateCascadingSelects(lineId, currentLevel) {
             const nextLevel = currentLevel + 1;
-            if (nextLevel > 4) return;
+            if (nextLevel > 5) return;
 
-            for (let i = nextLevel; i <= 4; i++) {
+            for (let i = nextLevel; i <= 5; i++) {
                 const selectToReset = document.getElementById(`nivel${i}-${lineId}`);
                 if (selectToReset) {
                     selectToReset.innerHTML = `<option value="">Selecione N${i - 1}</option>`;
@@ -245,22 +218,21 @@
         }
         
         function filterCentroForRow(lineId) {
-            const nivel1Select = document.getElementById(`nivel1-${lineId}`);
+            const nivel2Select = document.getElementById(`nivel2-${lineId}`);
             const centroSelect = document.getElementById(`centro-${lineId}`);
-            const selectedNivel1 = nivel1Select.value;
+            const selectedNivel2 = nivel2Select.value;
 
-            centroSelect.innerHTML = '<option value="">Selecione N1</option>';
+            centroSelect.innerHTML = '<option value="">Selecione N2 (Área)</option>';
             centroSelect.disabled = true;
 
-            if (selectedNivel1) {
+            if (selectedNivel2) {
                 const filteredCentros = centroData
-                    .filter(row => row[0] === selectedNivel1)
+                    .filter(row => row[0] === selectedNivel2)
                     .map(row => row[1]);
                 populateSelect(centroSelect, filteredCentros, 'Selecione o Centro');
             }
         }
 
-        // ✅ FUNÇÃO CORRIGIDA PARA RESOLVER O BUG DO CARREGAMENTO INFINITO
         async function loadOptionsAndFixedLists() {
             loadingOverlay.style.display = 'flex';
             try {
@@ -273,18 +245,16 @@
                     
                     const fixedLists = data.fixedLists;
                     
-                    // Preenche Competência
-                    const competenciaSelect = document.getElementById('competencia');
-                    if (competenciaSelect && fixedLists.competenciaList) {
-                        populateSelect(competenciaSelect, fixedLists.competenciaList, 'Selecione a Competência');
-                        competenciaSelect.disabled = false;
-                    }
-                    
-                    // Preenche Área Destino
-                    const areaDestinoSelect = document.getElementById('areaDestino');
-                    if (areaDestinoSelect && fixedLists.areaDestinoList) {
-                        populateSelect(areaDestinoSelect, fixedLists.areaDestinoList, 'Selecione a Área Destino');
-                        areaDestinoSelect.disabled = false;
+                    const idMap = { 'Competência': 'competencia', 'Área Destino': 'areaDestino' };
+                    for (const header in fixedLists) {
+                        const selectId = idMap[header];
+                        if (selectId) {
+                            const selectElement = document.getElementById(selectId);
+                            if (selectElement) {
+                                populateSelect(selectElement, fixedLists[header], `Selecione a ${header}`);
+                                selectElement.disabled = false;
+                            }
+                        }
                     }
 
                     if (rateioContainer.children.length === 0) {
@@ -309,6 +279,7 @@
                     nivel2: line.querySelector('select[name="nivel2"]').value || '',
                     nivel3: line.querySelector('select[name="nivel3"]').value || '',
                     nivel4: line.querySelector('select[name="nivel4"]').value || '',
+                    nivel5: line.querySelector('select[name="nivel5"]').value || '',
                     centro: line.querySelector('select[name="centro"]').value || '',
                     valorRateio: parseFloat(line.querySelector('input[name="valorRateio"]').value) || 0
                 };
@@ -338,18 +309,15 @@
             const formData = new FormData(submissionForm);
             formData.append('rateioJson', collectRateioData()); 
             
-            ['nivel1', 'nivel2', 'nivel3', 'nivel4', 'centro', 'valorRateio'].forEach(name => formData.delete(name));
+            ['nivel1', 'nivel2', 'nivel3', 'nivel4', 'nivel5', 'centro', 'valorRateio'].forEach(name => formData.delete(name));
             
             try {
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST', 
-                    body: formData
-                });
+                const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: formData });
                 if (!response.ok) throw new Error('Erro de rede ou servidor.');
                 const responseData = await response.json();
 
                 if (responseData && responseData.result === "success") {
-                    showMessage('success', `✅ Sucesso! Pedido registrado. ID do Documento: <strong>#${responseData.id}</strong>.`);
+                    showMessage('success', `✅ Sucesso! Pedido registrado. ID: <strong>#${responseData.id}</strong>.`);
                     submissionForm.reset(); 
                     rateioContainer.innerHTML = ''; 
                     createRateioLine();
@@ -357,7 +325,7 @@
                     throw new Error(responseData.error || "Resposta inesperada.");
                 }
             } catch (error) {
-                showMessage('error', `Ops! Houve um erro no envio. Verifique a URL e o Deploy.`);
+                showMessage('error', `Ops! Houve um erro no envio.`);
             } finally {
                 submitButton.disabled = false;
                 submitButton.textContent = 'Enviar Pedido de Reclassificação';
@@ -377,11 +345,9 @@
                 searchResultsDiv.innerHTML = '<p class="error message-box">Digite pelo menos 3 caracteres.</p>';
                 return;
             }
-
             btnSearch.disabled = true;
             btnSearch.textContent = 'Buscando...';
             searchResultsDiv.innerHTML = '<p id="searchPlaceholder">Aguarde, pesquisando...</p>';
-
             try {
                 const url = `${APPS_SCRIPT_URL}?action=search_requests&query=${encodeURIComponent(query)}`;
                 const response = await fetch(url);
@@ -407,7 +373,7 @@
                 case 'finalizado': return { emoji: '✅', class: 'status-finalizado', label: 'Finalizado' };
                 case 'duvida_enviada_no_email_do_solicitante':
                 case 'duvida_enviada': return { emoji: '📧', class: 'status-duvida_enviada', label: 'Dúvida Enviada' };
-                default: return { emoji: '⏳', class: 'status-nao_encontrado', label: status || 'Pendente' };
+                default: return { emoji: '❓', class: 'status-nao_encontrado', label: status || 'Indefinido' };
             }
         }
 
@@ -417,19 +383,7 @@
                 return;
             }
             let html = '<table class="results-table">';
-            html += `
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Solicitante</th>
-                        <th>Competência (MM/AAAA)</th> <th>Valor Total</th>
-                        <th>Status</th>
-                        <th>Quem Faz</th> 
-                        <th>Descrição</th> 
-                    </tr>
-                </thead>
-                <tbody>
-            `;
+            html += `<thead><tr><th>ID</th><th>Solicitante</th><th>Competência (MM/AAAA)</th><th>Valor Total</th><th>Status</th><th>Quem Faz</th><th>Descrição</th></tr></thead><tbody>`;
             results.forEach(item => {
                 const valorFormatado = (parseFloat(item.valorTotal) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 const statusInfo = getStatusInfo(item.status);
