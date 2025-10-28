@@ -177,7 +177,7 @@
                     tomInstance.disable(); // Desabilita se vazio
                 }
             } else {
-                 // Fallback caso TomSelect não tenha sido inicializado (pouco provável)
+                 // Fallback (não deve ocorrer se TomSelect for inicializado corretamente)
                  selectElement.innerHTML = `<option value="" disabled selected>${initialText}</option>`;
                  uniqueOptions.forEach(option => {
                     const opt = document.createElement('option');
@@ -196,7 +196,7 @@
             div.className = 'rateio-item';
             div.id = `line-${lineId}`;
             
-            // Note: Adicionamos placeholder diretamente nos selects para Tom Select usar
+            // Placeholders nos selects para Tom Select usar
             div.innerHTML = `
                 <div class="select-container"><select name="nivel1" id="nivel1-${lineId}" placeholder="Selecione Nível 1"></select></div>
                 <div class="select-container"><select name="nivel2" id="nivel2-${lineId}" placeholder="Selecione N1" disabled></select></div>
@@ -225,14 +225,12 @@
             });
             div.querySelector('select[name="nivel3"]').addEventListener('change', () => updateCascadingSelects(lineId, 3));
             div.querySelector('select[name="nivel4"]').addEventListener('change', () => updateCascadingSelects(lineId, 4));
-            // Nível 5 não precisa de listener pois não filtra nada depois
         }
 
         // ✅ FUNÇÃO UPDATECASCADINGSELECTS (ATUALIZADA PARA TOM SELECT)
         function updateCascadingSelects(lineId, currentLevel) {
             const nextLevel = currentLevel + 1;
             
-            // Reseta níveis seguintes
             for (let i = nextLevel; i <= 5; i++) {
                 const selectToReset = document.getElementById(`nivel${i}-${lineId}`);
                 if (selectToReset && selectToReset.tomselect) {
@@ -243,8 +241,7 @@
                     tomInstance.disable();
                 }
             }
-            // Reseta Centro se Nível 1 ou 2 mudar
-             if (currentLevel < 2) {
+            if (currentLevel < 2) { // Reseta Centro se Nível 1 for alterado
                 const centroSelect = document.getElementById(`centro-${lineId}`);
                 if (centroSelect && centroSelect.tomselect) {
                     const tomInstance = centroSelect.tomselect;
@@ -255,7 +252,7 @@
                 }
             }
 
-            if (nextLevel > 5) return; // Não há mais níveis para popular
+            if (nextLevel > 5) return;
 
             const selectedChain = [];
             for (let i = 1; i <= currentLevel; i++) {
@@ -269,7 +266,7 @@
                 }
             });
 
-            const nextOptions = [...new Set(filteredOptions.map(row => row[currentLevel]))]; // 'currentLevel' é o índice do próximo nível
+            const nextOptions = [...new Set(filteredOptions.map(row => row[currentLevel]))];
             const nextSelect = document.getElementById(`nivel${nextLevel}-${lineId}`);
             if (nextSelect) {
                 populateSelect(nextSelect, nextOptions, `Selecione Nível ${nextLevel}`);
@@ -309,7 +306,6 @@
                     
                     const competenciaSelect = document.getElementById('competencia');
                     if (competenciaSelect) {
-                         // Inicializa Tom Select ANTES de popular
                          new TomSelect(competenciaSelect, { placeholder: 'Carregando...' });
                          if (fixedLists.competenciaList) {
                            populateSelect(competenciaSelect, fixedLists.competenciaList, 'Selecione a Competência');
@@ -323,7 +319,8 @@
                     showMessage('error', `Erro ao carregar opções: ${data.error}`);
                 }
             } catch (error) {
-                showMessage('error', 'Falha na conexão. Verifique a URL do Apps Script e o Deploy.');
+                console.error("Erro detalhado em loadOptionsAndFixedLists:", error); // Log detalhado
+                showMessage('error', 'Falha na conexão ao carregar dados. Verifique o console (F12) e o Deploy.');
             } finally {
                 loadingOverlay.style.display = 'none';
             }
@@ -358,10 +355,21 @@
             // ✅ CORREÇÃO: Validação só ocorre se houver linhas de rateio
             if (rateioLines.length > 0) {
                 let somaRateio = 0;
+                let algumaLinhaIncompleta = false; // Flag para verificar preenchimento
                 rateioLines.forEach(line => {
                     const valorInput = line.querySelector('input[name="valorRateio"]');
                     somaRateio += parseFloat(valorInput.value) || 0;
+                    // Verifica se todos os selects obrigatórios da linha estão preenchidos
+                    line.querySelectorAll('select[required]').forEach(sel => {
+                        if (!sel.value) algumaLinhaIncompleta = true;
+                    });
+                     if (!valorInput.value) algumaLinhaIncompleta = true; // Verifica valor também
                 });
+
+                 if (algumaLinhaIncompleta) {
+                     showMessage('error', 'Erro: Preencha todos os campos obrigatórios em todas as linhas de rateio.');
+                     return; 
+                 }
 
                 if (Math.abs(valorTotalDoc - somaRateio) > 0.01) {
                     showMessage('error', `Erro de Rateio: O Valor Total (${valorTotalDoc.toFixed(2)}) não corresponde à soma dos rateios (${somaRateio.toFixed(2)}).`);
@@ -380,29 +388,32 @@
             
             try {
                 const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: formData });
-                if (!response.ok) throw new Error('Erro de rede ou servidor.');
+                if (!response.ok) {
+                    const errorText = await response.text(); // Tenta pegar mais detalhes do erro
+                    console.error("Erro do servidor:", errorText);
+                    throw new Error('Erro de rede ou servidor.');
+                }
                 const responseData = await response.json();
 
                 if (responseData && responseData.result === "success") {
                     showMessage('success', `✅ Sucesso! Pedido registrado. ID: <strong>#${responseData.id}</strong>.`);
                     submissionForm.reset(); 
                     
-                    // Limpa instâncias TomSelect antes de limpar o container
                      rateioContainer.querySelectorAll('select').forEach(select => {
                          if(select.tomselect) select.tomselect.destroy();
                      });
                     rateioContainer.innerHTML = ''; 
                     
-                    // Limpa e reinicializa TomSelect da Competência
                      const compSelect = document.getElementById('competencia');
                      if(compSelect.tomselect) compSelect.tomselect.clear();
 
-                    createRateioLine(); // Cria a primeira linha novamente
+                    createRateioLine(); 
                 } else {
                     throw new Error(responseData.error || "Resposta inesperada.");
                 }
             } catch (error) {
-                showMessage('error', `Ops! Houve um erro no envio.`);
+                 console.error("Erro detalhado no envio:", error); // Log detalhado
+                showMessage('error', `Ops! Houve um erro no envio. Verifique o console (F12).`);
             } finally {
                 submitButton.disabled = false;
                 submitButton.textContent = 'Enviar Pedido de Reclassificação';
@@ -428,14 +439,20 @@
             try {
                 const url = `${APPS_SCRIPT_URL}?action=search_requests&query=${encodeURIComponent(query)}`;
                 const response = await fetch(url);
+                 if (!response.ok) {
+                     const errorText = await response.text();
+                     console.error("Erro na busca:", errorText);
+                     throw new Error('Erro de rede ou servidor na busca.');
+                 }
                 const data = await response.json();
                 if (data.result === 'success') {
                     renderSearchResults(data.data);
                 } else {
-                    searchResultsDiv.innerHTML = `<p class="error message-box">Erro: ${data.error}.</p>`;
+                    searchResultsDiv.innerHTML = `<p class="error message-box">Erro na busca: ${data.error}.</p>`;
                 }
             } catch (error) {
-                searchResultsDiv.innerHTML = '<p class="error message-box">Falha na conexão.</p>';
+                 console.error("Erro detalhado na busca:", error); // Log detalhado
+                searchResultsDiv.innerHTML = '<p class="error message-box">Falha na conexão ao buscar. Verifique o console (F12). </p>';
             } finally {
                 btnSearch.disabled = false;
                 btnSearch.textContent = 'Buscar Pedidos';
