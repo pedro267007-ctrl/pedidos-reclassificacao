@@ -6,7 +6,6 @@
     <title>Pedido de Reclassificação (Rateio)</title>
     
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     
     <style>
         :root {
@@ -15,18 +14,6 @@
             --text-color: #333;
             --success-color: #28a745;
             --error-color: #dc3545;
-        }
-        .ts-control { /* Estilo base para Tom Select */
-            border-radius: 4px !important;
-            padding: 6px 12px !important; /* Ajuste padding para altura similar ao input */
-            border: 1px solid #ccc !important;
-            font-size: 1em !important;
-            min-height: 40px; /* Garante altura mínima */
-            line-height: 1.5; /* Melhora alinhamento vertical do texto */
-        }
-        .ts-wrapper.focus .ts-control {
-            border-color: var(--primary-color) !important;
-            box-shadow: none !important;
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: var(--secondary-color); color: var(--text-color); }
         header { background-color: var(--primary-color); color: white; padding: 20px 0; text-align: center; margin-bottom: 30px; }
@@ -38,11 +25,14 @@
         input[type="text"], input[type="number"], input[type="email"], select, textarea, input[type="file"] { 
             width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; 
             transition: border-color 0.3s; font-size: 1em;
-            min-height: 40px; /* Garante altura mínima para inputs também */
         }
         input:focus, select:focus, textarea:focus { border-color: var(--primary-color); outline: none; }
         textarea { resize: vertical; min-height: 100px; }
         
+        /* Estilos Tom Select */
+        .ts-wrapper.full.single .ts-control { width: 100%; padding: 6px 10px; height: auto; }
+        .ts-wrapper .dropdown { z-index: 1050; }
+
         .rateio-header { display: flex; font-weight: 600; margin-bottom: 10px; padding: 0 10px; color: var(--primary-color); font-size: 0.9em;}
         .rateio-header div { flex: 1; margin-right: 10px; }
         .rateio-header .header-valor { flex: 0 0 100px; } 
@@ -50,6 +40,7 @@
 
         .rateio-item { display: flex; gap: 10px; margin-bottom: 15px; border: 1px solid #eee; padding: 10px; border-radius: 4px; align-items: center; }
         .rateio-item .select-container, .rateio-item input { flex: 1; }
+        
         .rateio-item .input-valor { flex: 0 0 100px; }
 
         .btn-add-line { background-color: #5cb85c; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; margin-top: 15px; font-weight: bold; }
@@ -95,7 +86,7 @@
     <div class="container search-container">
         <h2>4. Rastreamento de Pedidos</h2>
         <div class="search-bar">
-            <input type="text" id="searchQuery" placeholder="Pesquisar por ID ou Solicitante..." />
+            <input type="text" id="searchQuery" placeholder="Pesquisar por ID, Solicitante ou Doc Nº..." />
             <button type="button" id="btnSearch">Buscar Pedidos</button>
         </div>
         <div id="searchResults" class="results-table-container">
@@ -112,7 +103,7 @@
                 <div class="input-group"><label for="parceiro">Nome do Parceiro:</label><input type="text" id="parceiro" name="parceiro" required></div>
                 <div class="input-group"><label for="docNumero">Nº do Documento/Histórico:</label><input type="text" id="docNumero" name="docNumero" required></div>
                 <div class="input-group"><label for="valorTotal">Valor Total do Documento (Cheio):</label><input type="number" step="0.01" id="valorTotal" name="valorTotal" required></div>
-                <div class="input-group"><label for="competencia">Competência:</label><select id="competencia" name="competencia" required disabled></select></div>
+                <div class="input-group"><label for="competencia">Competência:</label><select id="competencia" name="competencia" required disabled><option value="">Carregando...</option></select></div>
             </div>
 
             <h2>2. Detalhamento e Rateio da Conta</h2>
@@ -141,15 +132,22 @@
         </form>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+
     <script>
+        // Use a URL do App Script que você copiou do seu último deploy (Passo 3 da minha última resposta)
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8H2P6Mur5XroK3kvtuXVppW4-utOEZ4eXm080vLonQwrPey2YhAXBK_50hZl1gqLL/exec'; 
         
         const submissionForm = document.getElementById("submission-form");
         const formMessage = document.getElementById("form-message");
         const loadingOverlay = document.getElementById("loading-overlay");
         const rateioContainer = document.getElementById('rateio-container');
+        
         let cascadingOptionsData = [];
         let centroData = [];
+        
+        // Armazenamento das instâncias do Tom Select para que possam ser destruídas e recriadas
+        let tomSelectInstances = {};
 
         function showMessage(type, message) {
             formMessage.style.display = 'block';
@@ -157,107 +155,108 @@
             formMessage.innerHTML = message;
         }
 
-        // ✅ FUNÇÃO POPULATESELECT (ATUALIZADA PARA TOM SELECT)
+        // 💡 ATUALIZADO: Popula o select e adiciona o Tom Select
         function populateSelect(selectElement, options, initialText = 'Selecione') {
-            const uniqueOptions = [...new Set(options.filter(Boolean))].sort();
+            // Destrói a instância anterior se existir
+            if (tomSelectInstances[selectElement.id]) {
+                tomSelectInstances[selectElement.id].destroy();
+                delete tomSelectInstances[selectElement.id];
+            }
             
-            if (selectElement.tomselect) {
-                const tomInstance = selectElement.tomselect;
-                tomInstance.clear(); // Limpa seleção atual
-                tomInstance.clearOptions(); // Limpa opções existentes
-                
-                const newOptions = uniqueOptions.map(opt => ({ value: opt, text: opt }));
-                tomInstance.addOptions(newOptions); // Adiciona novas opções
-                tomInstance.settings.placeholder = initialText; // Atualiza placeholder
-                tomInstance.sync(); // Garante a atualização da UI
+            selectElement.innerHTML = `<option value="" disabled selected>${initialText}</option>`;
+            const uniqueOptions = [...new Set(options.filter(Boolean))].sort();
+            uniqueOptions.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                selectElement.appendChild(opt);
+            });
+            
+            selectElement.disabled = (uniqueOptions.length === 0 && !selectElement.multiple);
 
-                if (newOptions.length > 0) {
-                    tomInstance.enable(); // Habilita se houver opções
-                } else {
-                    tomInstance.disable(); // Desabilita se vazio
-                }
-            } else {
-                 // Fallback (não deve ocorrer se TomSelect for inicializado corretamente)
-                 selectElement.innerHTML = `<option value="" disabled selected>${initialText}</option>`;
-                 uniqueOptions.forEach(option => {
-                    const opt = document.createElement('option');
-                    opt.value = option;
-                    opt.textContent = option;
-                    selectElement.appendChild(opt);
-                 });
-                 selectElement.disabled = (uniqueOptions.length === 0);
+            // Cria uma nova instância do Tom Select
+            if (selectElement.id) {
+                tomSelectInstances[selectElement.id] = new TomSelect(selectElement, {
+                    create: false,
+                    sortField: { field: "text", direction: "asc" },
+                    placeholder: initialText,
+                    labelField: 'text',
+                    valueField: 'value'
+                });
             }
         }
 
-        // ✅ FUNÇÃO CREATERATEIOLINE (ATUALIZADA PARA TOM SELECT)
         function createRateioLine() {
             const lineId = Date.now();
             const div = document.createElement('div');
             div.className = 'rateio-item';
             div.id = `line-${lineId}`;
             
-            // Placeholders nos selects para Tom Select usar
+            // Adiciona um listener para remover a instância do Tom Select ao remover a linha
+            const removeFunction = function() {
+                ['nivel1', 'nivel2', 'nivel3', 'nivel4', 'nivel5', 'centro'].forEach(name => {
+                    const id = `${name}-${lineId}`;
+                    if (tomSelectInstances[id]) {
+                        tomSelectInstances[id].destroy();
+                        delete tomSelectInstances[id];
+                    }
+                });
+                div.remove();
+            };
+
             div.innerHTML = `
-                <div class="select-container"><select name="nivel1" id="nivel1-${lineId}" placeholder="Selecione Nível 1"></select></div>
-                <div class="select-container"><select name="nivel2" id="nivel2-${lineId}" placeholder="Selecione N1" disabled></select></div>
-                <div class="select-container"><select name="nivel3" id="nivel3-${lineId}" placeholder="Selecione N2" disabled></select></div>
-                <div class="select-container"><select name="nivel4" id="nivel4-${lineId}" placeholder="Selecione N3" disabled></select></div>
-                <div class="select-container"><select name="nivel5" id="nivel5-${lineId}" placeholder="Selecione N4" disabled></select></div>
-                <div class="select-container"><select name="centro" id="centro-${lineId}" placeholder="Selecione N2 (Área)" disabled></select></div>
+                <div class="select-container"><select name="nivel1" id="nivel1-${lineId}" data-level="1" required></select></div>
+                <div class="select-container"><select name="nivel2" id="nivel2-${lineId}" data-level="2" required disabled><option value="">Selecione N1</option></select></div>
+                <div class="select-container"><select name="nivel3" id="nivel3-${lineId}" data-level="3" required disabled><option value="">Selecione N2</option></select></div>
+                <div class="select-container"><select name="nivel4" id="nivel4-${lineId}" data-level="4" required disabled><option value="">Selecione N3</option></select></div>
+                <div class="select-container"><select name="nivel5" id="nivel5-${lineId}" data-level="5" required disabled><option value="">Selecione N4</option></select></div>
+                <div class="select-container"><select name="centro" id="centro-${lineId}" required disabled><option value="">Selecione N2</option></select></div>
                 <div class="input-valor"><input type="number" step="0.01" name="valorRateio" placeholder="Valor" required></div>
-                <button type="button" class="btn-remove-line" onclick="this.parentElement.remove()">X</button>
+                <button type="button" class="btn-remove-line" onclick="return false;">X</button>
             `;
             rateioContainer.appendChild(div);
 
-            const tomSelectSettings = { create: false }; // Impede criação de novas opções
-            const selectors = div.querySelectorAll('select');
-            selectors.forEach(select => new TomSelect(select, tomSelectSettings)); // Inicializa TomSelect
+            div.querySelector('.btn-remove-line').addEventListener('click', removeFunction);
 
             const nivel1Select = div.querySelector('select[name="nivel1"]');
             const nivel1Options = [...new Set(cascadingOptionsData.map(row => row[0]))];
             populateSelect(nivel1Select, nivel1Options, 'Selecione Nível 1');
 
             nivel1Select.addEventListener('change', () => updateCascadingSelects(lineId, 1));
+            
             const nivel2Select = div.querySelector('select[name="nivel2"]');
             nivel2Select.addEventListener('change', () => {
                 updateCascadingSelects(lineId, 2);
                 filterCentroForRow(lineId);
             });
+            
             div.querySelector('select[name="nivel3"]').addEventListener('change', () => updateCascadingSelects(lineId, 3));
             div.querySelector('select[name="nivel4"]').addEventListener('change', () => updateCascadingSelects(lineId, 4));
         }
 
-        // ✅ FUNÇÃO UPDATECASCADINGSELECTS (ATUALIZADA PARA TOM SELECT)
         function updateCascadingSelects(lineId, currentLevel) {
             const nextLevel = currentLevel + 1;
-            
-            for (let i = nextLevel; i <= 5; i++) {
-                const selectToReset = document.getElementById(`nivel${i}-${lineId}`);
-                if (selectToReset && selectToReset.tomselect) {
-                    const tomInstance = selectToReset.tomselect;
-                    tomInstance.clear();
-                    tomInstance.clearOptions();
-                    tomInstance.settings.placeholder = `Selecione N${i - 1}`;
-                    tomInstance.disable();
-                }
-            }
-            if (currentLevel < 2) { // Reseta Centro se Nível 1 for alterado
-                const centroSelect = document.getElementById(`centro-${lineId}`);
-                if (centroSelect && centroSelect.tomselect) {
-                    const tomInstance = centroSelect.tomselect;
-                    tomInstance.clear();
-                    tomInstance.clearOptions();
-                    tomInstance.settings.placeholder = 'Selecione N2 (Área)';
-                    tomInstance.disable();
-                }
-            }
-
             if (nextLevel > 5) return;
 
+            // Reseta do próximo nível em diante
+            for (let i = nextLevel; i <= 5; i++) {
+                const selectToReset = document.getElementById(`nivel${i}-${lineId}`);
+                if (selectToReset) {
+                    populateSelect(selectToReset, [], `Selecione N${i - 1}`);
+                    selectToReset.disabled = true;
+                }
+            }
+            
             const selectedChain = [];
             for (let i = 1; i <= currentLevel; i++) {
-                selectedChain.push(document.getElementById(`nivel${i}-${lineId}`).value);
+                // Obtém o valor do Tom Select, se existir, senão usa o valor do select
+                const selectElement = document.getElementById(`nivel${i}-${lineId}`);
+                const tsInstance = tomSelectInstances[selectElement.id];
+                selectedChain.push(tsInstance ? tsInstance.getValue() : selectElement.value);
             }
+            
+            // Só filtra se houver valor selecionado no nível atual
+            if (!selectedChain[currentLevel - 1]) return;
             
             let filteredOptions = cascadingOptionsData;
             selectedChain.forEach((value, index) => {
@@ -270,48 +269,49 @@
             const nextSelect = document.getElementById(`nivel${nextLevel}-${lineId}`);
             if (nextSelect) {
                 populateSelect(nextSelect, nextOptions, `Selecione Nível ${nextLevel}`);
+                nextSelect.disabled = nextOptions.length === 0;
             }
         }
         
-        // ✅ FUNÇÃO FILTERCENTROROW (ATUALIZADA PARA TOM SELECT)
         function filterCentroForRow(lineId) {
             const nivel2Select = document.getElementById(`nivel2-${lineId}`);
             const centroSelect = document.getElementById(`centro-${lineId}`);
-            const selectedNivel2 = nivel2Select.value;
+            
+            // Valor do Tom Select
+            const selectedNivel2 = tomSelectInstances[nivel2Select.id] ? tomSelectInstances[nivel2Select.id].getValue() : nivel2Select.value;
 
-            if (centroSelect.tomselect) {
-                 const tomInstance = centroSelect.tomselect;
-                 tomInstance.clear();
-                 tomInstance.clearOptions();
-                 tomInstance.settings.placeholder = 'Selecione N2 (Área)';
-                 tomInstance.disable();
-            }
+            // Sempre reseta
+            populateSelect(centroSelect, [], 'Selecione N2 (Área)');
 
             if (selectedNivel2) {
-                const filteredCentros = centroData.filter(row => row[0] === selectedNivel2).map(row => row[1]);
+                const filteredCentros = centroData
+                    .filter(row => row[0] === selectedNivel2) // Filtra pela Área (Nível 2 - Coluna A da aba Centros)
+                    .map(row => row[1]);                      // Mapeia para o Centro (Coluna B da aba Centros)
+                
                 populateSelect(centroSelect, filteredCentros, 'Selecione o Centro');
             }
         }
 
+        // ✅ FUNÇÃO loadOptionsAndFixedLists COM CORS CORRIGIDO (pela implementação no Apps Script)
         async function loadOptionsAndFixedLists() {
             loadingOverlay.style.display = 'flex';
             try {
                 const response = await fetch(`${APPS_SCRIPT_URL}?action=get_options`);
-                const data = await response.json();
+                // Se o CORS funcionou, a linha abaixo não dará erro
+                const data = await response.json(); 
 
                 if (data.result === 'success') {
                     cascadingOptionsData = data.cascadingOptions;
                     centroData = data.centroData;
+                    
                     const fixedLists = data.fixedLists;
                     
                     const competenciaSelect = document.getElementById('competencia');
-                    if (competenciaSelect) {
-                         new TomSelect(competenciaSelect, { placeholder: 'Carregando...' });
-                         if (fixedLists.competenciaList) {
-                           populateSelect(competenciaSelect, fixedLists.competenciaList, 'Selecione a Competência');
-                         }
+                    if (competenciaSelect && fixedLists.competenciaList) {
+                        populateSelect(competenciaSelect, fixedLists.competenciaList, 'Selecione a Competência');
+                        competenciaSelect.disabled = false;
                     }
-
+                    
                     if (rateioContainer.children.length === 0) {
                         createRateioLine();
                     }
@@ -319,8 +319,8 @@
                     showMessage('error', `Erro ao carregar opções: ${data.error}`);
                 }
             } catch (error) {
-                console.error("Erro detalhado em loadOptionsAndFixedLists:", error); // Log detalhado
-                showMessage('error', 'Falha na conexão ao carregar dados. Verifique o console (F12) e o Deploy.');
+                console.error("Erro detalhado em loadOptionsAndFixedLists:", error);
+                showMessage('error', `Falha na conexão. Verifique o console para detalhes (CORS, URL do Apps Script ou Deploy).`);
             } finally {
                 loadingOverlay.style.display = 'none';
             }
@@ -331,12 +331,13 @@
             const rateioData = [];
             rateioLines.forEach(line => {
                 const data = {
-                    nivel1: line.querySelector('select[name="nivel1"]').value || '',
-                    nivel2: line.querySelector('select[name="nivel2"]').value || '',
-                    nivel3: line.querySelector('select[name="nivel3"]').value || '',
-                    nivel4: line.querySelector('select[name="nivel4"]').value || '',
-                    nivel5: line.querySelector('select[name="nivel5"]').value || '',
-                    centro: line.querySelector('select[name="centro"]').value || '',
+                    // Pega o valor do Tom Select ou do Select padrão
+                    nivel1: tomSelectInstances[`nivel1-${line.id}`] ? tomSelectInstances[`nivel1-${line.id}`].getValue() : line.querySelector('select[name="nivel1"]').value || '',
+                    nivel2: tomSelectInstances[`nivel2-${line.id}`] ? tomSelectInstances[`nivel2-${line.id}`].getValue() : line.querySelector('select[name="nivel2"]').value || '',
+                    nivel3: tomSelectInstances[`nivel3-${line.id}`] ? tomSelectInstances[`nivel3-${line.id}`].getValue() : line.querySelector('select[name="nivel3"]').value || '',
+                    nivel4: tomSelectInstances[`nivel4-${line.id}`] ? tomSelectInstances[`nivel4-${line.id}`].getValue() : line.querySelector('select[name="nivel4"]').value || '',
+                    nivel5: tomSelectInstances[`nivel5-${line.id}`] ? tomSelectInstances[`nivel5-${line.id}`].getValue() : line.querySelector('select[name="nivel5"]').value || '',
+                    centro: tomSelectInstances[`centro-${line.id}`] ? tomSelectInstances[`centro-${line.id}`].getValue() : line.querySelector('select[name="centro"]').value || '',
                     valorRateio: parseFloat(line.querySelector('input[name="valorRateio"]').value) || 0
                 };
                 rateioData.push(data);
@@ -344,39 +345,27 @@
             return JSON.stringify(rateioData);
         }
         
-        // ✅ FUNÇÃO DE ENVIO (ATUALIZADA COM CORREÇÃO DO BUG DE RATEIO)
         submissionForm.addEventListener("submit", async function(event) {
             event.preventDefault(); 
             const submitButton = submissionForm.querySelector('button.btn-submit');
 
-            const valorTotalDoc = parseFloat(document.getElementById('valorTotal').value) || 0;
             const rateioLines = document.querySelectorAll('#rateio-container .rateio-item');
+            const isRateioPresent = rateioLines.length > 0;
             
-            // ✅ CORREÇÃO: Validação só ocorre se houver linhas de rateio
-            if (rateioLines.length > 0) {
-                let somaRateio = 0;
-                let algumaLinhaIncompleta = false; // Flag para verificar preenchimento
-                rateioLines.forEach(line => {
-                    const valorInput = line.querySelector('input[name="valorRateio"]');
-                    somaRateio += parseFloat(valorInput.value) || 0;
-                    // Verifica se todos os selects obrigatórios da linha estão preenchidos
-                    line.querySelectorAll('select[required]').forEach(sel => {
-                        if (!sel.value) algumaLinhaIncompleta = true;
-                    });
-                     if (!valorInput.value) algumaLinhaIncompleta = true; // Verifica valor também
+            const valorTotalDoc = parseFloat(document.getElementById('valorTotal').value) || 0;
+            let somaRateio = 0;
+
+            if (isRateioPresent) {
+                document.querySelectorAll('input[name="valorRateio"]').forEach(input => {
+                    somaRateio += parseFloat(input.value) || 0;
                 });
-
-                 if (algumaLinhaIncompleta) {
-                     showMessage('error', 'Erro: Preencha todos os campos obrigatórios em todas as linhas de rateio.');
-                     return; 
-                 }
-
-                if (Math.abs(valorTotalDoc - somaRateio) > 0.01) {
-                    showMessage('error', `Erro de Rateio: O Valor Total (${valorTotalDoc.toFixed(2)}) não corresponde à soma dos rateios (${somaRateio.toFixed(2)}).`);
-                    return; // Impede o envio se a soma estiver errada
-                }
             }
-            // Se não houver linhas, a validação é pulada
+
+            // ✅ CORRIGIDO O BUG: Só valida a soma se houver linhas de rateio.
+            if (isRateioPresent && Math.abs(valorTotalDoc - somaRateio) > 0.01) {
+                showMessage('error', `Erro de Rateio: O Valor Total (${valorTotalDoc.toFixed(2)}) não corresponde à soma dos rateios (${somaRateio.toFixed(2)}).`);
+                return;
+            }
 
             submitButton.disabled = true;
             submitButton.textContent = 'Enviando...';
@@ -384,42 +373,37 @@
             const formData = new FormData(submissionForm);
             formData.append('rateioJson', collectRateioData()); 
             
+            // Remove os campos de rateio da FormData original para evitar duplicação (o JSON é o que vale)
             ['nivel1', 'nivel2', 'nivel3', 'nivel4', 'nivel5', 'centro', 'valorRateio'].forEach(name => formData.delete(name));
             
             try {
                 const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: formData });
-                if (!response.ok) {
-                    const errorText = await response.text(); // Tenta pegar mais detalhes do erro
-                    console.error("Erro do servidor:", errorText);
-                    throw new Error('Erro de rede ou servidor.');
-                }
+                if (!response.ok) throw new Error('Erro de rede ou servidor.');
                 const responseData = await response.json();
 
                 if (responseData && responseData.result === "success") {
                     showMessage('success', `✅ Sucesso! Pedido registrado. ID: <strong>#${responseData.id}</strong>.`);
                     submissionForm.reset(); 
-                    
-                     rateioContainer.querySelectorAll('select').forEach(select => {
-                         if(select.tomselect) select.tomselect.destroy();
-                     });
+                    // Remove Tom Selects e recria a primeira linha
+                    Object.values(tomSelectInstances).forEach(ts => ts.destroy());
+                    tomSelectInstances = {};
                     rateioContainer.innerHTML = ''; 
-                    
-                     const compSelect = document.getElementById('competencia');
-                     if(compSelect.tomselect) compSelect.tomselect.clear();
-
-                    createRateioLine(); 
+                    createRateioLine();
                 } else {
                     throw new Error(responseData.error || "Resposta inesperada.");
                 }
             } catch (error) {
-                 console.error("Erro detalhado no envio:", error); // Log detalhado
-                showMessage('error', `Ops! Houve um erro no envio. Verifique o console (F12).`);
+                console.error("Erro de envio:", error);
+                showMessage('error', `Ops! Houve um erro no envio. Verifique o console para detalhes.`);
             } finally {
                 submitButton.disabled = false;
                 submitButton.textContent = 'Enviar Pedido de Reclassificação';
             }
         });
 
+        // =======================================================================
+        // CÓDIGO DE BUSCA
+        // =======================================================================
         const btnSearch = document.getElementById('btnSearch');
         const searchQueryInput = document.getElementById('searchQuery');
         const searchResultsDiv = document.getElementById('searchResults');
@@ -437,22 +421,17 @@
             btnSearch.textContent = 'Buscando...';
             searchResultsDiv.innerHTML = '<p id="searchPlaceholder">Aguarde, pesquisando...</p>';
             try {
+                // O CORS já foi corrigido no Code.gs, então esta chamada deve funcionar
                 const url = `${APPS_SCRIPT_URL}?action=search_requests&query=${encodeURIComponent(query)}`;
                 const response = await fetch(url);
-                 if (!response.ok) {
-                     const errorText = await response.text();
-                     console.error("Erro na busca:", errorText);
-                     throw new Error('Erro de rede ou servidor na busca.');
-                 }
                 const data = await response.json();
                 if (data.result === 'success') {
                     renderSearchResults(data.data);
                 } else {
-                    searchResultsDiv.innerHTML = `<p class="error message-box">Erro na busca: ${data.error}.</p>`;
+                    searchResultsDiv.innerHTML = `<p class="error message-box">Erro: ${data.error}.</p>`;
                 }
             } catch (error) {
-                 console.error("Erro detalhado na busca:", error); // Log detalhado
-                searchResultsDiv.innerHTML = '<p class="error message-box">Falha na conexão ao buscar. Verifique o console (F12). </p>';
+                searchResultsDiv.innerHTML = '<p class="error message-box">Falha na conexão ao buscar dados.</p>';
             } finally {
                 btnSearch.disabled = false;
                 btnSearch.textContent = 'Buscar Pedidos';
@@ -471,28 +450,14 @@
             }
         }
 
-        // ✅ FUNÇÃO RENDERSEARCHRESULTS (ATUALIZADA COM Nº DOCUMENTO)
         function renderSearchResults(results) {
             if (results.length === 0) {
                 searchResultsDiv.innerHTML = '<p id="searchPlaceholder">Nenhum pedido encontrado.</p>';
                 return;
             }
             let html = '<table class="results-table">';
-            html += `
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Solicitante</th>
-                        <th>Nº Documento</th> 
-                        <th>Competência</th>
-                        <th>Valor Total</th>
-                        <th>Status</th>
-                        <th>Quem Faz</th> 
-                        <th>Descrição</th> 
-                    </tr>
-                </thead>
-                <tbody>
-            `;
+            // ✅ ADICIONADO: Coluna Doc. Nº
+            html += `<thead><tr><th>ID</th><th>Solicitante</th><th>Doc. Nº</th><th>Competência (MM/AAAA)</th><th>Valor Total</th><th>Status</th><th>Quem Faz</th><th>Descrição</th></tr></thead><tbody>`;
             results.forEach(item => {
                 const valorFormatado = (parseFloat(item.valorTotal) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 const statusInfo = getStatusInfo(item.status);
