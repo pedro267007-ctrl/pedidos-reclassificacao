@@ -1,15 +1,17 @@
 <style>
     /* ---------------------------------------------------------------------- */
-    /* VARIAVEIS E RESET BASICO */
+    /* VARIAVEIS E RESET BASICO - NOVO TEMA */
     /* ---------------------------------------------------------------------- */
     :root {
-        --primary-color: #007bff; /* Azul vibrante (pode ser seu #005A9C, mas sugiro algo mais comum) */
-        --secondary-color: #f8f9fa; /* Fundo claro para o corpo */
-        --text-color: #343a40; /* Texto escuro */
-        --success-color: #28a745; 
-        --error-color: #dc3545;
-        --border-color: #dee2e6;
-        --shadow-light: 0 0.5rem 1rem rgba(0, 0, 0, 0.05); /* Sombra mais suave */
+        --primary-color: #005A9C; /* Seu Azul Original */
+        --primary-dark: #004576;  /* Azul mais escuro para hover */
+        --secondary-color: #F0F4F8; /* Fundo geral, um cinza/azul bem suave (off-white) */
+        --card-background: #FFFFFF; /* Fundo dos contêineres */
+        --text-color: #3C4858; /* Texto escuro acinzentado */
+        --success-color: #38C172; 
+        --error-color: #E3342F;
+        --border-color: #DDE2E7;
+        --shadow-subtle: 0 4px 10px rgba(0, 0, 0, 0.08); /* Sombra mais visível, mas suave */
     }
     body { 
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -22,12 +24,12 @@
     header { 
         background-color: var(--primary-color); 
         color: white; 
-        padding: 30px 0; /* Aumenta o padding do header */
+        padding: 40px 0; /* Aumenta um pouco mais */
         text-align: center; 
         margin-bottom: 30px; 
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
     }
-    h1 { margin: 0; font-size: 2em; }
+    h1 { margin: 0; font-size: 2.2em; font-weight: 300; } /* Deixa o título mais leve */
 
     /* ---------------------------------------------------------------------- */
     /* CONTÊINERES PRINCIPAIS */
@@ -36,9 +38,13 @@
         max-width: 1100px; 
         margin: 20px auto; 
         padding: 30px; 
-        background: white; 
-        border-radius: 8px; /* Bordas mais arredondadas */
-        box-shadow: var(--shadow-light); 
+        background: var(--card-background); /* Fundo branco para os cards */
+        border-radius: 8px; 
+        box-shadow: var(--shadow-subtle); 
+        transition: box-shadow 0.3s;
+    }
+    .container:hover {
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12); /* Sombra suave no hover */
     }
     .search-container { margin-bottom: 30px; }
 
@@ -47,7 +53,7 @@
     /* ---------------------------------------------------------------------- */
     h2 { 
         color: var(--primary-color); 
-        border-bottom: 2px solid var(--border-color); 
+        border-bottom: 2px solid #EAEAEA; 
         padding-bottom: 10px; 
         margin-bottom: 25px; 
         font-size: 1.5em; 
@@ -79,13 +85,13 @@
     }
     input:focus, select:focus, textarea:focus { 
         border-color: var(--primary-color); 
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Sombra de foco azul */
+        box-shadow: 0 0 0 0.2rem rgba(0, 90, 156, 0.25); 
         outline: none; 
     }
     textarea { resize: vertical; min-height: 100px; }
 
     /* ---------------------------------------------------------------------- */
-    /* ESTILOS TOM SELECT (Dropdowns pesquisáveis) */
+    /* ESTILOS TOM SELECT */
     /* ---------------------------------------------------------------------- */
     .ts-wrapper.full.single .ts-control { 
         width: 100%; 
@@ -97,10 +103,9 @@
     }
     .ts-wrapper.full.single .ts-control:focus {
         border-color: var(--primary-color); 
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        box-shadow: 0 0 0 0.2rem rgba(0, 90, 156, 0.25);
     }
-    .ts-wrapper .dropdown { z-index: 1050; border: 1px solid var(--border-color); border-radius: 4px; box-shadow: var(--shadow-light);}
-
+    .ts-wrapper .dropdown { z-index: 1050; border: 1px solid var(--border-color); border-radius: 4px; box-shadow: var(--shadow-subtle);}
 
     /* ---------------------------------------------------------------------- */
     /* RATEIO */
@@ -110,8 +115,8 @@
         font-weight: 700; 
         margin-bottom: 10px; 
         padding: 10px; 
-        color: white; /* Header branco */
-        background-color: var(--primary-color); /* Fundo primário */
+        color: white; 
+        background-color: #6C757D; /* Cinza escuro para destaque */
         border-radius: 4px 4px 0 0;
         font-size: 0.9em;
     }
@@ -126,8 +131,8 @@
         padding: 10px; 
         border-radius: 4px; 
         align-items: center; 
-        background-color: #fefefe;
-        border: 1px solid #e9ecef; /* Borda mais fina */
+        background-color: #F8F9FA; /* Fundo suave para a linha */
+        border: 1px solid #E9ECEF; 
     }
     .rateio-item .select-container, .rateio-item input { flex: 1; }
     .rateio-item .input-valor { flex: 0 0 100px; }
@@ -140,7 +145,7 @@
         padding: 10px 15px;
         border-radius: 4px;
         cursor: pointer;
-        font-weight: bold;
+        font-weight: 600;
         transition: background-color 0.2s, box-shadow 0.2s;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
@@ -150,7 +155,7 @@
         color: white; 
         margin-top: 15px; 
     }
-    .btn-add-line:hover { background-color: #1e7e34; }
+    .btn-add-line:hover { background-color: #2CA860; }
     
     .btn-remove-line { 
         background-color: var(--error-color); 
@@ -158,7 +163,7 @@
         padding: 8px 10px; 
         flex: 0 0 30px;
     }
-    .btn-remove-line:hover { background-color: #c9303d; }
+    .btn-remove-line:hover { background-color: #CC2D2D; }
 
     button.btn-submit { 
         background-color: var(--primary-color); 
@@ -167,16 +172,16 @@
         font-size: 1.1em;
         width: 100%; 
         margin-top: 25px;
-        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+        box-shadow: 0 4px 8px rgba(0, 90, 156, 0.4);
     }
-    button.btn-submit:disabled { background-color: #a4c4db; cursor: not-allowed; box-shadow: none; }
-    button.btn-submit:hover:not(:disabled) { background-color: #0056b3; }
+    button.btn-submit:disabled { background-color: #AEC1D5; cursor: not-allowed; box-shadow: none; }
+    button.btn-submit:hover:not(:disabled) { background-color: var(--primary-dark); }
 
     #btnSearch {
-        background-color: var(--primary-color); /* Usando primário para consistência */
+        background-color: var(--primary-color); 
         color: white;
     }
-    #btnSearch:hover { background-color: #0056b3; }
+    #btnSearch:hover { background-color: var(--primary-dark); }
 
 
     /* ---------------------------------------------------------------------- */
@@ -192,25 +197,29 @@
     }
     .success { background-color: #d4edda; color: var(--success-color); border: 1px solid #c3e6cb; }
     .error { background-color: #f8d7da; color: var(--error-color); border: 1px solid #f5c6cb; }
-    .loading-overlay { /* ... (Mantido o original, focado no centro) ... */ } 
+    .loading-overlay { /* Estilos mantidos */ } 
 
     /* Tabela de Resultados */
     .results-table-container { margin-top: 20px; overflow-x: auto; border: 1px solid var(--border-color); border-radius: 4px; }
     .results-table { width: 100%; border-collapse: collapse; }
     .results-table th, .results-table td { border: none; padding: 12px 10px; text-align: left; font-size: 0.9em; }
-    .results-table th { background-color: #e9ecef; color: var(--primary-color); font-weight: 700; border-bottom: 2px solid var(--border-color); }
-    .results-table tr:nth-child(even) { background-color: #f8f9fa; }
-    .results-table tr:hover { background-color: #e2f0ff; } /* Efeito hover na linha */
+    .results-table th { background-color: #E9ECEF; color: var(--text-color); font-weight: 700; border-bottom: 2px solid var(--border-color); }
+    .results-table tr:nth-child(even) { background-color: #F8F9FA; }
+    .results-table tr:hover { background-color: #E9F2FB; } 
     #searchPlaceholder { text-align: center; color: #888; padding: 15px; }
 
     /* Tags de Status */
     .status-tag { display: inline-block; padding: 4px 8px; border-radius: 16px; font-size: 0.8em; font-weight: 700; white-space: nowrap; }
+    .status-pendente { background-color: #FFC107; color: #333; }
+    .status-em_andamento { background-color: #17A2B8; color: white; }
+    .status-finalizado { background-color: var(--success-color); color: white; }
+    .status-duvida_enviada { background-color: #FD7E14; color: white; }
+    .status-nao_encontrado { background-color: #6C757D; color: white; }
 
     /* ---------------------------------------------------------------------- */
-    /* RESPONSIVIDADE (MOBILE FIRST) */
+    /* RESPONSIVIDADE */
     /* ---------------------------------------------------------------------- */
     @media (max-width: 992px) {
-        /* Em telas de tablet, reduz para 2 colunas */
         .section-grid {
             grid-template-columns: repeat(2, 1fr);
         }
@@ -220,13 +229,11 @@
         }
     }
     @media (max-width: 600px) {
-        /* Em telas pequenas (celulares), reduz para 1 coluna */
         .section-grid {
             grid-template-columns: 1fr;
         }
-        /* Ajusta o layout do rateio para empilhar em telas pequenas */
-        .rateio-header, .rateio-item {
-            display: none; /* Oculta a estrutura de linha complexa para simplificar */
+        .rateio-header {
+            display: none; 
         }
         .rateio-item {
             display: block;
