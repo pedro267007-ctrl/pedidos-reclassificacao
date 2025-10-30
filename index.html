@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pedido de Reclassificação (Rateio)</title>
+    <title>Pedidos de Reclassificação (Rateio)</title>
     
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
     
@@ -35,36 +35,33 @@
             font-size: 16px;
         }
 
-        /* ✅ MODIFICAÇÃO: Linha Verde no Topo */
-        .top-green-line {
-            width: 100%;
-            height: 8px; /* Altura da linha */
-            background-color: var(--abril-green);
-        }
+        /* Removido .top-green-line para aplicar o verde ao header */
 
         header { 
-            background-color: var(--card-background); 
-            color: var(--text-color-dark); 
-            padding: 25px 0; 
+            background-color: var(--abril-green); /* AGORA O CABEÇALHO É VERDE */
+            padding: 15px 0; /* Menos padding */
             text-align: center; 
             margin-bottom: 30px; 
-            box-shadow: var(--shadow-elevation-1);
-            display: flex; /* Para alinhar logo e título */
-            flex-direction: row; /* Lado a lado */
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1); 
+            display: flex; 
+            align-items: center;
+            justify-content: center;
+        }
+        .header-content-wrapper {
+            display: flex;
             align-items: center;
             justify-content: center;
             gap: 15px; /* Espaço entre a logo e o título */
         }
-        .header-logo-white { /* ✅ MODIFICAÇÃO: Logo da árvore branca no cabeçalho */
-            height: 45px; /* Tamanho da logo */
-            /* Imagens de Drive precisam de filtro para inverter para branco */
-            filter: brightness(0) invert(1); 
+        .header-logo-white { /* Logo da árvore branca no cabeçalho */
+            height: 45px;
+            filter: brightness(0) invert(1); /* Inverte a cor da imagem para branco */
         }
         h1 { 
+            color: white; /* TEXTO BRANCO DENTRO DO HEADER VERDE */
             margin: 0; 
             font-size: 2.0em; 
             font-weight: 300; 
-            color: var(--text-color-dark); 
         }
 
         /* ---------------------------------------------------------------------- */
@@ -94,12 +91,12 @@
             margin-bottom: 25px; 
             font-size: 1.4em; 
             font-weight: 600;
-            display: flex; /* Para alinhar título e logo verde */
+            display: flex; 
             align-items: center;
         }
-        .section-title-logo-green { /* ✅ MODIFICAÇÃO: Logo da árvore verde nos títulos de seção */
-            height: 25px; /* Tamanho da logo */
-            margin-left: 10px; /* Espaço entre o título e a logo */
+        .section-title-logo-green { /* Logo da árvore verde nos títulos de seção */
+            height: 25px; 
+            margin-left: 10px; 
         }
 
         .section-grid { 
@@ -198,16 +195,16 @@
             font-weight: 600;
             transition: background-color 0.2s, box-shadow 0.2s;
             box-shadow: var(--shadow-elevation-1);
-            display: flex; /* Para alinhar ícone e texto */
+            display: flex; 
             align-items: center;
             justify-content: center;
-            gap: 8px; /* Espaço entre o ícone e o texto */
+            gap: 8px; 
         }
 
-        .button-icon-white { /* ✅ MODIFICAÇÃO: Ícone da árvore branca nos botões */
+        .button-icon-white { /* Ícone da árvore branca nos botões */
             height: 20px; 
             vertical-align: middle;
-            filter: brightness(0) invert(1); /* Transforma a imagem verde em branca */
+            filter: brightness(0) invert(1); 
         }
 
         .btn-add-line { 
@@ -319,10 +316,7 @@
         /* RESPONSIVIDADE */
         /* ---------------------------------------------------------------------- */
         @media (max-width: 992px) {
-            .section-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-            }
+            .section-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
             .container { padding: 25px; margin: 15px; }
             h1 { font-size: 1.8em; }
             .header-logo-white { height: 40px; }
@@ -331,37 +325,20 @@
             .rateio-header, .results-table th, .results-table td { font-size: 0.85em; padding: 12px; }
         }
         @media (max-width: 600px) {
-            .section-grid {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
+            .section-grid { grid-template-columns: 1fr; gap: 10px; }
             .container { padding: 15px; margin: 10px; }
             h1 { font-size: 1.5em; }
-            header { flex-direction: column; gap: 10px; }
-            .header-logo-white { height: 40px; margin-bottom: 5px; }
+            .header-content-wrapper { flex-direction: column; gap: 8px; }
+            .header-logo-white { height: 40px; }
             .section-title-logo-green { height: 18px; margin-left: 8px; }
             .button-icon-white { height: 16px; }
 
             .rateio-header { display: none; } 
-            .rateio-item {
-                display: block;
-                border: 1px solid var(--border-color-light);
-                padding: 12px;
-                margin-bottom: 15px;
-            }
+            .rateio-item { display: block; padding: 12px; margin-bottom: 15px; }
             .rateio-item > div { margin-bottom: 8px; }
-            .rateio-item .select-container, .rateio-item input, .rateio-item .input-valor {
-                flex: auto;
-                width: 100%;
-            }
-            .btn-remove-line {
-                width: 100%;
-                margin-top: 10px;
-                padding: 8px;
-            }
-            .btn-add-line, button.btn-submit, #btnSearch {
-                padding: 10px;
-            }
+            .rateio-item .select-container, .rateio-item input, .rateio-item .input-valor { flex: auto; width: 100%; }
+            .btn-remove-line { width: 100%; margin-top: 10px; padding: 8px; }
+            .btn-add-line, button.btn-submit, #btnSearch { padding: 10px; }
         }
     </style>
 </head>
@@ -371,19 +348,19 @@
         Carregando...
     </div>
 
-    <div class="top-green-line"></div>
-    
     <header>
-        <img src="https://lh3.googleusercontent.com/d/1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Logo Abril" class="header-logo-white">
-        <h1>Formulário de Reclassificação</h1>
+        <div class="header-content-wrapper">
+            <img src="https://drive.google.com/uc?id=1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Logo Abril" class="header-logo-white">
+            <h1>Pedidos de Reclassificação</h1>
+        </div>
     </header>
 
     <div class="container search-container">
-        <h2>Rastreamento de Pedidos <img src="https://lh3.googleusercontent.com/d/1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Logo" class="section-title-logo-green"></h2>
+        <h2>Rastreamento de Pedidos <img src="https://drive.google.com/uc?id=1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Logo" class="section-title-logo-green"></h2>
         <div class="search-bar">
             <input type="text" id="searchQuery" placeholder="Pesquisar por ID, Solicitante ou Doc Nº..." />
             <button type="button" id="btnSearch">
-                <img src="https://lh3.googleusercontent.com/d/1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Buscar" class="button-icon-white">
+                <img src="https://drive.google.com/uc?id=1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Buscar" class="button-icon-white">
                 Buscar Pedidos
             </button>
         </div>
@@ -395,7 +372,7 @@
     <div class="container">
         <form id="submission-form" enctype="multipart/form-data"> 
             
-            <h2>1. Dados do Solicitante e Documento <img src="https://lh3.googleusercontent.com/d/1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Logo" class="section-title-logo-green"></h2>
+            <h2>1. Dados do Solicitante e Documento <img src="https://drive.google.com/uc?id=1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Logo" class="section-title-logo-green"></h2>
             <div class="section-grid">
                 <div class="input-group"><label for="solicitante">Solicitante:</label><input type="text" id="solicitante" name="solicitante" required></div>
                 <div class="input-group"><label for="emailSolicitante">E-mail do Solicitante:</label><input type="email" id="emailSolicitante" name="emailSolicitante" required></div>
@@ -405,7 +382,7 @@
                 <div class="input-group"><label for="competencia">Competência:</label><select id="competencia" name="competencia" required disabled><option value="">Carregando...</option></select></div>
             </div>
 
-            <h2>2. Detalhamento e Rateio da Conta <img src="https://lh3.googleusercontent.com/d/1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Logo" class="section-title-logo-green"></h2>
+            <h2>2. Detalhamento e Rateio da Conta <img src="https://drive.google.com/uc?id=1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Logo" class="section-title-logo-green"></h2>
             
             <div class="rateio-header">
                 <div>Nível 1</div>
@@ -421,22 +398,24 @@
             <div id="rateio-container"></div>
             
             <button type="button" class="btn-add-line" id="add-rateio-line">
-                <img src="https://lh3.googleusercontent.com/d/1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Adicionar" class="button-icon-white">
+                <img src="https://drive.google.com/uc?id=1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Adicionar" class="button-icon-white">
                 Fazer Rateio (Adicionar Linha)
             </button>
             
-            <h2>3. Descrição e Anexos <img src="https://lh3.googleusercontent.com/d/1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Logo" class="section-title-logo-green"></h2>
+            <h2>3. Descrição e Anexos <img src="https://drive.google.com/uc?id=1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Logo" class="section-title-logo-green"></h2>
             <div class="input-group"><label for="justificativa">Descrição Detalhada:</label><textarea id="justificativa" name="justificativa" rows="4" required></textarea></div>
             <div class="input-group"><label for="fileUpload">Anexar Documentos (Opcional):</label><input type="file" id="fileUpload" name="fileUpload" multiple></div>
             
             <button type="submit" class="btn-submit">
-                <img src="https://lh3.googleusercontent.com/d/1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Enviar" class="button-icon-white">
+                <img src="https://drive.google.com/uc?id=1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Enviar" class="button-icon-white">
                 Enviar Pedido de Reclassificação
-                <img src="https://lh3.googleusercontent.com/d/1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Enviar" class="button-icon-white">
+                <img src="https://drive.google.com/uc?id=1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" alt="Enviar" class="button-icon-white">
             </button>
             <div id="form-message" class="message-box"></div>
         </form>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 
     <script>
         // !! SUBSTITUA PELA SUA URL DE DEPLOY MAIS RECENTE !!
@@ -450,7 +429,6 @@
         let cascadingOptionsData = [];
         let centroData = [];
         
-        // Armazena instâncias do Tom Select para gerenciamento
         let tomSelectInstances = {};
 
         function showMessage(type, message) {
@@ -461,9 +439,10 @@
 
         // Popula o select e aplica o Tom Select
         function populateSelect(selectElement, options, initialText = 'Selecione') {
-            if (tomSelectInstances[selectElement.id]) {
-                tomSelectInstances[selectElement.id].destroy();
-                delete tomSelectInstances[selectElement.id];
+            const id = selectElement.id;
+            if (tomSelectInstances[id]) {
+                tomSelectInstances[id].destroy();
+                delete tomSelectInstances[id];
             }
             
             selectElement.innerHTML = `<option value="" disabled selected>${initialText}</option>`;
@@ -477,14 +456,23 @@
             
             selectElement.disabled = (uniqueOptions.length === 0 && !selectElement.multiple);
 
-            if (selectElement.id) {
-                tomSelectInstances[selectElement.id] = new TomSelect(selectElement, {
+            if (id) {
+                tomSelectInstances[id] = new TomSelect(selectElement, {
                     create: false,
                     sortField: { field: "text", direction: "asc" },
                     placeholder: initialText,
                     labelField: 'text',
                     valueField: 'value'
                 });
+            }
+        }
+        
+        // CORREÇÃO: Função auxiliar para adicionar listeners ao Tom Select
+        function addTomSelectChangeListener(selectId, handler) {
+            const tsInstance = tomSelectInstances[selectId];
+            if (tsInstance) {
+                tsInstance.off('change'); // Remove listeners antigos para evitar duplicação
+                tsInstance.on('change', handler);
             }
         }
 
@@ -519,7 +507,7 @@
 
             div.querySelector('.btn-remove-line').addEventListener('click', removeFunction);
 
-            // Popula Nível 1
+            // Popula Nível 1 e inicializa Tom Select
             const nivel1Select = div.querySelector('select[name="nivel1"]');
             const nivel1Options = [...new Set(cascadingOptionsData.map(row => row[0]))];
             populateSelect(nivel1Select, nivel1Options, 'Selecione Nível 1');
@@ -531,17 +519,16 @@
             populateSelect(div.querySelector('select[name="nivel5"]'), [], 'Selecione N4');
             populateSelect(div.querySelector('select[name="centro"]'), [], 'Selecione N2');
 
-            // Adiciona Event Listeners
-            nivel1Select.addEventListener('change', () => updateCascadingSelects(lineId, 1));
+            // CORREÇÃO: Adiciona Event Listeners na instância do Tom Select
+            addTomSelectChangeListener(`nivel1-${lineId}`, () => updateCascadingSelects(lineId, 1));
             
-            const nivel2Select = div.querySelector('select[name="nivel2"]');
-            nivel2Select.addEventListener('change', () => {
+            addTomSelectChangeListener(`nivel2-${lineId}`, () => {
                 updateCascadingSelects(lineId, 2);
                 filterCentroForRow(lineId);
             });
             
-            div.querySelector('select[name="nivel3"]').addEventListener('change', () => updateCascadingSelects(lineId, 3));
-            div.querySelector('select[name="nivel4"]').addEventListener('change', () => updateCascadingSelects(lineId, 4));
+            addTomSelectChangeListener(`nivel3-${lineId}`, () => updateCascadingSelects(lineId, 3));
+            addTomSelectChangeListener(`nivel4-${lineId}`, () => updateCascadingSelects(lineId, 4));
         }
 
         function updateCascadingSelects(lineId, currentLevel) {
@@ -555,8 +542,8 @@
                     selectToReset.disabled = true;
                 }
             }
-            // Reseta Centro se Nível 1 for alterado (pois Nível 2 será resetado)
-             if (currentLevel < 2) {
+            // Reseta Centro se Nível 1 ou 2 for alterado
+             if (currentLevel <= 2) {
                 const centroSelect = document.getElementById(`centro-${lineId}`);
                  if (centroSelect) {
                     populateSelect(centroSelect, [], 'Selecione N2 (Área)');
@@ -564,13 +551,14 @@
                  }
             }
 
-            if (nextLevel > 5) return; // Nível 5 era o último
+            if (nextLevel > 5) return; 
 
             const selectedChain = [];
             for (let i = 1; i <= currentLevel; i++) {
                 const selectElement = document.getElementById(`nivel${i}-${lineId}`);
                 const tsInstance = tomSelectInstances[selectElement.id];
-                selectedChain.push(tsInstance ? tsInstance.getValue() : selectElement.value);
+                // Certifica-se de que estamos pegando o valor da instância Tom Select
+                selectedChain.push(tsInstance ? tsInstance.getValue() : selectElement.value); 
             }
             
             if (!selectedChain[currentLevel - 1]) return;
@@ -587,6 +575,17 @@
             if (nextSelect) {
                 populateSelect(nextSelect, nextOptions, `Selecione Nível ${nextLevel}`);
                 nextSelect.disabled = nextOptions.length === 0;
+                
+                // CORREÇÃO: Re-adiciona o listener do próximo nível
+                 if (nextLevel <= 4) { // Nível 4 é o último a ter cascata para o Nível 5
+                     addTomSelectChangeListener(`nivel${nextLevel}-${lineId}`, () => updateCascadingSelects(lineId, nextLevel));
+                 }
+                 if (nextLevel === 2) { // Garante que o listener do Nível 2 para Centro seja reativado
+                     addTomSelectChangeListener(`nivel2-${lineId}`, () => {
+                         updateCascadingSelects(lineId, 2);
+                         filterCentroForRow(lineId);
+                     });
+                 }
             }
         }
         
@@ -597,7 +596,7 @@
             const selectedNivel2 = tomSelectInstances[nivel2Select.id] ? tomSelectInstances[nivel2Select.id].getValue() : nivel2Select.value;
 
             populateSelect(centroSelect, [], 'Selecione N2 (Área)');
-            centroSelect.disabled = true; // Garante que esteja desabilitado
+            centroSelect.disabled = true; 
 
             if (selectedNivel2) {
                 const filteredCentros = centroData
@@ -612,7 +611,7 @@
             loadingOverlay.style.display = 'flex';
             try {
                 const response = await fetch(`${APPS_SCRIPT_URL}?action=get_options`);
-                if (!response.ok) { // Verifica se a resposta da rede foi OK
+                if (!response.ok) { 
                      throw new Error(`Falha na rede: ${response.status} ${response.statusText}`);
                 }
                 const data = await response.json(); 
@@ -633,13 +632,11 @@
                         createRateioLine();
                     }
                 } else {
-                    // Erro vindo da lógica do Apps Script (ex: planilha não encontrada)
-                    showMessage('error', `Erro ao carregar opções: ${data.error}`);
+                    showMessage('error', `Erro ao carregar opções (Verifique Logs do Apps Script): ${data.error}`);
                 }
             } catch (error) {
-                // Erro de rede, CORS, ou JSON inválido
                 console.error("Erro detalhado em loadOptionsAndFixedLists:", error);
-                showMessage('error', `Falha na conexão inicial (CORS, URL do Apps Script ou Deploy). Verifique o console (F12).`);
+                showMessage('error', `Falha na conexão inicial. Verifique se a APPS_SCRIPT_URL está atualizada e se o Deploy permite "Qualquer pessoa".`);
             } finally {
                 loadingOverlay.style.display = 'none';
             }
@@ -663,7 +660,6 @@
             return JSON.stringify(rateioData);
         }
         
-        // ✅ FUNÇÃO DE ENVIO (ATUALIZADA COM CORREÇÃO DO BUG DE RATEIO)
         submissionForm.addEventListener("submit", async function(event) {
             event.preventDefault(); 
             const submitButton = submissionForm.querySelector('button.btn-submit');
@@ -680,7 +676,6 @@
                 });
             }
 
-            // CORREÇÃO DO BUG: A validação de soma só ocorre se houver linhas de rateio para somar.
             if (isRateioPresent && Math.abs(valorTotalDoc - somaRateio) > 0.01) {
                 showMessage('error', `Erro de Rateio: O Valor Total (${valorTotalDoc.toFixed(2)}) não corresponde à soma dos rateios (${somaRateio.toFixed(2)}).`);
                 return;
@@ -707,10 +702,10 @@
                     tomSelectInstances = {};
                     rateioContainer.innerHTML = ''; 
                     
-                    // Limpa o Tom Select da competência
                     const compSelect = document.getElementById('competencia');
-                    if (compSelect && tomSelectInstances[compSelect.id]) {
-                         tomSelectInstances[compSelect.id].clear();
+                    if (compSelect) {
+                        populateSelect(compSelect, data.fixedLists.competenciaList, 'Selecione a Competência'); // Recarrega a Competência
+                        compSelect.disabled = false;
                     }
 
                     createRateioLine();
@@ -776,7 +771,6 @@
             }
         }
 
-        // ✅ FUNÇÃO RENDERSEARCHRESULTS (ATUALIZADA COM Nº DOCUMENTO)
         function renderSearchResults(results) {
             if (results.length === 0) {
                 searchResultsDiv.innerHTML = '<p id="searchPlaceholder">Nenhum pedido encontrado.</p>';
