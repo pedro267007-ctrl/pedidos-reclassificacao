@@ -53,6 +53,7 @@
         }
         .header-logo-white { 
             height: 45px;
+            /* Usando um recurso placeholder para o Logo Branco */
             filter: brightness(0) invert(1); 
         }
         h1 { 
@@ -95,14 +96,25 @@
         .section-title-logo-green { 
             height: 25px; 
             margin-left: 10px; 
+            /* Usando um recurso placeholder para o Logo Verde */
         }
 
+        /* Ajuste na Grid para as novas seções */
         .section-grid { 
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
             gap: 20px; 
             margin-bottom: 25px; 
         } 
+        /* Regra específica para o grid de Solicitante (apenas duas colunas) */
+        .solicitante-grid {
+            grid-template-columns: repeat(2, 1fr); 
+        }
+        /* Regra específica para o grid de Documento (quatro colunas) */
+        .documento-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+        
         .input-group { margin-bottom: 18px; } 
         label { 
             display: block; 
@@ -202,6 +214,7 @@
         .button-icon-white { 
             height: 20px; 
             vertical-align: middle;
+            /* Usando um recurso placeholder para o ícone Branco */
             filter: brightness(0) invert(1); 
         }
 
@@ -315,6 +328,7 @@
         /* ---------------------------------------------------------------------- */
         @media (max-width: 992px) {
             .section-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .solicitante-grid, .documento-grid { grid-template-columns: repeat(2, 1fr); }
             .container { padding: 25px; margin: 15px; }
             h1 { font-size: 1.8em; }
             .header-logo-white { height: 40px; }
@@ -324,6 +338,7 @@
         }
         @media (max-width: 600px) {
             .section-grid { grid-template-columns: 1fr; gap: 10px; }
+            .solicitante-grid, .documento-grid { grid-template-columns: 1fr; }
             .container { padding: 15px; margin: 10px; }
             h1 { font-size: 1.5em; }
             .header-content-wrapper { flex-direction: column; gap: 8px; }
@@ -370,17 +385,21 @@
     <div class="container">
         <form id="submission-form" enctype="multipart/form-data"> 
             
-            <h2>1. Dados do Solicitante e Documento <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_H4Xp9bJmGrN_tZksDmuc8IOFTZu7l2OFO7ATkbzIbWPC_7CxabI7ZsvIgsi5XHs9U3a5ahH6Ao3yyCeGUxmzNXbLUwQq5Gx1oMX6lR-cqdOVfyh2QeEB93_RggPaV3DFgJSLqijXlsoa4OdnJYRN_Mtbw0WD7HejxlO_IvuYzXCwjhOmFtGjU_YDWghc144BqvCtf1PagSWmCpBMNwqmSF_bV-y5dXGC0_Sczp0mmelFKK1jqXcO-W5JAaTGuy2VsrP5FfVgllcbbOZcRxSZi3A7WEocdy0HmGoE7i_ffO2sJ588Lx2HlOCJ2z8h7TuhjCm-np7lB9ifeMm4Qjnh0aCANlLcC-bWc_kdnjTgVphs9HXkPwvQcBIhdy-_3g0si0iW5dJXqbPvM_YUHFdftu7FjqojKe6dELYAvIbdbUSGYBF9uGOP4NzB0gXNQVPJL74rksa_rR8VK9GE7qIpQGro8fouhCivuQ5o4lcEaPtXEpcF4dQwEYWORpTwwscWFJAqa0vsLPDL6CTWJ3jMjASEJpQpFUBsZiAZPgrZeTeV4m-ZJetddG94TGmAGAv1JY8t1LxzDTmUBMLhthzuMArLGOnPGMYje2XDO1y4ghpbiciBZ9PMuUOYn7laSKK_krNa7ChsmJ65y9iTMRukY-_MdhI2p_A_FuqMB-p0_9qsZOZWloFS1E9_qi0mpW0FQVfQT6AkBH9tiuDyWL8idCpoMcyDu-BInL0wcOcZlbFfRdCup4bL7srAmuRhDSdXfXcOho6BokcSEzYoNwptvECCopAMVbmjSJtJXdfS_J-crf891FPjSkcZwtd-bQXY-GbkeUdVZhkIyoGko3c79_9vkl3MPI8Kvrnp40UPDayhIsElOlM497xqGxPsmworQXKyO5tWRKeDAtKhCOPAoS51xHaCeJKYZDdTrDJWl2iuF70A3kDOysZiHzGWuOjEQQLe_q9-RZUHOpry_qAjr_i0jPr9EV1VHxN8vj3Co7sTJG74B3a6Ub9y9_aZqPink4Eg=s1600" alt="Logo" class="section-title-logo-green"></h2>
-            <div class="section-grid">
+            <h2>1. Dados do Solicitante <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_H4Xp9bJmGrN_tZksDmuc8IOFTZu7l2OFO7ATkbzIbWPC_7CxabI7ZsvIgsi5XHs9U3a5ahH6Ao3yyCeGUxmzNXbLUwQq5Gx1oMX6lR-cqdOVfyh2QeEB93_RggPaV3DFgJSLqijXlsoa4OdnJYRN_Mtbw0WD7HejxlO_IvuYzXCwjhOmFtGjU_YDWghc144BqvCtf1PagSWmCpBMNwqmSF_bV-y5dXGC0_Sczp0mmelFKK1jqXcO-W5JAaTGuy2VsrP5FfVgllcbbOZcRxSZi3A7WEocdy0HmGoE7i_ffO2sJ588Lx2HlOCJ2z8h7TuhjCm-np7lB9ifeMm4Qjnh0aCANlLcC-bWc_kdnjTgVphs9HXkPwvQcBIhdy-_3g0si0iW5dJXqbPvM_YUHFdftu7FjqojKe6dELYAvIbdbUSGYBF9uGOP4NzB0gXNQVPJL74rksa_rR8VK9GE7qIpQGro8fouhCivuQ5o4lcEaPtXEpcF4dQwEYWORpTwwscWFJAqa0vsLPDL6CTWJ3jMjASEJpQpFUBsZiAZPgrZeTeV4m-ZJetddG94TGmAGAv1JY8t1LxzDTmUBMLhthzuMArLGOnPGMYje2XDO1y4ghpbiciBZ9PMuUOYn7laSKK_krNa7ChsmJ65y9iTMRukY-_MdhI2p_A_FuqMB-p0_9qsZOZWloFS1E9_qi0mpW0FQVfQT6AkBH9tiuDyWL8idCpoMcyDu-BInL0wcOcZlbFfRdCup4bL7srAmuRhDSdXfXcOho6BokcSEzYoNwptvECCopAMVbmjSJtJXdfS_J-crf891FPjSkcZwtd-bQXY-GbkeUdVZhkIyoGko3c79_9vkl3MPI8Kvrnp40UPDayhIsElOlM497xqGxPsmworQXKyO5tWRKeDAtKhCOPAoS51xHaCeJKYZDdTrDJWl2iuF70A3kDOysZiHzGWuOjEQQLe_q9-RZUHOpry_qAjr_i0jPr9EV1VHxN8vj3Co7sTJG74B3a6Ub9y9_aZqPink4Eg=s1600" alt="Logo" class="section-title-logo-green"></h2>
+            <div class="section-grid solicitante-grid">
                 <div class="input-group"><label for="solicitante">Solicitante:</label><input type="text" id="solicitante" name="solicitante" required></div>
                 <div class="input-group"><label for="emailSolicitante">E-mail do Solicitante:</label><input type="email" id="emailSolicitante" name="emailSolicitante" required></div>
+            </div>
+
+            <h2>2. Dados do Documento <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_H4Xp9bJmGrN_tZksDmuc8IOFTZu7l2OFO7ATkbzIbWPC_7CxabI7ZsvIgsi5XHs9U3a5ahH6Ao3yyCeGUxmzNXbLUwQq5Gx1oMX6lR-cqdOVfyh2QeEB93_RggPaV3DFgJSLqijXlsoa4OdnJYRN_Mtbw0WD7HejxlO_IvuYzXCwjhOmFtGjU_YDWghc144BqvCtf1PagSWmCpBMNwqmSF_bV-y5dXGC0_Sczp0mmelFKK1jqXcO-W5JAaTGuy2VsrP5FfVgllcbbOZcRxSZi3A7WEocdy0HmGoE7i_ffO2sJ588Lx2HlOCJ2z8h7TuhjCm-np7lB9ifeMm4Qjnh0aCANlLcC-bWc_kdnjTgVphs9HXkPwvQcBIhdy-_3g0si0iW5dJXqbPvM_YUHFdftu7FjqojKe6dELYAvIbdbUSGYBF9uGOP4NzB0gXNQVPJL74rksa_rR8VK9GE7qIpQGro8fouhCivuQ5o4lcEaPtXEpcF4dQwEYWORpTwwscWFJAqa0vsLPDL6CTWJ3jMjASEJpQpFUBsZiAZPgrZeTeV4m-ZJetddG94TGmAGAv1JY8t1LxzDTmUBMLhthzuMArLGOnPGMYje2XDO1y4ghpbiciBZ9PMuUOYn7laSKK_krNa7ChsmJ65y9iTMRukY-_MdhI2p_A_FuqMB-p0_9qsZOZWloFS1E9_qi0mpW0FQVfQT6AkBH9tiuDyWL8idCpoMcyDu-BInL0wcOcZlbFfRdCup4bL7srAmuRhDSdXfXcOho6BokcSEzYoNwptvECCopAMVbmjSJtJXdfS_J-crf891FPjSkcZwtd-bQXY-GbkeUdVZhkIyoGko3c79_9vkl3MPI8Kvrnp40UPDayhIsElOlM497xqGxPsmworQXKyO5tWRKeDAtKhCOPAoS51xHaCeJKYZDdTrDJWl2iuF70A3kDOysZiHzGWuOjEQQLe_q9-RZUHOpry_qAjr_i0jPr9EV1VHxN8vj3Co7sTJG74B3a6Ub9y9_aZqPink4Eg=s1600" alt="Logo" class="section-title-logo-green"></h2>
+            <div class="section-grid documento-grid">
                 <div class="input-group"><label for="parceiro">Nome do Parceiro:</label><input type="text" id="parceiro" name="parceiro" required></div>
                 <div class="input-group"><label for="docNumero">Nº do Documento/Histórico:</label><input type="text" id="docNumero" name="docNumero" required></div>
                 <div class="input-group"><label for="valorTotal">Valor Total do Documento (Cheio):</label><input type="number" step="0.01" id="valorTotal" name="valorTotal" required></div>
                 <div class="input-group"><label for="competencia">Competência:</label><select id="competencia" name="competencia" required disabled><option value="">Carregando...</option></select></div>
             </div>
 
-            <h2>2. Detalhamento e Rateio da Conta <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_H4Xp9bJmGrN_tZksDmuc8IOFTZu7l2OFO7ATkbzIbWPC_7CxabI7ZsvIgsi5XHs9U3a5ahH6Ao3yyCeGUxmzNXbLUwQq5Gx1oMX6lR-cqdOVfyh2QeEB93_RggPaV3DFgJSLqijXlsoa4OdnJYRN_Mtbw0WD7HejxlO_IvuYzXCwjhOmFtGjU_YDWghc144BqvCtf1PagSWmCpBMNwqmSF_bV-y5dXGC0_Sczp0mmelFKK1jqXcO-W5JAaTGuy2VsrP5FfVgllcbbOZcRxSZi3A7WEocdy0HmGoE7i_ffO2sJ588Lx2HlOCJ2z8h7TuhjCm-np7lB9ifeMm4Qjnh0aCANlLcC-bWc_kdnjTgVphs9HXkPwvQcBIhdy-_3g0si0iW5dJXqbPvM_YUHFdftu7FjqojKe6dELYAvIbdbUSGYBF9uGOP4NzB0gXNQVPJL74rksa_rR8VK9GE7qIpQGro8fouhCivuQ5o4lcEaPtXEpcF4dQwEYWORpTwwscWFJAqa0vsLPDL6CTWJ3jMjASEJpQpFUBsZiAZPgrZeTeV4m-ZJetddG94TGmAGAv1JY8t1LxzDTmUBMLhthzuMArLGOnPGMYje2XDO1y4ghpbiciBZ9PMuUOYn7laSKK_krNa7ChsmJ65y9iTMRukY-_MdhI2p_A_FuqMB-p0_9qsZOZWloFS1E9_qi0mpW0FQVfQT6AkBH9tiuDyWL8idCpoMcyDu-BInL0wcOcZlbFfRdCup4bL7srAmuRhDSdXfXcOho6BokcSEzYoNwptvECCopAMVbmjSJtJXdfS_J-crf891FPjSkcZwtd-bQXY-GbkeUdVZhkIyoGko3c79_9vkl3MPI8Kvrnp40UPDayhIsElOlM497xqGxPsmworQXKyO5tWRKeDAtKhCOPAoS51xHaCeJKYZDdTrDJWl2iuF70A3kDOysZiHzGWuOjEQQLe_q9-RZUHOpry_qAjr_i0jPr9EV1VHxN8vj3Co7sTJG74B3a6Ub9y9_aZqPink4Eg=s1600" alt="Logo" class="section-title-logo-green"></h2>
+            <h2>3. Detalhamento e Rateio da Conta <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_H4Xp9bJmGrN_tZksDmuc8IOFTZu7l2OFO7ATkbzIbWPC_7CxabI7ZsvIgsi5XHs9U3a5ahH6Ao3yyCeGUxmzNXbLUwQq5Gx1oMX6lR-cqdOVfyh2QeEB93_RggPaV3DFgJSLqijXlsoa4OdnJYRN_Mtbw0WD7HejxlO_IvuYzXCwjhOmFtGjU_YDWghc144BqvCtf1PagSWmCpBMNwqmSF_bV-y5dXGC0_Sczp0mmelFKK1jqXcO-W5JAaTGuy2VsrP5FfVgllcbbOZcRxSZi3A7WEocdy0HmGoE7i_ffO2sJ588Lx2HlOCJ2z8h7TuhjCm-np7lB9ifeMm4Qjnh0aCANlLcC-bWc_kdnjTgVphs9HXkPwvQcBIhdy-_3g0si0iW5dJXqbPvM_YUHFdftu7FjqojKe6dELYAvIbdbUSGYBF9uGOP4NzB0gXNQVPJL74rksa_rR8VK9GE7qIpQGro8fouhCivuQ5o4lcEaPtXEpcF4dQwEYWORpTwwscWFJAqa0vsLPDL6CTWJ3jMjASEJpQpFUBsZiAZPgrZeTeV4m-ZJetddG94TGmAGAv1JY8t1LxzDTmUBMLhthzuMArLGOnPGMYje2XDO1y4ghpbiciBZ9PMuUOYn7laSKK_krNa7ChsmJ65y9iTMRukY-_MdhI2p_A_FuqMB-p0_9qsZOZWloFS1E9_qi0mpW0FQVfQT6AkBH9tiuDyWL8idCpoMcyDu-BInL0wcOcZlbFfRdCup4bL7srAmuRhDSdXfXcOho6BokcSEzYoNwptvECCopAMVbmjSJtJXdfS_J-crf891FPjSkcZwtd-bQXY-GbkeUdVZhkIyoGko3c79_9vkl3MPI8Kvrnp40UPDayhIsElOlM497xqGxPsmworQXKyO5tWRKeDAtKhCOPAoS51xHaCeJKYZDdTrDJWl2iuF70A3kDOysZiHzGWuOjEQQLe_q9-RZUHOpry_qAjr_i0jPr9EV1VHxN8vj3Co7sTJG74B3a6Ub9y9_aZqPink4Eg=s1600" alt="Logo" class="section-title-logo-green"></h2>
             
             <div class="rateio-header">
                 <div>Nível 1</div>
@@ -400,7 +419,7 @@
                 Fazer Rateio (Adicionar Linha)
             </button>
             
-            <h2>3. Descrição e Anexos <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_H4Xp9bJmGrN_tZksDmuc8IOFTZu7l2OFO7ATkbzIbWPC_7CxabI7ZsvIgsi5XHs9U3a5ahH6Ao3yyCeGUxmzNXbLUwQq5Gx1oMX6lR-cqdOVfyh2QeEB93_RggPaV3DFgJSLqijXlsoa4OdnJYRN_Mtbw0WD7HejxlO_IvuYzXCwjhOmFtGjU_YDWghc144BqvCtf1PagSWmCpBMNwqmSF_bV-y5dXGC0_Sczp0mmelFKK1jqXcO-W5JAaTGuy2VsrP5FfVgllcbbOZcRxSZi3A7WEocdy0HmGoE7i_ffO2sJ588Lx2HlOCJ2z8h7TuhjCm-np7lB9ifeMm4Qjnh0aCANlLcC-bWc_kdnjTgVphs9HXkPwvQcBIhdy-_3g0si0iW5dJXqbPvM_YUHFdftu7FjqojKe6dELYAvIbdbUSGYBF9uGOP4NzB0gXNQVPJL74rksa_rR8VK9GE7qIpQGro8fouhCivuQ5o4lcEaPtXEpcF4dQwEYWORpTwwscWFJAqa0vsLPDL6CTWJ3jMjASEJpQpFUBsZiAZPgrZeTeV4m-ZJetddG94TGmAGAv1JY8t1LxzDTmUBMLhthzuMArLGOnPGMYje2XDO1y4ghpbiciBZ9PMuUOYn7laSKK_krNa7ChsmJ65y9iTMRukY-_MdhI2p_A_FuqMB-p0_9qsZOZWloFS1E9_qi0mpW0FQVfQT6AkBH9tiuDyWL8idCpoMcyDu-BInL0wcOcZlbFfRdCup4bL7srAmuRhDSdXfXcOho6BokcSEzYoNwptvECCopAMVbmjSJtJXdfS_J-crf891FPjSkcZwtd-bQXY-GbkeUdVZhkIyoGko3c79_9vkl3MPI8Kvrnp40UPDayhIsElOlM497xqGxPsmworQXKyO5tWRKeDAtKhCOPAoS51xHaCeJKYZDdTrDJWl2iuF70A3kDOysZiHzGWuOjEQQLe_q9-RZUHOpry_qAjr_i0jPr9EV1VHxN8vj3Co7sTJG74B3a6Ub9y9_aZqPink4Eg=s1600" alt="Logo" class="section-title-logo-green"></h2>
+            <h2>4. Descrição e Anexos <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_H4Xp9bJmGrN_tZksDmuc8IOFTZu7l2OFO7ATkbzIbWPC_7CxabI7ZsvIgsi5XHs9U3a5ahH6Ao3yyCeGUxmzNXbLUwQq5Gx1oMX6lR-cqdOVfyh2QeEB93_RggPaV3DFgJSLqijXlsoa4OdnJYRN_Mtbw0WD7HejxlO_IvuYzXCwjhOmFtGjU_YDWghc144BqvCtf1PagSWmCpBMNwqmSF_bV-y5dXGC0_Sczp0mmelFKK1jqXcO-W5JAaTGuy2VsrP5FfVgllcbbOZcRxSZi3A7WEocdy0HmGoE7i_ffO2sJ588Lx2HlOCJ2z8h7TuhjCm-np7lB9ifeMm4Qjnh0aCANlLcC-bWc_kdnjTgVphs9HXkPwvQcBIhdy-_3g0si0iW5dJXqbPvM_YUHFdftu7FjqojKe6dELYAvIbdbUSGYBF9uGOP4NzB0gXNQVPJL74rksa_rR8VK9GE7qIpQGro8fouhCivuQ5o4lcEaPtXEpcF4dQwEYWORpTwwscWFJAqa0vsLPDL6CTWJ3jMjASEJpQpFUBsZiAZPgrZeTeV4m-ZJetddG94TGmAGAv1JY8t1LxzDTmUBMLhthzuMArLGOnPGMYje2XDO1y4ghpbiciBZ9PMuUOYn7laSKK_krNa7ChsmJ65y9iTMRukY-_MdhI2p_A_FuqMB-p0_9qsZOZWloFS1E9_qi0mpW0FQVfQT6AkBH9tiuDyWL8idCpoMcyDu-BInL0wcOcZlbFfRdCup4bL7srAmuRhDSdXfXcOho6BokcSEzYoNwptvECCopAMVbmjSJtJXdfS_J-crf891FPjSkcZwtd-bQXY-GbkeUdVZhkIyoGko3c79_9vkl3MPI8Kvrnp40UPDayhIsElOlM497xqGxPsmworQXKyO5tWRKeDAtKhCOPAoS51xHaCeJKYZDdTrDJWl2iuF70A3kDOysZiHzGWuOjEQQLe_q9-RZUHOpry_qAjr_i0jPr9EV1VHxN8vj3Co7sTJG74B3a6Ub9y9_aZqPink4Eg=s1600" alt="Logo" class="section-title-logo-green"></h2>
             <div class="input-group"><label for="justificativa">Descrição Detalhada:</label><textarea id="justificativa" name="justificativa" rows="4" required></textarea></div>
             <div class="input-group"><label for="fileUpload">Anexar Documentos (Opcional):</label><input type="file" id="fileUpload" name="fileUpload" multiple></div>
             
@@ -435,7 +454,7 @@
             formMessage.innerHTML = message;
         }
         
-        // ✅ CORREÇÃO 2: Função para ordenar "MM/AAAA"
+        // Função para ordenar "MM/AAAA" corretamente (cronologicamente)
         function sortCompetencia(a, b) {
             const [mesA, anoA] = a.split('/').map(Number);
             const [mesB, anoB] = b.split('/').map(Number);
@@ -444,16 +463,19 @@
             return dataA - dataB;
         }
 
-        // Popula o select e aplica o Tom Select
-        function populateSelect(selectElement, options, initialText = 'Selecione') {
+        function populateSelect(selectElement, options, initialText = 'Selecione', skipSort = false) {
             const id = selectElement.id;
             if (tomSelectInstances[id]) {
                 tomSelectInstances[id].destroy();
                 delete tomSelectInstances[id];
             }
             
-            // A ordenação padrão (alfabética) é mantida aqui
-            const uniqueOptions = [...new Set(options.filter(Boolean))].sort();
+            let uniqueOptions = [...new Set(options.filter(Boolean))];
+            
+            // Só ordena alfabeticamente se skipSort for false
+            if (!skipSort) {
+                uniqueOptions.sort();
+            }
             
             selectElement.innerHTML = `<option value="" disabled selected>${initialText}</option>`;
             uniqueOptions.forEach(option => {
@@ -466,17 +488,24 @@
             selectElement.disabled = (uniqueOptions.length === 0 && !selectElement.multiple);
 
             if (id) {
-                tomSelectInstances[id] = new TomSelect(selectElement, {
+                // Configuração padrão do Tom Select (com ordenação alfabética)
+                let tsConfig = {
                     create: false,
                     sortField: { field: "text", direction: "asc" },
                     placeholder: initialText,
                     labelField: 'text',
                     valueField: 'value'
-                });
+                };
+                
+                // *** CORREÇÃO: Desabilita a ordenação do Tom Select para a Competência ***
+                if (id === 'competencia') {
+                    tsConfig.sortField = []; 
+                }
+
+                tomSelectInstances[id] = new TomSelect(selectElement, tsConfig);
             }
         }
         
-        // Função auxiliar para adicionar listeners ao Tom Select
         function addTomSelectChangeListener(selectId, handler) {
             const tsInstance = tomSelectInstances[selectId];
             if (tsInstance) {
@@ -516,19 +545,16 @@
 
             div.querySelector('.btn-remove-line').addEventListener('click', removeFunction);
 
-            // Popula Nível 1 e inicializa Tom Select
             const nivel1Select = div.querySelector('select[name="nivel1"]');
             const nivel1Options = [...new Set(cascadingOptionsData.map(row => row[0]))];
             populateSelect(nivel1Select, nivel1Options, 'Selecione Nível 1');
 
-            // Inicializa os outros selects (vazios) com Tom Select
             populateSelect(div.querySelector('select[name="nivel2"]'), [], 'Selecione N1');
             populateSelect(div.querySelector('select[name="nivel3"]'), [], 'Selecione N2');
             populateSelect(div.querySelector('select[name="nivel4"]'), [], 'Selecione N3');
             populateSelect(div.querySelector('select[name="nivel5"]'), [], 'Selecione N4');
             populateSelect(div.querySelector('select[name="centro"]'), [], 'Selecione N2');
 
-            // Adiciona Event Listeners na instância do Tom Select
             addTomSelectChangeListener(`nivel1-${lineId}`, () => updateCascadingSelects(lineId, 1));
             
             addTomSelectChangeListener(`nivel2-${lineId}`, () => {
@@ -612,8 +638,11 @@
             }
         }
 
-        async function loadOptionsAndFixedLists() {
-            loadingOverlay.style.display = 'flex';
+        async function loadOptionsAndFixedLists(isReload = false) {
+            if (!isReload) {
+                loadingOverlay.style.display = 'flex';
+            }
+            
             try {
                 const response = await fetch(`${APPS_SCRIPT_URL}?action=get_options`);
                 if (!response.ok) { 
@@ -630,24 +659,31 @@
                     const competenciaSelect = document.getElementById('competencia');
                     if (competenciaSelect && fixedLists.competenciaList) {
                         
-                        // ✅ CORREÇÃO 2: Ordena a lista de competência antes de popular
+                        // Ordena a lista de competência cronologicamente
                         fixedLists.competenciaList.sort(sortCompetencia); 
                         
-                        populateSelect(competenciaSelect, fixedLists.competenciaList, 'Selecione a Competência');
+                        // Passa 'true' para pular a ordenação alfabética padrão (já ordenamos cronologicamente)
+                        populateSelect(competenciaSelect, fixedLists.competenciaList, 'Selecione a Competência', true); 
                         competenciaSelect.disabled = false;
                     }
                     
-                    if (rateioContainer.children.length === 0) {
+                    if (rateioContainer.children.length === 0 && !isReload) {
                         createRateioLine();
                     }
                 } else {
-                    showMessage('error', `Erro ao carregar opções (Verifique Logs do Apps Script): ${data.error}`);
+                    if (!isReload) {
+                        showMessage('error', `Erro ao carregar opções (Verifique Logs do Apps Script): ${data.error}`);
+                    }
                 }
             } catch (error) {
                 console.error("Erro detalhado em loadOptionsAndFixedLists:", error);
-                showMessage('error', `Falha na conexão inicial. Verifique se a APPS_SCRIPT_URL está atualizada e se o Deploy permite "Qualquer pessoa".`);
+                if (!isReload) {
+                    showMessage('error', `Falha na conexão inicial. Verifique se a APPS_SCRIPT_URL está atualizada e se o Deploy permite "Qualquer pessoa".`);
+                }
             } finally {
-                loadingOverlay.style.display = 'none';
+                if (!isReload) {
+                    loadingOverlay.style.display = 'none';
+                }
             }
         }
 
@@ -672,6 +708,7 @@
         submissionForm.addEventListener("submit", async function(event) {
             event.preventDefault(); 
             const submitButton = submissionForm.querySelector('button.btn-submit');
+            const originalButtonText = submitButton.innerHTML; 
 
             const rateioLines = document.querySelectorAll('#rateio-container .rateio-item');
             const isRateioPresent = rateioLines.length > 0;
@@ -722,10 +759,8 @@
                     tomSelectInstances = {};
                     rateioContainer.innerHTML = ''; 
                     
-                    // ✅ CORREÇÃO 1: Não 'await'. Apenas chama o recarregamento.
-                    // Isso mostra a msg de sucesso imediatamente e previne que
-                    // um erro de recarga sobreponha a msg de sucesso.
-                    loadOptionsAndFixedLists(); 
+                    // Recarrega as listas em background
+                    loadOptionsAndFixedLists(true); 
                     
                 } else {
                     throw new Error(responseData.error || `Resposta de erro do servidor Apps Script: ${JSON.stringify(responseData)}`);
@@ -735,12 +770,7 @@
                 showMessage('error', `❌ **Falha de Comunicação:** ${error.message}. O pedido pode ter sido enviado, mas a confirmação falhou. Verifique a planilha.`);
             } finally {
                 submitButton.disabled = false;
-                // Restaura o texto original do botão (com as árvores)
-                submitButton.innerHTML = `
-                    <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_HvciQwqli0eJBkxj916j4FAPmt_gBsPdNJvXntsmHxGX-auipSkhmR2N-TAWNnWlRn7mMcutPEJ9TPfcrLptcbQvYaFTtWg_yPBRTYRfJC6DUwDTk_ouY1h2ozUlUbDDh_hCT0Oo0ADhnrfqDwxO5-Yv8CnefaTqvO31ZnlQk3nZb0yHH56wBbO55ZUpkfVASHM6JK4GSN7Q01DYq-cd6AW5vFDCN4zvyhNh7F_E2nlY1EtI-y4aBXj0MoUDhx8qQ5XRSAaadiUHSW4EoFqNImvSuEi33ATvg00S-Ril3FVd8-v-sfLdd5y_YpxMQ79rmYGHWF-T7GTNe0u5nywwhAv77ec8GEgUEfSuWoGX0enNqqSC26YmM_Mg4oRtPlPwTjPDS2cPqpvpmq7ibArhgXmrb-zEVUmmOAJb33kJJLNgurWWsxI_hP34nHobPAzgkQgFdM9OERNqO-nv-Y5x6h-Mhp4eLKCRsAdJwwVoqQ8qZHsray1M6JJf-wdFacdOxUb_YABfzKnfulZpauGlGlGZfHXHvlGj896jblzfHIsnMGsj79jE7X7SawZRoyVK7ycfy9nahqxaWizSuZWcWM4SNkQTBaka55A4RwQLGFFoQnasC3AoXg4JBUkvXHYPTeWyI_eRE90nyyRh-h_DhC9oJrJl_ylitTAXvr3TOMQpOWpoBTYPslAH5u2k0N-9FtRijUSazroMaN--UfVl0f91yhqQbhpwWk3QuYKfSczGollaRQN2vZVMN2jU58LjWaSdS3v-Idr3zI_mfy0GFQr70yVmyG6iz4SD9eHJMqwZTWJSoClExRKNVtKAStK7FsubllPy1SOMVorJHWkcpPrf-hWVJClMubw4g91ddgJQRRH1Ax0NOtkgFyvzUbGulND41Y2VzjmRakIhDOwjQLnLX2EA12P5D_QdZEL6VyLP6FeE5qRW4_RVHyubKCea-b2D8HLeyApDtADACc4jpgNu9aphrsvaXyEKKNYkimiKyKHjNj_x7g4wy4s64CLVPZ=s1600" alt="Enviar" class="button-icon-white">
-                    Enviar Pedido de Reclassificação
-                    <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_HvciQwqli0eJBkxj916j4FAPmt_gBsPdNJvXntsmHxGX-auipSkhmR2N-TAWNnWlRn7mMcutPEJ9TPfcrLptcbQvYaFTtWg_yPBRTYRfJC6DUwDTk_ouY1h2ozUlUbDDh_hCT0Oo0ADhnrfqDwxO5-Yv8CnefaTqvO31ZnlQk3nZb0yHH56wBbO55ZUpkfVASHM6JK4GSN7Q01DYq-cd6AW5vFDCN4zvyhNh7F_E2nlY1EtI-y4aBXj0MoUDhx8qQ5XRSAaadiUHSW4EoFqNImvSuEi33ATvg00S-Ril3FVd8-v-sfLdd5y_YpxMQ79rmYGHWF-T7GTNe0u5nywwhAv77ec8GEgUEfSuWoGX0enNqqSC26YmM_Mg4oRtPlPwTjPDS2cPqpvpmq7ibArhgXmrb-zEVUmmOAJb33kJJLNgurWWsxI_hP34nHobPAzgkQgFdM9OERNqO-nv-Y5x6h-Mhp4eLKCRsAdJwwVoqQ8qZHsray1M6JJf-wdFacdOxUb_YABfzKnfulZpauGlGlGZfHXHvlGj896jblzfHIsnMGsj79jE7X7SawZRoyVK7ycfy9nahqxaWizSuZWcWM4SNkQTBaka55A4RwQLGFFoQnasC3AoXg4JBUkvXHYPTeWyI_eRE90nyyRh-h_DhC9oJrJl_ylitTAXvr3TOMQpOWpoBTYPslAH5u2k0N-9FtRijUSazroMaN--UfVl0f91yhqQbhpwWk3QuYKfSczGollaRQN2vZVMN2jU58LjWaSdS3v-Idr3zI_mfy0GFQr70yVmyG6iz4SD9eHJMqwZTWJSoClExRKNVtKAStK7FsubllPy1SOMVorJHWkcpPrf-hWVJClMubw4g91ddgJQRRH1Ax0NOtkgFyvzUbGulND41Y2VzjmRakIhDOwjQLnLX2EA12P5D_QdZEL6VyLP6FeE5qRW4_RVHyubKCea-b2D8HLeyApDtADACc4jpgNu9aphrsvaXyEKKNYkimiKyKHjNj_x7g4wy4s64CLVPZ=s1600" alt="Enviar" class="button-icon-white">
-                `;
+                submitButton.innerHTML = originalButtonText; // Restaura o HTML original (com ícones)
             }
         });
 
@@ -756,6 +786,8 @@
 
         async function handleSearch() {
             const query = searchQueryInput.value.trim();
+            const originalButtonText = btnSearch.innerHTML; 
+            
             if (query.length < 3) {
                 searchResultsDiv.innerHTML = '<p class="error message-box">Digite pelo menos 3 caracteres.</p>';
                 return;
@@ -778,11 +810,7 @@
                 showMessage('error', `Falha na conexão ao buscar dados. Verifique o console (F12).`);
             } finally {
                 btnSearch.disabled = false;
-                // Restaura o texto original do botão (com a árvore)
-                btnSearch.innerHTML = `
-                    <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_HvciQwqli0eJBkxj916j4FAPmt_gBsPdNJvXntsmHxGX-auipSkhmR2N-TAWNnWlRn7mMcutPEJ9TPfcrLptcbQvYaFTtWg_yPBRTYRfJC6DUwDTk_ouY1h2ozUlUbDDh_hCT0Oo0ADhnrfqDwxO5-Yv8CnefaTqvO31ZnlQk3nZb0yHH56wBbO55ZUpkfVASHM6JK4GSN7Q01DYq-cd6AW5vFDCN4zvyhNh7F_E2nlY1EtI-y4aBXj0MoUDhx8qQ5XRSAaadiUHSW4EoFqNImvSuEi33ATvg00S-Ril3FVd8-v-sfLdd5y_YpxMQ79rmYGHWF-T7GTNe0u5nywwhAv77ec8GEgUEfSuWoGX0enNqqSC26YmM_Mg4oRtPlPwTjPDS2cPqpvpmq7ibArhgXmrb-zEVUmmOAJb33kJJLNgurWWsxI_hP34nHobPAzgkQgFdM9OERNqO-nv-Y5x6h-Mhp4eLKCRsAdJwwVoqQ8qZHsray1M6JJf-wdFacdOxUb_YABfzKnfulZpauGlGlGZfHXHvlGj896jblzfHIsnMGsj79jE7X7SawZRoyVK7ycfy9nahqxaWizSuZWcWM4SNkQTBaka55A4RwQLGFFoQnasC3AoXg4JBUkvXHYPTeWyI_eRE90nyyRh-h_DhC9oJrJl_ylitTAXvr3TOMQpOWpoBTYPslAH5u2k0N-9FtRijUSazroMaN--UfVl0f91yhqQbhpwWk3QuYKfSczGollaRQN2vZVMN2jU58LjWaSdS3v-Idr3zI_mfy0GFQr70yVmyG6iz4SD9eHJMqwZTWJSoClExRKNVtKAStK7FsubllPy1SOMVorJHWkcpPrf-hWVJClMubw4g91ddgJQRRH1Ax0NOtkgFyvzUbGulND41Y2VzjmRakIhDOwjQLnLX2EA12P5D_QdZEL6VyLP6FeE5qRW4_RVHyubKCea-b2D8HLeyApDtADACc4jpgNu9aphrsvaXyEKKNYkimiKyKHjNj_x7g4wy4s64CLVPZ=s1600" alt="Buscar" class="button-icon-white">
-                    Buscar Pedidos
-                `;
+                btnSearch.innerHTML = originalButtonText; 
             }
         }
         
