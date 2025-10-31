@@ -444,20 +444,16 @@
             return dataA - dataB;
         }
 
-        // ✅ CORREÇÃO 2: 'skipSort' foi adicionado
-        function populateSelect(selectElement, options, initialText = 'Selecione', skipSort = false) {
+        // Popula o select e aplica o Tom Select
+        function populateSelect(selectElement, options, initialText = 'Selecione') {
             const id = selectElement.id;
             if (tomSelectInstances[id]) {
                 tomSelectInstances[id].destroy();
                 delete tomSelectInstances[id];
             }
             
-            let uniqueOptions = [...new Set(options.filter(Boolean))];
-            
-            // Só ordena alfabeticamente se skipSort for false
-            if (!skipSort) {
-                uniqueOptions.sort();
-            }
+            // A ordenação padrão (alfabética) é mantida aqui
+            const uniqueOptions = [...new Set(options.filter(Boolean))].sort();
             
             selectElement.innerHTML = `<option value="" disabled selected>${initialText}</option>`;
             uniqueOptions.forEach(option => {
@@ -480,6 +476,7 @@
             }
         }
         
+        // Função auxiliar para adicionar listeners ao Tom Select
         function addTomSelectChangeListener(selectId, handler) {
             const tsInstance = tomSelectInstances[selectId];
             if (tsInstance) {
@@ -519,16 +516,19 @@
 
             div.querySelector('.btn-remove-line').addEventListener('click', removeFunction);
 
+            // Popula Nível 1 e inicializa Tom Select
             const nivel1Select = div.querySelector('select[name="nivel1"]');
             const nivel1Options = [...new Set(cascadingOptionsData.map(row => row[0]))];
             populateSelect(nivel1Select, nivel1Options, 'Selecione Nível 1');
 
+            // Inicializa os outros selects (vazios) com Tom Select
             populateSelect(div.querySelector('select[name="nivel2"]'), [], 'Selecione N1');
             populateSelect(div.querySelector('select[name="nivel3"]'), [], 'Selecione N2');
             populateSelect(div.querySelector('select[name="nivel4"]'), [], 'Selecione N3');
             populateSelect(div.querySelector('select[name="nivel5"]'), [], 'Selecione N4');
             populateSelect(div.querySelector('select[name="centro"]'), [], 'Selecione N2');
 
+            // Adiciona Event Listeners na instância do Tom Select
             addTomSelectChangeListener(`nivel1-${lineId}`, () => updateCascadingSelects(lineId, 1));
             
             addTomSelectChangeListener(`nivel2-${lineId}`, () => {
@@ -612,12 +612,8 @@
             }
         }
 
-        // ✅ CORREÇÃO 1: Adicionado parâmetro isReload
-        async function loadOptionsAndFixedLists(isReload = false) {
-            if (!isReload) {
-                loadingOverlay.style.display = 'flex';
-            }
-            
+        async function loadOptionsAndFixedLists() {
+            loadingOverlay.style.display = 'flex';
             try {
                 const response = await fetch(`${APPS_SCRIPT_URL}?action=get_options`);
                 if (!response.ok) { 
@@ -634,34 +630,24 @@
                     const competenciaSelect = document.getElementById('competencia');
                     if (competenciaSelect && fixedLists.competenciaList) {
                         
-                        // ✅ CORREÇÃO 2: Ordena a lista de competência
+                        // ✅ CORREÇÃO 2: Ordena a lista de competência antes de popular
                         fixedLists.competenciaList.sort(sortCompetencia); 
                         
-                        // ✅ CORREÇÃO 2: Passa 'true' para pular a re-ordenação alfabética
-                        populateSelect(competenciaSelect, fixedLists.competenciaList, 'Selecione a Competência', true); 
+                        populateSelect(competenciaSelect, fixedLists.competenciaList, 'Selecione a Competência');
                         competenciaSelect.disabled = false;
                     }
                     
-                    if (rateioContainer.children.length === 0 && !isReload) {
+                    if (rateioContainer.children.length === 0) {
                         createRateioLine();
                     }
                 } else {
-                    // Só mostra erro se não for um recarregamento
-                    if (!isReload) {
-                        showMessage('error', `Erro ao carregar opções (Verifique Logs do Apps Script): ${data.error}`);
-                    }
+                    showMessage('error', `Erro ao carregar opções (Verifique Logs do Apps Script): ${data.error}`);
                 }
             } catch (error) {
                 console.error("Erro detalhado em loadOptionsAndFixedLists:", error);
-                // Só mostra erro se não for um recarregamento
-                if (!isReload) {
-                    showMessage('error', `Falha na conexão inicial. Verifique se a APPS_SCRIPT_URL está atualizada e se o Deploy permite "Qualquer pessoa".`);
-                }
+                showMessage('error', `Falha na conexão inicial. Verifique se a APPS_SCRIPT_URL está atualizada e se o Deploy permite "Qualquer pessoa".`);
             } finally {
-                // Só esconde o overlay se não for um recarregamento (pois no recarregamento ele nem é mostrado)
-                if (!isReload) {
-                    loadingOverlay.style.display = 'none';
-                }
+                loadingOverlay.style.display = 'none';
             }
         }
 
@@ -686,7 +672,6 @@
         submissionForm.addEventListener("submit", async function(event) {
             event.preventDefault(); 
             const submitButton = submissionForm.querySelector('button.btn-submit');
-            const originalButtonText = submitButton.innerHTML; // Salva o HTML original do botão
 
             const rateioLines = document.querySelectorAll('#rateio-container .rateio-item');
             const isRateioPresent = rateioLines.length > 0;
@@ -737,9 +722,10 @@
                     tomSelectInstances = {};
                     rateioContainer.innerHTML = ''; 
                     
-                    // ✅ CORREÇÃO 1: Chama o recarregamento com a flag 'isReload = true'
-                    // Isso evita que a mensagem de sucesso seja sobrescrita por um erro de recarga.
-                    loadOptionsAndFixedLists(true); 
+                    // ✅ CORREÇÃO 1: Não 'await'. Apenas chama o recarregamento.
+                    // Isso mostra a msg de sucesso imediatamente e previne que
+                    // um erro de recarga sobreponha a msg de sucesso.
+                    loadOptionsAndFixedLists(); 
                     
                 } else {
                     throw new Error(responseData.error || `Resposta de erro do servidor Apps Script: ${JSON.stringify(responseData)}`);
@@ -749,7 +735,12 @@
                 showMessage('error', `❌ **Falha de Comunicação:** ${error.message}. O pedido pode ter sido enviado, mas a confirmação falhou. Verifique a planilha.`);
             } finally {
                 submitButton.disabled = false;
-                submitButton.innerHTML = originalButtonText; // Restaura o HTML original (com ícones)
+                // Restaura o texto original do botão (com as árvores)
+                submitButton.innerHTML = `
+                    <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_HvciQwqli0eJBkxj916j4FAPmt_gBsPdNJvXntsmHxGX-auipSkhmR2N-TAWNnWlRn7mMcutPEJ9TPfcrLptcbQvYaFTtWg_yPBRTYRfJC6DUwDTk_ouY1h2ozUlUbDDh_hCT0Oo0ADhnrfqDwxO5-Yv8CnefaTqvO31ZnlQk3nZb0yHH56wBbO55ZUpkfVASHM6JK4GSN7Q01DYq-cd6AW5vFDCN4zvyhNh7F_E2nlY1EtI-y4aBXj0MoUDhx8qQ5XRSAaadiUHSW4EoFqNImvSuEi33ATvg00S-Ril3FVd8-v-sfLdd5y_YpxMQ79rmYGHWF-T7GTNe0u5nywwhAv77ec8GEgUEfSuWoGX0enNqqSC26YmM_Mg4oRtPlPwTjPDS2cPqpvpmq7ibArhgXmrb-zEVUmmOAJb33kJJLNgurWWsxI_hP34nHobPAzgkQgFdM9OERNqO-nv-Y5x6h-Mhp4eLKCRsAdJwwVoqQ8qZHsray1M6JJf-wdFacdOxUb_YABfzKnfulZpauGlGlGZfHXHvlGj896jblzfHIsnMGsj79jE7X7SawZRoyVK7ycfy9nahqxaWizSuZWcWM4SNkQTBaka55A4RwQLGFFoQnasC3AoXg4JBUkvXHYPTeWyI_eRE90nyyRh-h_DhC9oJrJl_ylitTAXvr3TOMQpOWpoBTYPslAH5u2k0N-9FtRijUSazroMaN--UfVl0f91yhqQbhpwWk3QuYKfSczGollaRQN2vZVMN2jU58LjWaSdS3v-Idr3zI_mfy0GFQr70yVmyG6iz4SD9eHJMqwZTWJSoClExRKNVtKAStK7FsubllPy1SOMVorJHWkcpPrf-hWVJClMubw4g91ddgJQRRH1Ax0NOtkgFyvzUbGulND41Y2VzjmRakIhDOwjQLnLX2EA12P5D_QdZEL6VyLP6FeE5qRW4_RVHyubKCea-b2D8HLeyApDtADACc4jpgNu9aphrsvaXyEKKNYkimiKyKHjNj_x7g4wy4s64CLVPZ=s1600" alt="Enviar" class="button-icon-white">
+                    Enviar Pedido de Reclassificação
+                    <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_HvciQwqli0eJBkxj916j4FAPmt_gBsPdNJvXntsmHxGX-auipSkhmR2N-TAWNnWlRn7mMcutPEJ9TPfcrLptcbQvYaFTtWg_yPBRTYRfJC6DUwDTk_ouY1h2ozUlUbDDh_hCT0Oo0ADhnrfqDwxO5-Yv8CnefaTqvO31ZnlQk3nZb0yHH56wBbO55ZUpkfVASHM6JK4GSN7Q01DYq-cd6AW5vFDCN4zvyhNh7F_E2nlY1EtI-y4aBXj0MoUDhx8qQ5XRSAaadiUHSW4EoFqNImvSuEi33ATvg00S-Ril3FVd8-v-sfLdd5y_YpxMQ79rmYGHWF-T7GTNe0u5nywwhAv77ec8GEgUEfSuWoGX0enNqqSC26YmM_Mg4oRtPlPwTjPDS2cPqpvpmq7ibArhgXmrb-zEVUmmOAJb33kJJLNgurWWsxI_hP34nHobPAzgkQgFdM9OERNqO-nv-Y5x6h-Mhp4eLKCRsAdJwwVoqQ8qZHsray1M6JJf-wdFacdOxUb_YABfzKnfulZpauGlGlGZfHXHvlGj896jblzfHIsnMGsj79jE7X7SawZRoyVK7ycfy9nahqxaWizSuZWcWM4SNkQTBaka55A4RwQLGFFoQnasC3AoXg4JBUkvXHYPTeWyI_eRE90nyyRh-h_DhC9oJrJl_ylitTAXvr3TOMQpOWpoBTYPslAH5u2k0N-9FtRijUSazroMaN--UfVl0f91yhqQbhpwWk3QuYKfSczGollaRQN2vZVMN2jU58LjWaSdS3v-Idr3zI_mfy0GFQr70yVmyG6iz4SD9eHJMqwZTWJSoClExRKNVtKAStK7FsubllPy1SOMVorJHWkcpPrf-hWVJClMubw4g91ddgJQRRH1Ax0NOtkgFyvzUbGulND41Y2VzjmRakIhDOwjQLnLX2EA12P5D_QdZEL6VyLP6FeE5qRW4_RVHyubKCea-b2D8HLeyApDtADACc4jpgNu9aphrsvaXyEKKNYkimiKyKHjNj_x7g4wy4s64CLVPZ=s1600" alt="Enviar" class="button-icon-white">
+                `;
             }
         });
 
@@ -765,8 +756,6 @@
 
         async function handleSearch() {
             const query = searchQueryInput.value.trim();
-            const originalButtonText = btnSearch.innerHTML; // Salva HTML original
-            
             if (query.length < 3) {
                 searchResultsDiv.innerHTML = '<p class="error message-box">Digite pelo menos 3 caracteres.</p>';
                 return;
@@ -789,7 +778,11 @@
                 showMessage('error', `Falha na conexão ao buscar dados. Verifique o console (F12).`);
             } finally {
                 btnSearch.disabled = false;
-                btnSearch.innerHTML = originalButtonText; // Restaura HTML original
+                // Restaura o texto original do botão (com a árvore)
+                btnSearch.innerHTML = `
+                    <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_HvciQwqli0eJBkxj916j4FAPmt_gBsPdNJvXntsmHxGX-auipSkhmR2N-TAWNnWlRn7mMcutPEJ9TPfcrLptcbQvYaFTtWg_yPBRTYRfJC6DUwDTk_ouY1h2ozUlUbDDh_hCT0Oo0ADhnrfqDwxO5-Yv8CnefaTqvO31ZnlQk3nZb0yHH56wBbO55ZUpkfVASHM6JK4GSN7Q01DYq-cd6AW5vFDCN4zvyhNh7F_E2nlY1EtI-y4aBXj0MoUDhx8qQ5XRSAaadiUHSW4EoFqNImvSuEi33ATvg00S-Ril3FVd8-v-sfLdd5y_YpxMQ79rmYGHWF-T7GTNe0u5nywwhAv77ec8GEgUEfSuWoGX0enNqqSC26YmM_Mg4oRtPlPwTjPDS2cPqpvpmq7ibArhgXmrb-zEVUmmOAJb33kJJLNgurWWsxI_hP34nHobPAzgkQgFdM9OERNqO-nv-Y5x6h-Mhp4eLKCRsAdJwwVoqQ8qZHsray1M6JJf-wdFacdOxUb_YABfzKnfulZpauGlGlGZfHXHvlGj896jblzfHIsnMGsj79jE7X7SawZRoyVK7ycfy9nahqxaWizSuZWcWM4SNkQTBaka55A4RwQLGFFoQnasC3AoXg4JBUkvXHYPTeWyI_eRE90nyyRh-h_DhC9oJrJl_ylitTAXvr3TOMQpOWpoBTYPslAH5u2k0N-9FtRijUSazroMaN--UfVl0f91yhqQbhpwWk3QuYKfSczGollaRQN2vZVMN2jU58LjWaSdS3v-Idr3zI_mfy0GFQr70yVmyG6iz4SD9eHJMqwZTWJSoClExRKNVtKAStK7FsubllPy1SOMVorJHWkcpPrf-hWVJClMubw4g91ddgJQRRH1Ax0NOtkgFyvzUbGulND41Y2VzjmRakIhDOwjQLnLX2EA12P5D_QdZEL6VyLP6FeE5qRW4_RVHyubKCea-b2D8HLeyApDtADACc4jpgNu9aphrsvaXyEKKNYkimiKyKHjNj_x7g4wy4s64CLVPZ=s1600" alt="Buscar" class="button-icon-white">
+                    Buscar Pedidos
+                `;
             }
         }
         
