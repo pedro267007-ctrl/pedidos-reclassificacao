@@ -37,7 +37,7 @@
 
         header { 
             background-color: var(--abril-green); /* CABEÇALHO VERDE */
-            padding: 15px 0; 
+            padding: 15px 0; /* Menos padding */
             text-align: center; 
             margin-bottom: 30px; 
             box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1); 
@@ -49,14 +49,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px; 
+            gap: 15px; /* Espaço entre a logo e o título */
         }
-        .header-logo-white { 
+        .header-logo-white { /* Logo da árvore branca no cabeçalho */
             height: 45px;
-            filter: brightness(0) invert(1); 
+            filter: brightness(0) invert(1); /* Mantido, caso precise inverter para branco puro */
         }
         h1 { 
-            color: white; 
+            color: white; /* TEXTO BRANCO DENTRO DO HEADER VERDE */
             margin: 0; 
             font-size: 2.0em; 
             font-weight: 300; 
@@ -92,7 +92,7 @@
             display: flex; 
             align-items: center;
         }
-        .section-title-logo-green { 
+        .section-title-logo-green { /* Logo da árvore verde nos títulos de seção */
             height: 25px; 
             margin-left: 10px; 
         }
@@ -103,13 +103,6 @@
             gap: 20px; 
             margin-bottom: 25px; 
         } 
-        .solicitante-grid {
-            grid-template-columns: repeat(2, 1fr); 
-        }
-        .documento-grid {
-            grid-template-columns: repeat(4, 1fr);
-        }
-        
         .input-group { margin-bottom: 18px; } 
         label { 
             display: block; 
@@ -206,10 +199,10 @@
             gap: 8px; 
         }
 
-        .button-icon-white { 
+        .button-icon-white { /* Ícone da árvore branca nos botões */
             height: 20px; 
             vertical-align: middle;
-            filter: brightness(0) invert(1); 
+            filter: brightness(0) invert(1); /* Mantido, caso precise inverter para branco puro */
         }
 
         .btn-add-line { 
@@ -322,7 +315,6 @@
         /* ---------------------------------------------------------------------- */
         @media (max-width: 992px) {
             .section-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
-            .solicitante-grid, .documento-grid { grid-template-columns: repeat(2, 1fr); }
             .container { padding: 25px; margin: 15px; }
             h1 { font-size: 1.8em; }
             .header-logo-white { height: 40px; }
@@ -332,7 +324,6 @@
         }
         @media (max-width: 600px) {
             .section-grid { grid-template-columns: 1fr; gap: 10px; }
-            .solicitante-grid, .documento-grid { grid-template-columns: 1fr; }
             .container { padding: 15px; margin: 10px; }
             h1 { font-size: 1.5em; }
             .header-content-wrapper { flex-direction: column; gap: 8px; }
@@ -379,21 +370,17 @@
     <div class="container">
         <form id="submission-form" enctype="multipart/form-data"> 
             
-            <h2>1. Dados do Solicitante <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_H4Xp9bJmGrN_tZksDmuc8IOFTZu7l2OFO7ATkbzIbWPC_7CxabI7ZsvIgsi5XHs9U3a5ahH6Ao3yyCeGUxmzNXbLUwQq5Gx1oMX6lR-cqdOVfyh2QeEB93_RggPaV3DFgJSLqijXlsoa4OdnJYRN_Mtbw0WD7HejxlO_IvuYzXCwjhOmFtGjU_YDWghc144BqvCtf1PagSWmCpBMNwqmSF_bV-y5dXGC0_Sczp0mmelFKK1jqXcO-W5JAaTGuy2VsrP5FfVgllcbbOZcRxSZi3A7WEocdy0HmGoE7i_ffO2sJ588Lx2HlOCJ2z8h7TuhjCm-np7lB9ifeMm4Qjnh0aCANlLcC-bWc_kdnjTgVphs9HXkPwvQcBIhdy-_3g0si0iW5dJXqbPvM_YUHFdftu7FjqojKe6dELYAvIbdbUSGYBF9uGOP4NzB0gXNQVPJL74rksa_rR8VK9GE7qIpQGro8fouhCivuQ5o4lcEaPtXEpcF4dQwEYWORpTwwscWFJAqa0vsLPDL6CTWJ3jMjASEJpQpFUBsZiAZPgrZeTeV4m-ZJetddG94TGmAGAv1JY8t1LxzDTmUBMLhthzuMArLGOnPGMYje2XDO1y4ghpbiciBZ9PMuUOYn7laSKK_krNa7ChsmJ65y9iTMRukY-_MdhI2p_A_FuqMB-p0_9qsZOZWloFS1E9_qi0mpW0FQVfQT6AkBH9tiuDyWL8idCpoMcyDu-BInL0wcOcZlbFfRdCup4bL7srAmuRhDSdXfXcOho6BokcSEzYoNwptvECCopAMVbmjSJtJXdfS_J-crf891FPjSkcZwtd-bQXY-GbkeUdVZhkIyoGko3c79_9vkl3MPI8Kvrnp40UPDayhIsElOlM497xqGxPsmworQXKyO5tWRKeDAtKhCOPAoS51xHaCeJKYZDdTrDJWl2iuF70A3kDOysZiHzGWuOjEQQLe_q9-RZUHOpry_qAjr_i0jPr9EV1VHxN8vj3Co7sTJG74B3a6Ub9y9_aZqPink4Eg=s1600" alt="Logo" class="section-title-logo-green"></h2>
-            <div class="section-grid solicitante-grid">
+            <h2>1. Dados do Solicitante e Documento <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_H4Xp9bJmGrN_tZksDmuc8IOFTZu7l2OFO7ATkbzIbWPC_7CxabI7ZsvIgsi5XHs9U3a5ahH6Ao3yyCeGUxmzNXbLUwQq5Gx1oMX6lR-cqdOVfyh2QeEB93_RggPaV3DFgJSLqijXlsoa4OdnJYRN_Mtbw0WD7HejxlO_IvuYzXCwjhOmFtGjU_YDWghc144BqvCtf1PagSWmCpBMNwqmSF_bV-y5dXGC0_Sczp0mmelFKK1jqXcO-W5JAaTGuy2VsrP5FfVgllcbbOZcRxSZi3A7WEocdy0HmGoE7i_ffO2sJ588Lx2HlOCJ2z8h7TuhjCm-np7lB9ifeMm4Qjnh0aCANlLcC-bWc_kdnjTgVphs9HXkPwvQcBIhdy-_3g0si0iW5dJXqbPvM_YUHFdftu7FjqojKe6dELYAvIbdbUSGYBF9uGOP4NzB0gXNQVPJL74rksa_rR8VK9GE7qIpQGro8fouhCivuQ5o4lcEaPtXEpcF4dQwEYWORpTwwscWFJAqa0vsLPDL6CTWJ3jMjASEJpQpFUBsZiAZPgrZeTeV4m-ZJetddG94TGmAGAv1JY8t1LxzDTmUBMLhthzuMArLGOnPGMYje2XDO1y4ghpbiciBZ9PMuUOYn7laSKK_krNa7ChsmJ65y9iTMRukY-_MdhI2p_A_FuqMB-p0_9qsZOZWloFS1E9_qi0mpW0FQVfQT6AkBH9tiuDyWL8idCpoMcyDu-BInL0wcOcZlbFfRdCup4bL7srAmuRhDSdXfXcOho6BokcSEzYoNwptvECCopAMVbmjSJtJXdfS_J-crf891FPjSkcZwtd-bQXY-GbkeUdVZhkIyoGko3c79_9vkl3MPI8Kvrnp40UPDayhIsElOlM497xqGxPsmworQXKyO5tWRKeDAtKhCOPAoS51xHaCeJKYZDdTrDJWl2iuF70A3kDOysZiHzGWuOjEQQLe_q9-RZUHOpry_qAjr_i0jPr9EV1VHxN8vj3Co7sTJG74B3a6Ub9y9_aZqPink4Eg=s1600" alt="Logo" class="section-title-logo-green"></h2>
+            <div class="section-grid">
                 <div class="input-group"><label for="solicitante">Solicitante:</label><input type="text" id="solicitante" name="solicitante" required></div>
                 <div class="input-group"><label for="emailSolicitante">E-mail do Solicitante:</label><input type="email" id="emailSolicitante" name="emailSolicitante" required></div>
-            </div>
-
-            <h2>2. Dados do Documento <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_H4Xp9bJmGrN_tZksDmuc8IOFTZu7l2OFO7ATkbzIbWPC_7CxabI7ZsvIgsi5XHs9U3a5ahH6Ao3yyCeGUxmzNXbLUwQq5Gx1oMX6lR-cqdOVfyh2QeEB93_RggPaV3DFgJSLqijXlsoa4OdnJYRN_Mtbw0WD7HejxlO_IvuYzXCwjhOmFtGjU_YDWghc144BqvCtf1PagSWmCpBMNwqmSF_bV-y5dXGC0_Sczp0mmelFKK1jqXcO-W5JAaTGuy2VsrP5FfVgllcbbOZcRxSZi3A7WEocdy0HmGoE7i_ffO2sJ588Lx2HlOCJ2z8h7TuhjCm-np7lB9ifeMm4Qjnh0aCANlLcC-bWc_kdnjTgVphs9HXkPwvQcBIhdy-_3g0si0iW5dJXqbPvM_YUHFdftu7FjqojKe6dELYAvIbdbUSGYBF9uGOP4NzB0gXNQVPJL74rksa_rR8VK9GE7qIpQGro8fouhCivuQ5o4lcEaPtXEpcF4dQwEYWORpTwwscWFJAqa0vsLPDL6CTWJ3jMjASEJpQpFUBsZiAZPgrZeTeV4m-ZJetddG94TGmAGAv1JY8t1LxzDTmUBMLhthzuMArLGOnPGMYje2XDO1y4ghpbiciBZ9PMuUOYn7laSKK_krNa7ChsmJ65y9iTMRukY-_MdhI2p_A_FuqMB-p0_9qsZOZWloFS1E9_qi0mpW0FQVfQT6AkBH9tiuDyWL8idCpoMcyDu-BInL0wcOcZlbFfRdCup4bL7srAmuRhDSdXfXcOho6BokcSEzYoNwptvECCopAMVbmjSJtJXdfS_J-crf891FPjSkcZwtd-bQXY-GbkeUdVZhkIyoGko3c79_9vkl3MPI8Kvrnp40UPDayhIsElOlM497xqGxPsmworQXKyO5tWRKeDAtKhCOPAoS51xHaCeJKYZDdTrDJWl2iuF70A3kDOysZiHzGWuOjEQQLe_q9-RZUHOpry_qAjr_i0jPr9EV1VHxN8vj3Co7sTJG74B3a6Ub9y9_aZqPink4Eg=s1600" alt="Logo" class="section-title-logo-green"></h2>
-            <div class="section-grid documento-grid">
                 <div class="input-group"><label for="parceiro">Nome do Parceiro:</label><input type="text" id="parceiro" name="parceiro" required></div>
                 <div class="input-group"><label for="docNumero">Nº do Documento/Histórico:</label><input type="text" id="docNumero" name="docNumero" required></div>
                 <div class="input-group"><label for="valorTotal">Valor Total do Documento (Cheio):</label><input type="number" step="0.01" id="valorTotal" name="valorTotal" required></div>
                 <div class="input-group"><label for="competencia">Competência:</label><select id="competencia" name="competencia" required disabled><option value="">Carregando...</option></select></div>
             </div>
 
-            <h2>3. Detalhamento e Rateio da Conta <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_H4Xp9bJmGrN_tZksDmuc8IOFTZu7l2OFO7ATkbzIbWPC_7CxabI7ZsvIgsi5XHs9U3a5ahH6Ao3yyCeGUxmzNXbLUwQq5Gx1oMX6lR-cqdOVfyh2QeEB93_RggPaV3DFgJSLqijXlsoa4OdnJYRN_Mtbw0WD7HejxlO_IvuYzXCwjhOmFtGjU_YDWghc144BqvCtf1PagSWmCpBMNwqmSF_bV-y5dXGC0_Sczp0mmelFKK1jqXcO-W5JAaTGuy2VsrP5FfVgllcbbOZcRxSZi3A7WEocdy0HmGoE7i_ffO2sJ588Lx2HlOCJ2z8h7TuhjCm-np7lB9ifeMm4Qjnh0aCANlLcC-bWc_kdnjTgVphs9HXkPwvQcBIhdy-_3g0si0iW5dJXqbPvM_YUHFdftu7FjqojKe6dELYAvIbdbUSGYBF9uGOP4NzB0gXNQVPJL74rksa_rR8VK9GE7qIpQGro8fouhCivuQ5o4lcEaPtXEpcF4dQwEYWORpTwwscWFJAqa0vsLPDL6CTWJ3jMjASEJpQpFUBsZiAZPgrZeTeV4m-ZJetddG94TGmAGAv1JY8t1LxzDTmUBMLhthzuMArLGOnPGMYje2XDO1y4ghpbiciBZ9PMuUOYn7laSKK_krNa7ChsmJ65y9iTMRukY-_MdhI2p_A_FuqMB-p0_9qsZOZWloFS1E9_qi0mpW0FQVfQT6AkBH9tiuDyWL8idCpoMcyDu-BInL0wcOcZlbFfRdCup4bL7srAmuRhDSdXfXcOho6BokcSEzYoNwptvECCopAMVbmjSJtJXdfS_J-crf891FPjSkcZwtd-bQXY-GbkeUdVZhkIyoGko3c79_9vkl3MPI8Kvrnp40UPDayhIsElOlM497xqGxPsmworQXKyO5tWRKeDAtKhCOPAoS51xHaCeJKYZDdTrDJWl2iuF70A3kDOysZiHzGWuOjEQQLe_q9-RZUHOpry_qAjr_i0jPr9EV1VHxN8vj3Co7sTJG74B3a6Ub9y9_aZqPink4Eg=s1600" alt="Logo" class="section-title-logo-green"></h2>
+            <h2>2. Detalhamento e Rateio da Conta <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_H4Xp9bJmGrN_tZksDmuc8IOFTZu7l2OFO7ATkbzIbWPC_7CxabI7ZsvIgsi5XHs9U3a5ahH6Ao3yyCeGUxmzNXbLUwQq5Gx1oMX6lR-cqdOVfyh2QeEB93_RggPaV3DFgJSLqijXlsoa4OdnJYRN_Mtbw0WD7HejxlO_IvuYzXCwjhOmFtGjU_YDWghc144BqvCtf1PagSWmCpBMNwqmSF_bV-y5dXGC0_Sczp0mmelFKK1jqXcO-W5JAaTGuy2VsrP5FfVgllcbbOZcRxSZi3A7WEocdy0HmGoE7i_ffO2sJ588Lx2HlOCJ2z8h7TuhjCm-np7lB9ifeMm4Qjnh0aCANlLcC-bWc_kdnjTgVphs9HXkPwvQcBIhdy-_3g0si0iW5dJXqbPvM_YUHFdftu7FjqojKe6dELYAvIbdbUSGYBF9uGOP4NzB0gXNQVPJL74rksa_rR8VK9GE7qIpQGro8fouhCivuQ5o4lcEaPtXEpcF4dQwEYWORpTwwscWFJAqa0vsLPDL6CTWJ3jMjASEJpQpFUBsZiAZPgrZeTeV4m-ZJetddG94TGmAGAv1JY8t1LxzDTmUBMLhthzuMArLGOnPGMYje2XDO1y4ghpbiciBZ9PMuUOYn7laSKK_krNa7ChsmJ65y9iTMRukY-_MdhI2p_A_FuqMB-p0_9qsZOZWloFS1E9_qi0mpW0FQVfQT6AkBH9tiuDyWL8idCpoMcyDu-BInL0wcOcZlbFfRdCup4bL7srAmuRhDSdXfXcOho6BokcSEzYoNwptvECCopAMVbmjSJtJXdfS_J-crf891FPjSkcZwtd-bQXY-GbkeUdVZhkIyoGko3c79_9vkl3MPI8Kvrnp40UPDayhIsElOlM497xqGxPsmworQXKyO5tWRKeDAtKhCOPAoS51xHaCeJKYZDdTrDJWl2iuF70A3kDOysZiHzGWuOjEQQLe_q9-RZUHOpry_qAjr_i0jPr9EV1VHxN8vj3Co7sTJG74B3a6Ub9y9_aZqPink4Eg=s1600" alt="Logo" class="section-title-logo-green"></h2>
             
             <div class="rateio-header">
                 <div>Nível 1</div>
@@ -413,7 +400,7 @@
                 Fazer Rateio (Adicionar Linha)
             </button>
             
-            <h2>4. Descrição e Anexos <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_H4Xp9bJmGrN_tZksDmuc8IOFTZu7l2OFO7ATkbzIbWPC_7CxabI7ZsvIgsi5XHs9U3a5ahH6Ao3yyCeGUxmzNXbLUwQq5Gx1oMX6lR-cqdOVfyh2QeEB93_RggPaV3DFgJSLqijXlsoa4OdnJYRN_Mtbw0WD7HejxlO_IvuYzXCwjhOmFtGjU_YDWghc144BqvCtf1PagSWmCpBMNwqmSF_bV-y5dXGC0_Sczp0mmelFKK1jqXcO-W5JAaTGuy2VsrP5FfVgllcbbOZcRxSZi3A7WEocdy0HmGoE7i_ffO2sJ588Lx2HlOCJ2z8h7TuhjCm-np7lB9ifeMm4Qjnh0aCANlLcC-bWc_kdnjTgVphs9HXkPwvQcBIhdy-_3g0si0iW5dJXqbPvM_YUHFdftu7FjqojKe6dELYAvIbdbUSGYBF9uGOP4NzB0gXNQVPJL74rksa_rR8VK9GE7qIpQGro8fouhCivuQ5o4lcEaPtXEpcF4dQwEYWORpTwwscWFJAqa0vsLPDL6CTWJ3jMjASEJpQpFUBsZiAZPgrZeTeV4m-ZJetddG94TGmAGAv1JY8t1LxzDTmUBMLhthzuMArLGOnPGMYje2XDO1y4ghpbiciBZ9PMuUOYn7laSKK_krNa7ChsmJ65y9iTMRukY-_MdhI2p_A_FuqMB-p0_9qsZOZWloFS1E9_qi0mpW0FQVfQT6AkBH9tiuDyWL8idCpoMcyDu-BInL0wcOcZlbFfRdCup4bL7srAmuRhDSdXfXcOho6BokcSEzYoNwptvECCopAMVbmjSJtJXdfS_J-crf891FPjSkcZwtd-bQXY-GbkeUdVZhkIyoGko3c79_9vkl3MPI8Kvrnp40UPDayhIsElOlM497xqGxPsmworQXKyO5tWRKeDAtKhCOPAoS51xHaCeJKYZDdTrDJWl2iuF70A3kDOysZiHzGWuOjEQQLe_q9-RZUHOpry_qAjr_i0jPr9EV1VHxN8vj3Co7sTJG74B3a6Ub9y9_aZqPink4Eg=s1600" alt="Logo" class="section-title-logo-green"></h2>
+            <h2>3. Descrição e Anexos <img src="https://lh3.googleusercontent.com/rd-d/ALs6j_H4Xp9bJmGrN_tZksDmuc8IOFTZu7l2OFO7ATkbzIbWPC_7CxabI7ZsvIgsi5XHs9U3a5ahH6Ao3yyCeGUxmzNXbLUwQq5Gx1oMX6lR-cqdOVfyh2QeEB93_RggPaV3DFgJSLqijXlsoa4OdnJYRN_Mtbw0WD7HejxlO_IvuYzXCwjhOmFtGjU_YDWghc144BqvCtf1PagSWmCpBMNwqmSF_bV-y5dXGC0_Sczp0mmelFKK1jqXcO-W5JAaTGuy2VsrP5FfVgllcbbOZcRxSZi3A7WEocdy0HmGoE7i_ffO2sJ588Lx2HlOCJ2z8h7TuhjCm-np7lB9ifeMm4Qjnh0aCANlLcC-bWc_kdnjTgVphs9HXkPwvQcBIhdy-_3g0si0iW5dJXqbPvM_YUHFdftu7FjqojKe6dELYAvIbdbUSGYBF9uGOP4NzB0gXNQVPJL74rksa_rR8VK9GE7qIpQGro8fouhCivuQ5o4lcEaPtXEpcF4dQwEYWORpTwwscWFJAqa0vsLPDL6CTWJ3jMjASEJpQpFUBsZiAZPgrZeTeV4m-ZJetddG94TGmAGAv1JY8t1LxzDTmUBMLhthzuMArLGOnPGMYje2XDO1y4ghpbiciBZ9PMuUOYn7laSKK_krNa7ChsmJ65y9iTMRukY-_MdhI2p_A_FuqMB-p0_9qsZOZWloFS1E9_qi0mpW0FQVfQT6AkBH9tiuDyWL8idCpoMcyDu-BInL0wcOcZlbFfRdCup4bL7srAmuRhDSdXfXcOho6BokcSEzYoNwptvECCopAMVbmjSJtJXdfS_J-crf891FPjSkcZwtd-bQXY-GbkeUdVZhkIyoGko3c79_9vkl3MPI8Kvrnp40UPDayhIsElOlM497xqGxPsmworQXKyO5tWRKeDAtKhCOPAoS51xHaCeJKYZDdTrDJWl2iuF70A3kDOysZiHzGWuOjEQQLe_q9-RZUHOpry_qAjr_i0jPr9EV1VHxN8vj3Co7sTJG74B3a6Ub9y9_aZqPink4Eg=s1600" alt="Logo" class="section-title-logo-green"></h2>
             <div class="input-group"><label for="justificativa">Descrição Detalhada:</label><textarea id="justificativa" name="justificativa" rows="4" required></textarea></div>
             <div class="input-group"><label for="fileUpload">Anexar Documentos (Opcional):</label><input type="file" id="fileUpload" name="fileUpload" multiple></div>
             
@@ -447,31 +434,17 @@
             formMessage.className = `message-box ${type}`;
             formMessage.innerHTML = message;
         }
-        
-        // Função para ordenar "MM/AAAA" corretamente (cronologicamente)
-        function sortCompetencia(a, b) {
-            const [mesA, anoA] = a.split('/').map(Number);
-            const [mesB, anoB] = b.split('/').map(Number);
-            const dataA = new Date(anoA, mesA - 1); // Mês é 0-indexado
-            const dataB = new Date(anoB, mesB - 1);
-            return dataA - dataB;
-        }
 
-        function populateSelect(selectElement, options, initialText = 'Selecione', skipSort = false) {
+        // Popula o select e aplica o Tom Select
+        function populateSelect(selectElement, options, initialText = 'Selecione') {
             const id = selectElement.id;
             if (tomSelectInstances[id]) {
                 tomSelectInstances[id].destroy();
                 delete tomSelectInstances[id];
             }
             
-            let uniqueOptions = [...new Set(options.filter(Boolean))];
-            
-            // Só ordena alfabeticamente se skipSort for false
-            if (!skipSort) {
-                uniqueOptions.sort();
-            }
-            
             selectElement.innerHTML = `<option value="" disabled selected>${initialText}</option>`;
+            const uniqueOptions = [...new Set(options.filter(Boolean))].sort();
             uniqueOptions.forEach(option => {
                 const opt = document.createElement('option');
                 opt.value = option;
@@ -482,26 +455,21 @@
             selectElement.disabled = (uniqueOptions.length === 0 && !selectElement.multiple);
 
             if (id) {
-                let tsConfig = {
+                tomSelectInstances[id] = new TomSelect(selectElement, {
                     create: false,
                     sortField: { field: "text", direction: "asc" },
                     placeholder: initialText,
                     labelField: 'text',
                     valueField: 'value'
-                };
-                
-                if (id === 'competencia') {
-                    tsConfig.sortField = []; 
-                }
-
-                tomSelectInstances[id] = new TomSelect(selectElement, tsConfig);
+                });
             }
         }
         
+        // CORREÇÃO: Função auxiliar para adicionar listeners ao Tom Select
         function addTomSelectChangeListener(selectId, handler) {
             const tsInstance = tomSelectInstances[selectId];
             if (tsInstance) {
-                tsInstance.off('change'); 
+                tsInstance.off('change'); // Remove listeners antigos para evitar duplicação
                 tsInstance.on('change', handler);
             }
         }
@@ -537,16 +505,19 @@
 
             div.querySelector('.btn-remove-line').addEventListener('click', removeFunction);
 
+            // Popula Nível 1 e inicializa Tom Select
             const nivel1Select = div.querySelector('select[name="nivel1"]');
             const nivel1Options = [...new Set(cascadingOptionsData.map(row => row[0]))];
             populateSelect(nivel1Select, nivel1Options, 'Selecione Nível 1');
 
+            // Inicializa os outros selects (vazios) com Tom Select
             populateSelect(div.querySelector('select[name="nivel2"]'), [], 'Selecione N1');
             populateSelect(div.querySelector('select[name="nivel3"]'), [], 'Selecione N2');
             populateSelect(div.querySelector('select[name="nivel4"]'), [], 'Selecione N3');
             populateSelect(div.querySelector('select[name="nivel5"]'), [], 'Selecione N4');
             populateSelect(div.querySelector('select[name="centro"]'), [], 'Selecione N2');
 
+            // CORREÇÃO: Adiciona Event Listeners na instância do Tom Select
             addTomSelectChangeListener(`nivel1-${lineId}`, () => updateCascadingSelects(lineId, 1));
             
             addTomSelectChangeListener(`nivel2-${lineId}`, () => {
@@ -561,6 +532,7 @@
         function updateCascadingSelects(lineId, currentLevel) {
             const nextLevel = currentLevel + 1;
             
+            // Reseta do próximo nível em diante
             for (let i = nextLevel; i <= 5; i++) {
                 const selectToReset = document.getElementById(`nivel${i}-${lineId}`);
                 if (selectToReset) {
@@ -568,6 +540,7 @@
                     selectToReset.disabled = true;
                 }
             }
+            // Reseta Centro se Nível 1 ou 2 for alterado
              if (currentLevel <= 2) {
                 const centroSelect = document.getElementById(`centro-${lineId}`);
                  if (centroSelect) {
@@ -582,6 +555,7 @@
             for (let i = 1; i <= currentLevel; i++) {
                 const selectElement = document.getElementById(`nivel${i}-${lineId}`);
                 const tsInstance = tomSelectInstances[selectElement.id];
+                // Certifica-se de que estamos pegando o valor da instância Tom Select
                 selectedChain.push(tsInstance ? tsInstance.getValue() : selectElement.value); 
             }
             
@@ -600,10 +574,11 @@
                 populateSelect(nextSelect, nextOptions, `Selecione Nível ${nextLevel}`);
                 nextSelect.disabled = nextOptions.length === 0;
                 
-                 if (nextLevel <= 4) { 
+                // CORREÇÃO: Re-adiciona o listener do próximo nível
+                 if (nextLevel <= 4) { // Nível 4 é o último a ter cascata para o Nível 5
                      addTomSelectChangeListener(`nivel${nextLevel}-${lineId}`, () => updateCascadingSelects(lineId, nextLevel));
                  }
-                 if (nextLevel === 2) { 
+                 if (nextLevel === 2) { // Garante que o listener do Nível 2 para Centro seja reativado
                      addTomSelectChangeListener(`nivel2-${lineId}`, () => {
                          updateCascadingSelects(lineId, 2);
                          filterCentroForRow(lineId);
@@ -630,19 +605,8 @@
             }
         }
 
-        async function loadOptionsAndFixedLists(isReload = false) {
-            if (!isReload) {
-                loadingOverlay.style.display = 'flex';
-            }
-            
-            const loadingTimeout = setTimeout(() => {
-                if (!isReload && loadingOverlay.style.display === 'flex') {
-                    loadingOverlay.style.display = 'none';
-                    console.warn('⚠️ AVISO DE CARREGAMENTO: O carregamento inicial demorou > 30s e foi forçado a fechar.');
-                    showMessage('error', 'Falha ao carregar dados. Verifique a URL do Apps Script e o Deploy.');
-                }
-            }, 30000); 
-
+        async function loadOptionsAndFixedLists() {
+            loadingOverlay.style.display = 'flex';
             try {
                 const response = await fetch(`${APPS_SCRIPT_URL}?action=get_options`);
                 if (!response.ok) { 
@@ -658,31 +622,21 @@
                     
                     const competenciaSelect = document.getElementById('competencia');
                     if (competenciaSelect && fixedLists.competenciaList) {
-                        
-                        fixedLists.competenciaList.sort(sortCompetencia); 
-                        
-                        populateSelect(competenciaSelect, fixedLists.competenciaList, 'Selecione a Competência', true); 
+                        populateSelect(competenciaSelect, fixedLists.competenciaList, 'Selecione a Competência');
                         competenciaSelect.disabled = false;
                     }
                     
-                    if (rateioContainer.children.length === 0 && !isReload) {
+                    if (rateioContainer.children.length === 0) {
                         createRateioLine();
                     }
                 } else {
-                    if (!isReload) {
-                        showMessage('error', `Erro ao carregar opções (Verifique Logs do Apps Script): ${data.error}`);
-                    }
+                    showMessage('error', `Erro ao carregar opções (Verifique Logs do Apps Script): ${data.error}`);
                 }
             } catch (error) {
                 console.error("Erro detalhado em loadOptionsAndFixedLists:", error);
-                if (!isReload) {
-                    showMessage('error', `Falha na conexão inicial. Verifique se a APPS_SCRIPT_URL está atualizada. Detalhe: ${error.message}`);
-                }
+                showMessage('error', `Falha na conexão inicial. Verifique se a APPS_SCRIPT_URL está atualizada e se o Deploy permite "Qualquer pessoa".`);
             } finally {
-                clearTimeout(loadingTimeout); 
-                if (!isReload) {
-                    loadingOverlay.style.display = 'none';
-                }
+                loadingOverlay.style.display = 'none';
             }
         }
 
@@ -707,7 +661,6 @@
         submissionForm.addEventListener("submit", async function(event) {
             event.preventDefault(); 
             const submitButton = submissionForm.querySelector('button.btn-submit');
-            const originalButtonText = submitButton.innerHTML; 
 
             const rateioLines = document.querySelectorAll('#rateio-container .rateio-item');
             const isRateioPresent = rateioLines.length > 0;
@@ -736,19 +689,8 @@
             
             try {
                 const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: formData });
-
-                if (!response.ok) {
-                    throw new Error(`Erro do servidor (Status ${response.status}).`);
-                }
-                
-                let responseData;
-                try {
-                    responseData = await response.json();
-                } catch (e) {
-                    const textResponse = await response.text();
-                    console.error("Erro ao tentar ler JSON. Resposta do Apps Script:", textResponse);
-                    throw new Error(`Falha no formato da resposta. O Apps Script retornou HTML/Texto. Conteúdo: ${textResponse.substring(0, 50)}...`);
-                }
+                if (!response.ok) throw new Error('Erro de rede ou servidor.');
+                const responseData = await response.json();
 
                 if (responseData && responseData.result === "success") {
                     showMessage('success', `✅ Sucesso! Pedido registrado. ID: <strong>#${responseData.id}</strong>.`);
@@ -758,17 +700,22 @@
                     tomSelectInstances = {};
                     rateioContainer.innerHTML = ''; 
                     
-                    loadOptionsAndFixedLists(true); 
-                    
+                    const compSelect = document.getElementById('competencia');
+                    if (compSelect) {
+                        populateSelect(compSelect, data.fixedLists.competenciaList, 'Selecione a Competência'); // Recarrega a Competência
+                        compSelect.disabled = false;
+                    }
+
+                    createRateioLine();
                 } else {
-                    throw new Error(responseData.error || `Resposta de erro do servidor Apps Script: ${JSON.stringify(responseData)}`);
+                    throw new Error(responseData.error || "Resposta inesperada.");
                 }
             } catch (error) {
                 console.error("Erro de envio:", error);
-                showMessage('error', `❌ **Falha de Comunicação:** ${error.message}. O pedido pode ter sido enviado, mas a confirmação falhou. Verifique a planilha.`);
+                showMessage('error', `Ops! Houve um erro no envio.`);
             } finally {
                 submitButton.disabled = false;
-                submitButton.innerHTML = originalButtonText; 
+                submitButton.textContent = 'Enviar Pedido de Reclassificação';
             }
         });
 
@@ -784,8 +731,6 @@
 
         async function handleSearch() {
             const query = searchQueryInput.value.trim();
-            const originalButtonText = btnSearch.innerHTML; 
-            
             if (query.length < 3) {
                 searchResultsDiv.innerHTML = '<p class="error message-box">Digite pelo menos 3 caracteres.</p>';
                 return;
@@ -808,12 +753,12 @@
                 showMessage('error', `Falha na conexão ao buscar dados. Verifique o console (F12).`);
             } finally {
                 btnSearch.disabled = false;
-                btnSearch.innerHTML = originalButtonText; 
+                btnSearch.textContent = 'Buscar Pedidos';
             }
         }
         
         function getStatusInfo(status) {
-            const s = status ? status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_') : 'nao_encontrado';
+            const s = status ? status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, '_') : 'nao_encontrado';
             switch (s) {
                 case 'pendente': return { emoji: '⏳', class: 'status-pendente', label: 'Pendente' };
                 case 'em_andamento': return { emoji: '⚙️', class: 'status-em_andamento', label: 'Em Andamento' };
