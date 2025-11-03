@@ -482,7 +482,6 @@
             selectElement.disabled = (uniqueOptions.length === 0 && !selectElement.multiple);
 
             if (id) {
-                // Configuração padrão do Tom Select (com ordenação alfabética)
                 let tsConfig = {
                     create: false,
                     sortField: { field: "text", direction: "asc" },
@@ -491,7 +490,6 @@
                     valueField: 'value'
                 };
                 
-                // Desabilita a ordenação do Tom Select para a Competência
                 if (id === 'competencia') {
                     tsConfig.sortField = []; 
                 }
