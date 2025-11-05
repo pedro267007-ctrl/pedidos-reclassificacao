@@ -449,16 +449,24 @@
             formMessage.innerHTML = message;
         }
         
-        // ✅ CORREÇÃO: Função para ordenar "MM/AAAA" corretamente (cronologicamente)
+        // Função para ordenar "MM/AAAA" corretamente (cronologicamente)
         function sortCompetencia(a, b) {
-            const [mesA, anoA] = a.split('/').map(Number);
-            const [mesB, anoB] = b.split('/').map(Number);
-            const dataA = new Date(anoA, mesA - 1); // Mês é 0-indexado
-            const dataB = new Date(anoB, mesB - 1);
-            return dataA - dataB;
+            // Tenta extrair MM/AAAA
+            const matchA = a.match(/^(\d{2})\/(\d{4})$/);
+            const matchB = b.match(/^(\d{2})\/(\d{4})$/);
+
+            // Se ambos os formatos forem válidos, compara como datas
+            if (matchA && matchB) {
+                const [_, mesA, anoA] = matchA.map(Number);
+                const [_, mesB, anoB] = matchB.map(Number);
+                const dataA = new Date(anoA, mesA - 1); // Mês é 0-indexado
+                const dataB = new Date(anoB, mesB - 1);
+                return dataA - dataB;
+            }
+            // Se o formato for inesperado, usa ordenação de string padrão
+            return a.localeCompare(b);
         }
 
-        // ✅ CORREÇÃO: Adicionado 'skipSort' para a competência
         function populateSelect(selectElement, options, initialText = 'Selecione', skipSort = false) {
             const id = selectElement.id;
             if (tomSelectInstances[id]) {
@@ -492,7 +500,7 @@
                     valueField: 'value'
                 };
                 
-                // ✅ CORREÇÃO: Desabilita a ordenação do Tom Select para a Competência
+                // Desabilita a ordenação interna do Tom Select para a Competência
                 if (id === 'competencia') {
                     tsConfig.sortField = []; 
                 }
@@ -764,7 +772,7 @@
                     tomSelectInstances = {};
                     rateioContainer.innerHTML = ''; 
                     
-                    // ✅ CORREÇÃO: Recarrega as listas em background (isReload = true)
+                    // Recarrega as listas em background (isReload = true)
                     loadOptionsAndFixedLists(true); 
                     
                 } else {
