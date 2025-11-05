@@ -314,7 +314,7 @@
         .status-tag { display: inline-block; padding: 5px 10px; border-radius: 20px; font-size: 0.8em; font-weight: 700; white-space: nowrap; }
         .status-pendente { background-color: #FFC107; color: #333; }
         .status-em_andamento { background-color: #17A2B8; color: white; }
-        .status-finalizado { background-color: var(--success-color); color: white; }
+        .status-finalizado { background-color: #28a745; color: white; }
         .status-duvida_enviada { background-color: #FD7E14; color: white; }
         .status-nao_encontrado { background-color: #6C757D; color: white; }
 
@@ -458,7 +458,7 @@
             return dataA - dataB;
         }
 
-        // ✅ CORREÇÃO DE ORDENAÇÃO: Adicionado 'skipSort'
+        // Popula o select, com opção de pular a ordenação (para a Competência)
         function populateSelect(selectElement, options, initialText = 'Selecione', skipSort = false) {
             const id = selectElement.id;
             if (tomSelectInstances[id]) {
@@ -492,7 +492,7 @@
                     valueField: 'value'
                 };
                 
-                // ✅ CORREÇÃO DE ORDENAÇÃO: Desabilita a ordenação do Tom Select para a Competência
+                // Desabilita a ordenação do Tom Select para a Competência
                 if (id === 'competencia') {
                     tsConfig.sortField = []; 
                 }
@@ -633,7 +633,6 @@
             }
         }
 
-        // ✅ CORREÇÃO: Adicionado 'isReload' para o bug da mensagem de erro
         async function loadOptionsAndFixedLists(isReload = false) {
             if (!isReload) {
                 loadingOverlay.style.display = 'flex';
@@ -667,7 +666,7 @@
                         // Ordena a lista de competência cronologicamente
                         fixedLists.competenciaList.sort(sortCompetencia); 
                         
-                        // Passa 'true' para pular a ordenação alfabética padrão (já ordenamos cronologicamente)
+                        // Passa 'true' para pular a ordenação alfabética padrão
                         populateSelect(competenciaSelect, fixedLists.competenciaList, 'Selecione a Competência', true); 
                         competenciaSelect.disabled = false;
                     }
@@ -765,10 +764,11 @@
                     tomSelectInstances = {};
                     rateioContainer.innerHTML = ''; 
                     
-                    // ✅ CORREÇÃO: Recarrega as listas em background (isReload = true)
+                    // Recarrega as listas em background
                     loadOptionsAndFixedLists(true); 
                     
                 } else {
+                    // O console.error estava aqui e foi movido para o bloco catch
                     throw new Error(responseData.error || `Resposta de erro do servidor Apps Script: ${JSON.stringify(responseData)}`);
                 }
             } catch (error) {
