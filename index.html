@@ -431,7 +431,7 @@
 
     <script>
         // !! SUBSTITUA PELA SUA URL DE DEPLOY MAIS RECENTE !!
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyeNkxzkyzISud0c307W8qcoxy_FC2SWezvXqjk43zknOduqpK7zknOduqpBKVV7lleNLV9Dqdi0D/exec'; 
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyeNkxzkyzISud0c307W8qcoxy_FC2SWezvXqjk43zknOduqpBKVV7lleNLV9Dqdi0D/exec'; 
         
         const submissionForm = document.getElementById("submission-form");
         const formMessage = document.getElementById("form-message");
@@ -449,7 +449,7 @@
             formMessage.innerHTML = message;
         }
         
-        // Função para ordenar "MM/AAAA" corretamente (cronologicamente)
+        // ✅ CORREÇÃO: Função para ordenar "MM/AAAA" corretamente (cronologicamente)
         function sortCompetencia(a, b) {
             const [mesA, anoA] = a.split('/').map(Number);
             const [mesB, anoB] = b.split('/').map(Number);
@@ -458,7 +458,7 @@
             return dataA - dataB;
         }
 
-        // Função para popular selects
+        // ✅ CORREÇÃO: Adicionado 'skipSort' para a competência
         function populateSelect(selectElement, options, initialText = 'Selecione', skipSort = false) {
             const id = selectElement.id;
             if (tomSelectInstances[id]) {
@@ -492,7 +492,7 @@
                     valueField: 'value'
                 };
                 
-                // Desabilita a ordenação do Tom Select para a Competência
+                // ✅ CORREÇÃO: Desabilita a ordenação do Tom Select para a Competência
                 if (id === 'competencia') {
                     tsConfig.sortField = []; 
                 }
@@ -764,7 +764,7 @@
                     tomSelectInstances = {};
                     rateioContainer.innerHTML = ''; 
                     
-                    // Recarrega as listas em background
+                    // ✅ CORREÇÃO: Recarrega as listas em background (isReload = true)
                     loadOptionsAndFixedLists(true); 
                     
                 } else {
