@@ -633,26 +633,35 @@
             }
         }
 
+        // =======================================================================
+        // FUNÇÃO DE CARREGAMENTO (COM TRATAMENTO DE ERRO AGRESSIVO)
+        // =======================================================================
         async function loadOptionsAndFixedLists(isReload = false) {
             if (!isReload) {
                 loadingOverlay.style.display = 'flex';
             }
             
-            // Timeout defensivo
-            const loadingTimeout = setTimeout(() => {
-                if (!isReload && loadingOverlay.style.display === 'flex') {
-                    loadingOverlay.style.display = 'none';
-                    console.warn('⚠️ AVISO DE CARREGAMENTO: O carregamento inicial demorou > 30s e foi forçado a fechar.');
-                    showMessage('error', 'Falha ao carregar dados. Verifique a URL do Apps Script e o Deploy.');
-                }
-            }, 30000); 
-
             try {
+                // 1. Tenta fazer a requisição
                 const response = await fetch(`${APPS_SCRIPT_URL}?action=get_options`);
+                
+                // 2. Se a resposta da rede não for OK (ex: 404, 500, etc.)
                 if (!response.ok) { 
-                     throw new Error(`Falha na rede: ${response.status} ${response.statusText}`);
+                     // Tenta ler o texto da resposta para ver se há um erro HTML do Google
+                     const errorText = await response.text();
+                     console.error(`Falha na rede: Status ${response.status} ${response.statusText}. Resposta do servidor: ${errorText.substring(0, 100)}...`);
+                     throw new Error(`Erro de conexão (${response.status}). Verifique se a URL do Apps Script está correta.`);
                 }
-                const data = await response.json(); 
+                
+                // 3. Tenta ler o JSON (Este é o ponto de falha mais comum)
+                let data;
+                try {
+                    data = await response.json(); 
+                } catch(e) {
+                    const textResponse = await response.text();
+                    console.error("Erro ao tentar ler JSON de opções. Resposta de texto:", textResponse.substring(0, 100) + '...');
+                    throw new Error(`Falha no formato da resposta do Apps Script. O servidor não devolveu um JSON válido.`);
+                }
 
                 if (data.result === 'success') {
                     cascadingOptionsData = data.cascadingOptions;
@@ -662,11 +671,7 @@
                     
                     const competenciaSelect = document.getElementById('competencia');
                     if (competenciaSelect && fixedLists.competenciaList) {
-                        
-                        // Ordena a lista de competência cronologicamente
                         fixedLists.competenciaList.sort(sortCompetencia); 
-                        
-                        // Passa 'true' para pular a ordenação alfabética padrão
                         populateSelect(competenciaSelect, fixedLists.competenciaList, 'Selecione a Competência', true); 
                         competenciaSelect.disabled = false;
                     }
@@ -680,17 +685,18 @@
                     }
                 }
             } catch (error) {
-                console.error("Erro detalhado em loadOptionsAndFixedLists:", error);
+                console.error("Erro CRÍTICO em loadOptionsAndFixedLists:", error);
                 if (!isReload) {
-                    showMessage('error', `Falha na conexão inicial. Verifique se a APPS_SCRIPT_URL está atualizada. Detalhe: ${error.message}`);
+                    showMessage('error', `ATENÇÃO: Falha na conexão inicial. O carregamento foi interrompido. Detalhe: ${error.message}`);
                 }
             } finally {
-                clearTimeout(loadingTimeout); 
                 if (!isReload) {
                     loadingOverlay.style.display = 'none';
                 }
             }
         }
+        // =======================================================================
+
 
         function collectRateioData() {
             const rateioLines = document.querySelectorAll('#rateio-container .rateio-item');
@@ -711,7 +717,7 @@
         }
         
         // =======================================================================
-        // FUNÇÃO DE SUBMISSÃO CORRIGIDA PARA O ERRO DA MENSAGEM
+        // FUNÇÃO DE SUBMISSÃO (CORRIGIDA PARA MENSAGEM DE SUCESSO)
         // =======================================================================
         submissionForm.addEventListener("submit", async function(event) {
             event.preventDefault();
