@@ -1,154 +1,69 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Sistema de Reclassificação</title>
-
-<!-- Bootstrap -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
-
-<!-- Tom Select -->
-<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet"/>
-
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet" />
 <style>
-    body {
-        background: #f2f4f3;
-        font-family: "Inter", sans-serif;
-        padding: 30px;
-    }
-
-    /* Card padrão */
-    .card-box {
-        background: #fff;
-        border-radius: 18px;
-        padding: 28px;
-        margin-bottom: 35px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    }
-
-    h2.section-title {
-        font-size: 22px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        margin-bottom: 22px;
-    }
-
-    h2.section-title img {
-        height: 1.1em;
-        margin-left: 8px;
-    }
-
-    .btn-main {
-        background: #0f6c3f;
-        color: #fff;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 10px;
-        font-weight: 600;
-        transition: .2s;
-    }
-
-    .btn-main:hover {
-        background: #0b512f;
-    }
-
-    .rateioLinha {
-        padding: 15px;
-        background: #fafafa;
-        border-radius: 12px;
-        margin-bottom: 18px;
-        border: 1px solid #e7e7e7;
-    }
-
+ body { background:#f2f4f3; padding:40px; font-family: "Inter", sans-serif; }
+ .card-custom { background:#fff; border-radius:16px; padding:32px; box-shadow:0 4px 20px rgba(0,0,0,0.08); margin-bottom:40px; }
+ h2.section-title { font-size:22px; font-weight:700; margin-bottom:20px; display:flex; align-items:center; }
+ h2.section-title img { height:1em; margin-left:8px; vertical-align:middle; }
+ .btn-main { background:#0f6c3f; color:#fff; border:none; padding:10px 22px; border-radius:10px; font-weight:600; transition:.2s; }
+ .btn-main:hover { background:#0c5733; }
+ img.iconTree { height:1em; vertical-align:middle; margin-left:6px; }
 </style>
 </head>
 <body>
 
-<!-- ========================= -->
-<!-- BLOCO: BUSCA -->
-<!-- ========================= -->
-<div class="card-box">
-    <h2 class="section-title">
-        Rastreamento de Pedidos
-        <!-- Ícone → trocar depois -->
-        <img src="" alt="">
-    </h2>
+<div class="card-custom">
+  <h2 class="section-title">Rastreamento de Pedidos <img src="A_2D_vector_graphic_of_a_stylized_tree_icon_is_cen.png" class="iconTree" /></h2>
 
-    <div class="row g-3 mb-3">
-        <div class="col-md-8">
-            <input id="searchInput" class="form-control" placeholder="Pesquisar por ID, Nome, Documento..."/>
-        </div>
-        <div class="col-md-4">
-            <button class="btn-main w-100" onclick="searchRequests()">Buscar</button>
-        </div>
-    </div>
+  <div class="row g-3 mb-3">
+    <div class="col-md-6"><input id="searchInput" class="form-control" placeholder="Pesquisar Solicitações..." /></div>
+    <div class="col-md-3"><button class="btn-main w-100" onclick="searchRequests()">Buscar</button></div>
+  </div>
 
-    <div class="table-responsive mt-3">
-        <table class="table table-bordered" id="resultsTable">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th><th>Solicitante</th><th>Doc Nº</th><th>Competência</th><th>Valor Total</th><th>Status</th><th>Quem Faz</th><th>Descrição</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+  <div class="table-responsive">
+    <table class="table table-bordered" id="resultsTable">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th><th>Solicitante</th><th>Doc Nº</th><th>Competência</th><th>Valor Total</th><th>Status</th><th>Quem Faz</th><th>Descrição</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 </div>
 
+<div class="card-custom">
+  <h2 class="section-title">1. Dados do Solicitante <img src="A_2D_vector_graphic_of_a_stylized_tree_icon_is_cen.png" class="iconTree" /></h2>
 
-<!-- ========================= -->
-<!-- BLOCO 1: SOLICITANTE -->
-<!-- ========================= -->
-<div class="card-box">
-    <h2 class="section-title">
-        1. Dados do Solicitante
-        <!-- Ícone → trocar depois -->
-        <img src="" alt="">
-    </h2>
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><label>Solicitante</label><input id="solicitante" class="form-control" /></div>
+    <div class="col-md-3"><label>E-mail</label><input id="email" class="form-control" /></div>
+    <div class="col-md-3"><label>Nome Parceiro</label><input id="parceiro" class="form-control" /></div>
+    <div class="col-md-3"><label>Nº Documento</label><input id="numDocumento" class="form-control" /></div>
+  </div>
 
-    <div class="row g-3 mb-4">
-        <div class="col-md-3"><label>Solicitante</label><input id="solicitante" class="form-control"/></div>
-        <div class="col-md-3"><label>E-mail</label><input id="email" class="form-control"/></div>
-        <div class="col-md-3"><label>Nome do Parceiro</label><input id="parceiro" class="form-control"/></div>
-        <div class="col-md-3"><label>Nº Documento</label><input id="numDocumento" class="form-control"/></div>
-    </div>
-
-    <div class="row g-3">
-        <div class="col-md-3"><label>Valor Total</label><input id="valorTotal" class="form-control"/></div>
-        <div class="col-md-3"><label>Competência</label><select id="competencia" class="form-select"></select></div>
-    </div>
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><label>Valor Total</label><input id="valorTotal" class="form-control" /></div>
+    <div class="col-md-3"><label>Competência</label><select id="competencia" class="form-select"></select></div>
+  </div>
 </div>
 
+<div class="card-custom">
+  <h2 class="section-title">2. Rateio <img src="A_2D_vector_graphic_of_a_stylized_tree_icon_is_cen.png" class="iconTree" /></h2>
 
-<!-- ========================= -->
-<!-- BLOCO 2: RATEIO -->
-<!-- ========================= -->
-<div class="card-box">
-    <h2 class="section-title">
-        2. Rateio da Conta
-        <!-- Ícone → trocar depois -->
-        <img src="" alt="">
-    </h2>
-
-    <div id="rateioContainer"></div>
-
-    <button class="btn-main mt-3" onclick="addRateioLinha()">+ Adicionar Rateio</button>
+  <div id="rateioContainer"></div>
+  <button class="btn-main mt-3" onclick="addRateioLinha()">+ Adicionar Rateio</button>
 </div>
 
-
-<!-- ========================= -->
-<!-- ENVIAR -->
-<!-- ========================= -->
-<div class="text-end mb-5">
-    <button class="btn-main" onclick="enviarFormulario()">Enviar Pedido</button>
+<div class="text-end">
+  <button class="btn-main" onclick="enviarFormulario()">Enviar Pedido</button>
 </div>
-
-
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwrJS1vjpqemqZtl3y9ZeGx-eCF1oQV486c-p01ZtXYpDMLKEpln63aOf-CoQpaBxRB/exec";
@@ -176,9 +91,9 @@ function carregarCompetencia(data){
     });
 }
 
-/* ==========================================
-   RATEIO — CASCATA COMPLETA
-========================================== */
+/* ===========================================================
+   RATEIO — CASCATA
+=========================================================== */
 function addRateioLinha(){
     const linha = document.createElement("div");
     linha.className = "rateioLinha row g-3";
@@ -226,11 +141,10 @@ function aplicarCascata(linha){
 
     n2.onchange = () => {
         fill(n3, ops.filter(r => r[1] === n2.value).map(r => r[2]));
+        fill(n4, []); fill(n5, []);
 
         const listaCentros = centros.filter(r => r[0] === n2.value).map(r => r[1]);
         fill(centro, listaCentros);
-
-        fill(n4, []); fill(n5, []);
     };
 
     n3.onchange = () => {
@@ -243,13 +157,169 @@ function aplicarCascata(linha){
     };
 }
 
-/* ==========================================
+/* ===========================================================
    ENVIO DO FORMULÁRIO
-========================================== */
+=========================================================== */
 function enviarFormulario(){
-    alert("Enviado! (backend será configurado depois)");
+
+    const payload = {
+        solicitante: document.getElementById("solicitante").value,
+        email: document.getElementById("email").value,
+        parceiro: document.getElementById("parceiro").value,
+        numDocumento: document.getElementById("numDocumento").value,
+        valorTotal: document.getElementById("valorTotal").value,
+        competencia: document.getElementById("competencia").value,
+        rateios: []
+    };
+
+    document.querySelectorAll(".rateioLinha").forEach(l => {
+        payload.rateios.push({
+            n1: l.querySelector(".n1").value,
+            n2: l.querySelector(".n2").value,
+            n3: l.querySelector(".n3").value,
+            n4: l.querySelector(".n4").value,
+            n5: l.querySelector(".n5").value,
+            centro: l.querySelector(".centro").value,
+            valor: l.querySelector(".valor").value
+        });
+    });
+
+    fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(res => {
+        if(res.status === "success"){
+            alert("Pedido enviado com sucesso!");
+        } else {
+            alert("Erro ao enviar: " + res.message);
+        }
+    })
+    .catch(err => {
+        alert("Falha na conexão com o servidor.");
+        console.log(err);
+    });
 }
 
+/* ===========================================================
+   BUSCA (PESQUISA)
+=========================================================== */
+function searchRequests(){
+    const term = document.getElementById("searchInput").value.trim();
+
+    fetch(API_URL + "?action=search&query=" + encodeURIComponent(term))
+        .then(r => r.json())
+        .then(res => {
+            const tbody = document.querySelector("#resultsTable tbody");
+            tbody.innerHTML = "";
+
+            res.data.forEach(r => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${r.id}</td>
+                    <td>${r.solicitante}</td>
+                    <td>${r.docNumero}</td>
+                    <td>${r.competencia}</td>
+                    <td>${r.valorTotal}</td>
+                    <td>${r.status}</td>
+                    <td>${r.quemFaz}</td>
+                    <td>${r.descricao}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        })
+        .catch(err => {
+            alert("Erro ao buscar dados.");
+            console.log(err);
+        });
+}
 </script>
-</body>
-</html>
+<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbwrJS1vjpqemqZtl3y9ZeGx-eCF1oQV486c-p01ZtXYpDMLKEpln63aOf-CoQpaBxRB/exec";
+let listas = {};
+
+window.onload = () => { carregarListas(); };
+
+function carregarListas(){
+ fetch(API_URL + "?action=get_options")
+   .then(r => r.json())
+   .then(data => { listas = data; carregarCompetencia(data); });
+}
+
+function carregarCompetencia(data){
+ const select = document.getElementById("competencia");
+ data.fixedLists.competenciaList.forEach(c => {
+   const op = document.createElement("option");
+   op.value = c; op.textContent = c;
+   select.appendChild(op);
+ });
+}
+
+function addRateioLinha(){
+ const linha = document.createElement("div");
+ linha.className = "row g-3 mb-3 rateioLinha";
+ linha.innerHTML = `
+   <div class="col-md-2"><select class="form-select n1"><option value="">Natureza</option></select></div>
+   <div class="col-md-2"><select class="form-select n2"><option value="">Área</option></select></div>
+   <div class="col-md-2"><select class="form-select n3"><option value="">N3</option></select></div>
+   <div class="col-md-2"><select class="form-select n4"><option value="">N4</option></select></div>
+   <div class="col-md-2"><select class="form-select n5"><option value="">N5</option></select></div>
+   <div class="col-md-2"><select class="form-select centro"><option value="">Centro</option></select></div>
+   <div class="col-md-2 mt-2"><input class="form-control valor" placeholder="Valor" /></div>
+   <div class="col-md-1 mt-2 text-end"><button class="btn btn-danger" onclick="this.parentElement.parentElement.remove()">X</button></div>
+ `;
+ document.getElementById("rateioContainer").appendChild(linha);
+ aplicarCascata(linha);
+}
+
+function aplicarCascata(linha){
+ const n1 = linha.querySelector(".n1");
+ const n2 = linha.querySelector(".n2");
+ const n3 = linha.querySelector(".n3");
+ const n4 = linha.querySelector(".n4");
+ const n5 = linha.querySelector(".n5");
+ const centro = linha.querySelector(".centro");
+
+ const ops = listas.cascadingOptions;
+ const centrosLista = listas.centroData;
+
+ function preencher(select, valores){
+   select.innerHTML = `<option value=""></option>`;
+   valores.forEach(v => {
+     if(v) select.innerHTML += `<option value="${v}">${v}</option>`;
+   });
+ }
+
+ preencher(n1, [...new Set(ops.map(r => r[0]))]);
+
+ n1.onchange = () => {
+   const val = n1.value;
+   preencher(n2, [...new Set(ops.filter(r => r[0] === val).map(r => r[1]))]);
+   preencher(n3, []); preencher(n4, []); preencher(n5, []); preencher(centro, []);
+ };
+
+ n2.onchange = () => {
+   const v1 = n1.value, v2 = n2.value;
+   preencher(n3, [...new Set(ops.filter(r => r[0]===v1 && r[1]===v2).map(r => r[2]))]);
+   preencher(n4, []); preencher(n5, []);
+   const cents = centrosLista.filter(r => r[0]===v2).map(r=>r[1]);
+   preencher(centro, cents);
+ };
+
+ n3.onchange = () => {
+   const v1=n1.value, v2=n2.value, v3=n3.value;
+   preencher(n4, [...new Set(ops.filter(r=>r[0]===v1 && r[1]===v2 && r[2]===v3).map(r=>r[3]))]);
+   preencher(n5, []);
+ };
+
+ n4.onchange = () => {
+   const v1=n1.value, v2=n2.value, v3=n3.value, v4=n4.value;
+   preencher(n5, [...new Set(ops.filter(r=>r[0]===v1 && r[1]===v2 && r[2]===v3 && r[3]===v4).map(r=>r[4]))]);
+ };
+}
+
+function enviarFormulario(){ alert("Enviado!"); }
+</script>
+</body></html>
