@@ -70,21 +70,25 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwrJS1vjpqemqZtl3y9ZeGx
 
 let listas = {};
 
-window.onload = () => { carregarListas(); };
+window.onload = () => carregarListas();
 
-function carregarListas(){
+/* ===========================================================
+   CARREGAR LISTAS
+=========================================================== */
+function carregarListas() {
     fetch(API_URL + "?action=get_options")
         .then(r => r.json())
         .then(data => {
             listas = data;
             carregarCompetencia(data);
-        });
+        })
+        .catch(err => console.error("Erro ao carregar listas:", err));
 }
 
-function carregarCompetencia(data){
+function carregarCompetencia(data) {
     const select = document.getElementById("competencia");
     data.fixedLists.competenciaList.forEach(c => {
-        const op = document.createElement("option");
+        let op = document.createElement("option");
         op.value = c;
         op.textContent = c;
         select.appendChild(op);
@@ -92,11 +96,11 @@ function carregarCompetencia(data){
 }
 
 /* ===========================================================
-   RATEIO — CASCATA
+   CASCATA DO RATEIO
 =========================================================== */
-function addRateioLinha(){
+function addRateioLinha() {
     const linha = document.createElement("div");
-    linha.className = "rateioLinha row g-3";
+    linha.className = "rateioLinha row g-3 mb-3";
 
     linha.innerHTML = `
         <div class="col-md-2"><select class="form-select n1"><option value="">Natureza</option></select></div>
@@ -114,7 +118,7 @@ function addRateioLinha(){
     aplicarCascata(linha);
 }
 
-function aplicarCascata(linha){
+function aplicarCascata(linha) {
     const ops = listas.cascadingOptions;
     const centros = listas.centroData;
 
@@ -125,10 +129,10 @@ function aplicarCascata(linha){
     const n5 = linha.querySelector(".n5");
     const centro = linha.querySelector(".centro");
 
-    function fill(select, values){
+    function fill(select, values) {
         select.innerHTML = `<option value=""></option>`;
         [...new Set(values)].forEach(v => {
-            if(v) select.innerHTML += `<option value="${v}">${v}</option>`;
+            if (v) select.innerHTML += `<option value="${v}">${v}</option>`;
         });
     }
 
@@ -158,64 +162,70 @@ function aplicarCascata(linha){
 }
 
 /* ===========================================================
-   ENVIO DO FORMULÁRIO
+   ENVIO DO FORMULÁRIO (CORRETO PARA SEU APPS SCRIPT)
 =========================================================== */
-function enviarFormulario(){
+function enviarFormulario() {
 
-    const payload = {
-        solicitante: document.getElementById("solicitante").value,
-        email: document.getElementById("email").value,
-        parceiro: document.getElementById("parceiro").value,
-        numDocumento: document.getElementById("numDocumento").value,
-        valorTotal: document.getElementById("valorTotal").value,
-        competencia: document.getElementById("competencia").value,
-        rateios: []
-    };
+    let fd = new FormData();
+
+    fd.append("solicitante", document.getElementById("solicitante").value);
+    fd.append("emailSolicitante", document.getElementById("email").value);
+    fd.append("parceiro", document.getElementById("parceiro").value);
+    fd.append("docNumero", document.getElementById("numDocumento").value);
+    fd.append("valorTotal", document.getElementById("valorTotal").value);
+    fd.append("competencia", document.getElementById("competencia").value);
+
+    let rateios = [];
 
     document.querySelectorAll(".rateioLinha").forEach(l => {
-        payload.rateios.push({
-            n1: l.querySelector(".n1").value,
-            n2: l.querySelector(".n2").value,
-            n3: l.querySelector(".n3").value,
-            n4: l.querySelector(".n4").value,
-            n5: l.querySelector(".n5").value,
+        rateios.push({
+            nivel1: l.querySelector(".n1").value,
+            nivel2: l.querySelector(".n2").value,
+            nivel3: l.querySelector(".n3").value,
+            nivel4: l.querySelector(".n4").value,
+            nivel5: l.querySelector(".n5").value,
             centro: l.querySelector(".centro").value,
-            valor: l.querySelector(".valor").value
+            valorRateio: l.querySelector(".valor").value
         });
     });
 
+    fd.append("rateioJson", JSON.stringify(rateios));
+
     fetch(API_URL, {
         method: "POST",
-        body: JSON.stringify(payload)
+        body: fd
     })
     .then(r => r.json())
     .then(res => {
-        if(res.status === "success"){
+        if (res.result === "success") {
             alert("Pedido enviado com sucesso!");
         } else {
-            alert("Erro ao enviar: " + res.message);
+            alert("Erro ao enviar: " + res.error);
         }
     })
     .catch(err => {
-        alert("Falha na conexão com o servidor.");
-        console.log(err);
+        alert("Erro na conexão com o servidor.");
+        console.error(err);
     });
 }
 
 /* ===========================================================
-   BUSCA (PESQUISA)
+   BUSCA (CORRETA PARA SEU APPS SCRIPT)
 =========================================================== */
-function searchRequests(){
+function searchRequests() {
     const term = document.getElementById("searchInput").value.trim();
 
-    fetch(API_URL + "?action=search&query=" + encodeURIComponent(term))
+    fetch(API_URL + "?action=search_requests&query=" + encodeURIComponent(term))
         .then(r => r.json())
         .then(res => {
+
             const tbody = document.querySelector("#resultsTable tbody");
             tbody.innerHTML = "";
 
+            if (!res.data) return;
+
             res.data.forEach(r => {
-                const tr = document.createElement("tr");
+                let tr = document.createElement("tr");
                 tr.innerHTML = `
                     <td>${r.id}</td>
                     <td>${r.solicitante}</td>
@@ -228,10 +238,11 @@ function searchRequests(){
                 `;
                 tbody.appendChild(tr);
             });
+
         })
         .catch(err => {
-            alert("Erro ao buscar dados.");
-            console.log(err);
+            alert("Erro ao buscar.");
+            console.error(err);
         });
 }
 </script>
