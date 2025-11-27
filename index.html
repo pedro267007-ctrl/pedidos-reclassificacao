@@ -21,7 +21,7 @@
 
   <div class="row g-3 mb-3">
     <div class="col-md-6"><input id="searchInput" class="form-control" placeholder="Pesquisar Solicitações..." /></div>
-    <div class="col-md-3"><button class="btn-main w-100" onclick="searchRequests()">Buscar</button></div>
+    <div class="col-md-3"><button class="btn-main w-100" id="btnSearch">Buscar</button></div>
   </div>
 
   <div class="table-responsive">
@@ -53,7 +53,7 @@
     <div class="col-md-3"><label>Nome Parceiro</label><input id="parceiro" class="form-control" /></div>
     <div class="col-md-3"><label>Nº Documento</label><input id="numDocumento" class="form-control" /></div>
     <div class="col-md-3"><label>Valor Total</label><input id="valorTotal" type="number" class="form-control" /></div>
-    <div class="col-md-3"><label>Competência</label><select id="competencia" class="form-select"></select></div>
+    <div class="col-md-3"><label>Competência</label><select id="competencia" class="form-select"><option value="">Carregando...</option></select></div>
   </div>
 
   <label>Descrição do Documento</label>
@@ -64,11 +64,11 @@
   <h2 class="section-title">3. Rateio</h2>
 
   <div id="rateioContainer"></div>
-  <button class="btn-main mt-3" onclick="addRateioLinha()">+ Adicionar Rateio</button>
+  <button class="btn-main mt-3" id="btnAddRateio">+ Adicionar Rateio</button>
 </div>
 
 <div class="text-end">
-  <button class="btn-main" onclick="enviarFormulario()">Enviar Pedido</button>
+  <button class="btn-main" id="btnEnviar">Enviar Pedido</button>
 </div>
 
 <div id="mensagem" class="alert mt-4" style="display:none"></div>
@@ -77,40 +77,77 @@
 <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwrJS1vjpqemqZtl3y9ZeGx-eCF1oQV486c-p01ZtXYpDMLKEpln63aOf-CoQpaBxRB/exec";
-let listas = {};
+let listas = { cascadingOptions: [], centroData: [], fixedLists: { competenciaList: [] } };
 
-window.onload = () => { carregarListas(); };
+document.addEventListener('DOMContentLoaded', () => {
+    // ligar botões
+    document.getElementById('btnAddRateio').addEventListener('click', addRateioLinha);
+    document.getElementById('btnEnviar').addEventListener('click', enviarFormulario);
+    document.getElementById('btnSearch').addEventListener('click', searchRequests);
+    document.getElementById('searchInput').addEventListener('keypress', e => { if(e.key === 'Enter'){ e.preventDefault(); searchRequests(); }});
 
-function carregarListas(){
- fetch(API_URL + "?action=get_options")
-   .then(r => r.json())
-   .then(data => { listas = data; carregarCompetencia(data); });
+    carregarListas().then(() => {
+        // cria a primeira linha de rateio
+        addRateioLinha();
+    });
+});
+
+async function carregarListas(){
+    try {
+        const resp = await fetch(API_URL + "?action=get_options");
+        if (!resp.ok) throw new Error(`Status ${resp.status}`);
+        const data = await resp.json();
+        if (data.result !== 'success') throw new Error(data.error || 'Resposta sem success');
+
+        listas = {
+            cascadingOptions: data.cascadingOptions || [],
+            centroData: data.centroData || [],
+            fixedLists: data.fixedLists || { competenciaList: [] }
+        };
+        preencherCompetencias();
+    } catch (err) {
+        console.error("Erro ao carregar listas:", err);
+        mostrarMensagem('danger', 'Erro ao carregar opções da API. Veja console (F12).');
+        // deixa select com opção vazia
+        const sel = document.getElementById('competencia');
+        sel.innerHTML = '<option value="">(erro ao carregar)</option>';
+    }
 }
 
-function carregarCompetencia(data){
- const select = document.getElementById("competencia");
- data.fixedLists.competenciaList.forEach(c => {
-   const op = document.createElement("option");
-   op.value = c; op.textContent = c;
-   select.appendChild(op);
- });
+function preencherCompetencias(){
+    const select = document.getElementById("competencia");
+    select.innerHTML = '<option value="">Selecione</option>';
+    const list = (listas.fixedLists && listas.fixedLists.competenciaList) ? listas.fixedLists.competenciaList : [];
+    // ordenar cronologicamente MM/AAAA se parecer com esse formato
+    function sortCompet(a,b){
+        const ax = a.split('/').map(Number), bx = b.split('/').map(Number);
+        if(ax.length===2 && bx.length===2){ return new Date(ax[1], ax[0]-1) - new Date(bx[1], bx[0]-1); }
+        return (''+a).localeCompare(''+b);
+    }
+    list.sort(sortCompet).forEach(c => {
+       const op = document.createElement("option");
+       op.value = c; op.textContent = c;
+       select.appendChild(op);
+    });
 }
 
 function addRateioLinha(){
- const linha = document.createElement("div");
- linha.className = "row g-3 mb-3 rateioLinha";
- linha.innerHTML = `
-   <div class="col-md-2"><select class="form-select n1"><option value="">Natureza</option></select></div>
-   <div class="col-md-2"><select class="form-select n2"><option value="">Área</option></select></div>
-   <div class="col-md-2"><select class="form-select n3"><option value="">N3</option></select></div>
-   <div class="col-md-2"><select class="form-select n4"><option value="">N4</option></select></div>
-   <div class="col-md-2"><select class="form-select n5"><option value="">N5</option></select></div>
-   <div class="col-md-2"><select class="form-select centro"><option value="">Centro</option></select></div>
-   <div class="col-md-2 mt-2"><input class="form-control valor" type="number" placeholder="Valor" /></div>
-   <div class="col-md-1 mt-2 text-end"><button class="btn btn-danger" onclick="this.parentElement.parentElement.remove()">X</button></div>
- `;
- document.getElementById("rateioContainer").appendChild(linha);
- aplicarCascata(linha);
+    const linha = document.createElement("div");
+    linha.className = "row g-3 mb-3 rateioLinha align-items-end";
+    linha.innerHTML = `
+      <div class="col-md-2"><label class="form-label visually-hidden">Natureza</label><select class="form-select n1"><option value="">Natureza</option></select></div>
+      <div class="col-md-2"><label class="form-label visually-hidden">Área</label><select class="form-select n2" disabled><option value="">Área</option></select></div>
+      <div class="col-md-2"><label class="form-label visually-hidden">N3</label><select class="form-select n3" disabled><option value="">N3</option></select></div>
+      <div class="col-md-2"><label class="form-label visually-hidden">N4</label><select class="form-select n4" disabled><option value="">N4</option></select></div>
+      <div class="col-md-2"><label class="form-label visually-hidden">N5</label><select class="form-select n5" disabled><option value="">N5</option></select></div>
+      <div class="col-md-2"><label class="form-label visually-hidden">Centro</label><select class="form-select centro" disabled><option value="">Centro</option></select></div>
+      <div class="col-md-2 mt-2"><label class="form-label visually-hidden">Valor</label><input class="form-control valor" type="number" placeholder="Valor" /></div>
+      <div class="col-md-1 mt-2 text-end"><button class="btn btn-danger" type="button" title="Remover">X</button></div>
+    `;
+    const btnRemove = linha.querySelector('button');
+    btnRemove.addEventListener('click', ()=> linha.remove());
+    document.getElementById("rateioContainer").appendChild(linha);
+    aplicarCascata(linha);
 }
 
 function aplicarCascata(linha){
@@ -121,55 +158,143 @@ function aplicarCascata(linha){
     const n5 = linha.querySelector(".n5");
     const centro = linha.querySelector(".centro");
 
-    const ops = listas.cascadingOptions;
-    const centrosLista = listas.centroData;
+    const ops = listas.cascadingOptions || [];
+    const centrosLista = listas.centroData || [];
 
     function preencher(select, valores){
         select.innerHTML = `<option value=""></option>`;
-        valores.forEach(v => { if(v) select.innerHTML += `<option value="${v}">${v}</option>`; });
+        valores.forEach(v => { if(v !== null && v !== undefined && v !== '') {
+            const opt = document.createElement('option'); opt.value = v; opt.textContent = v; select.appendChild(opt);
+        }});
+        select.disabled = valores.length === 0;
     }
 
-    preencher(n1, [...new Set(ops.map(r => r[0]))]);
+    // preencher N1 (Natureza) -- sempre derive do primeiro índice (natureza)
+    const n1Opts = [...new Set(ops.map(r => r[0]).filter(Boolean))].sort();
+    preencher(n1, n1Opts);
 
     n1.onchange = () => {
-        preencher(n2, [...new Set(ops.filter(r => r[0] === n1.value).map(r => r[1]))]);
+        const v1 = n1.value;
+        const n2Opts = [...new Set(ops.filter(r => r[0] === v1).map(r => r[1]).filter(Boolean))].sort();
+        preencher(n2, n2Opts);
         preencher(n3, []); preencher(n4, []); preencher(n5, []); preencher(centro, []);
     };
 
     n2.onchange = () => {
-        const cents = centrosLista.filter(r => r[0] === n2.value).map(r => r[1]);
+        const v1 = n1.value, v2 = n2.value;
+        const n3Opts = [...new Set(ops.filter(r => r[0] === v1 && r[1] === v2).map(r => r[2]).filter(Boolean))].sort();
+        preencher(n3, n3Opts);
+        preencher(n4, []); preencher(n5, []);
+        const cents = [...new Set(centrosLista.filter(r => r[0] === v2).map(r => r[1]).filter(Boolean))].sort();
         preencher(centro, cents);
-
-        preencher(n3, [...new Set(ops.filter(r => r[0] === n1.value && r[1] === n2.value).map(r => r[2]))]);
-        preencher(n4, []);
-        preencher(n5, []);
     };
 
     n3.onchange = () => {
-        preencher(n4, [...new Set(ops.filter(r => r[0] === n1.value && r[1] === n2.value && r[2] === n3.value).map(r => r[3]))]);
+        const v1=n1.value, v2=n2.value, v3=n3.value;
+        const n4Opts = [...new Set(ops.filter(r => r[0] === v1 && r[1] === v2 && r[2] === v3).map(r => r[3]).filter(Boolean))].sort();
+        preencher(n4, n4Opts);
         preencher(n5, []);
     };
 
     n4.onchange = () => {
-        preencher(n5, [...new Set(ops.filter(r => r[0] === n1.value && r[1] === n2.value && r[2] === n3.value && r[3] === n4.value).map(r => r[4]))]);
+        const v1=n1.value, v2=n2.value, v3=n3.value, v4=n4.value;
+        const n5Opts = [...new Set(ops.filter(r => r[0] === v1 && r[1] === v2 && r[2] === v3 && r[3] === v4).map(r => r[4]).filter(Boolean))].sort();
+        preencher(n5, n5Opts);
     };
 }
 
-function enviarFormulario(){
-    const valores = [...document.querySelectorAll('.valor')].map(v => parseFloat(v.value) || 0);
-    const soma = valores.reduce((a,b)=>a+b,0);
-    const total = parseFloat(document.getElementById('valorTotal').value) || 0;
+function coletarRateio(){
+    const linhas = Array.from(document.querySelectorAll('.rateioLinha'));
+    return linhas.map(l => {
+        return {
+            nivel1: l.querySelector('.n1').value || '',
+            nivel2: l.querySelector('.n2').value || '',
+            nivel3: l.querySelector('.n3').value || '',
+            nivel4: l.querySelector('.n4').value || '',
+            nivel5: l.querySelector('.n5').value || '',
+            centro: l.querySelector('.centro').value || '',
+            valorRateio: parseFloat(l.querySelector('.valor').value || 0)
+        };
+    });
+}
 
-    if(soma !== total){
-        mostrarMensagem('danger', '❌ O total dos rateios deve ser IGUAL ao valor total.');
+async function enviarFormulario(){
+    // checar soma dos rateios
+    const rateios = coletarRateio();
+    const soma = rateios.reduce((s, r) => s + (r.valorRateio || 0), 0);
+    const total = parseFloat(document.getElementById('valorTotal').value || 0);
+
+    if (Math.abs(soma - total) > 0.01) {
+        mostrarMensagem('danger', `❌ O total dos rateios (${soma.toFixed(2)}) deve ser IGUAL ao valor total (${total.toFixed(2)}).`);
         return;
     }
 
-    const idGerado = Math.floor(Math.random()*90000 + 10000);
-    mostrarMensagem('success', '✔ Pedido enviado com sucesso! Seu ID é: #' + idGerado);
+    // coletar dados
+    const payload = new FormData();
+    payload.append('solicitante', document.getElementById('solicitante').value || '');
+    payload.append('emailSolicitante', document.getElementById('email').value || '');
+    payload.append('descricaoSolicitante', document.getElementById('descricaoSolicitante').value || '');
+    payload.append('parceiro', document.getElementById('parceiro').value || '');
+    payload.append('numDocumento', document.getElementById('numDocumento').value || '');
+    payload.append('valorTotal', total);
+    payload.append('competencia', document.getElementById('competencia').value || '');
+    payload.append('descricaoDocumento', document.getElementById('descricaoDocumento').value || '');
+    payload.append('rateioJson', JSON.stringify(rateios));
+
+    // botão enviar - desabilitar para evitar duplicados
+    const btn = document.getElementById('btnEnviar');
+    btn.disabled = true; btn.textContent = 'Enviando...';
+
+    try {
+        const resp = await fetch(API_URL, { method: 'POST', body: payload });
+        if (!resp.ok) throw new Error(`Status ${resp.status}`);
+
+        // tenta JSON primeiro
+        let respJson = null;
+        try {
+            respJson = await resp.json();
+        } catch(e) {
+            // se não for JSON, pega texto
+            const txt = await resp.text();
+            // tenta extrair id de um texto
+            const m = txt.match(/"id"\s*:\s*"([^"]+)"/) || txt.match(/id[:=]\s*['"]?([0-9-]+)['"]?/i);
+            if (m && m[1]) {
+                mostrarMensagem('success', `✔ Pedido enviado com sucesso! Seu ID é: #${m[1]}`);
+                resetFormAfterSend();
+                return;
+            } else {
+                throw new Error('Resposta inválida do servidor (não JSON). Verifique o Apps Script.');
+            }
+        }
+
+        if (respJson && respJson.result === 'success') {
+            const id = respJson.id || respJson.documentId || respJson.docId || 'Não informado';
+            mostrarMensagem('success', `✔ Pedido enviado com sucesso! Seu ID é: #${id}`);
+            resetFormAfterSend();
+        } else {
+            const err = (respJson && respJson.error) ? respJson.error : 'Erro no envio';
+            mostrarMensagem('danger', `❌ Erro ao enviar: ${err}`);
+        }
+    } catch (err) {
+        console.error('Erro no envio:', err);
+        mostrarMensagem('danger', `❌ Falha ao enviar: ${err.message || err}`);
+    } finally {
+        btn.disabled = false; btn.textContent = 'Enviar Pedido';
+    }
 }
 
- mostrarMensagem("success", "✔ Pedido enviado com sucesso! Seu ID é: #" + Math.floor(Math.random()*90000+10000));
+function resetFormAfterSend(){
+    // limpa campos principais, mantem competências carregadas
+    document.getElementById('solicitante').value = '';
+    document.getElementById('email').value = '';
+    document.getElementById('descricaoSolicitante').value = '';
+    document.getElementById('parceiro').value = '';
+    document.getElementById('numDocumento').value = '';
+    document.getElementById('valorTotal').value = '';
+    document.getElementById('descricaoDocumento').value = '';
+    // limpar rateios e criar uma nova linha
+    document.getElementById('rateioContainer').innerHTML = '';
+    addRateioLinha();
 }
 
 function mostrarMensagem(tipo, texto){
@@ -177,9 +302,73 @@ function mostrarMensagem(tipo, texto){
     box.className = 'alert alert-' + tipo;
     box.innerHTML = texto;
     box.style.display = 'block';
+    // esconde após 8s
+    setTimeout(()=> { box.style.display = 'none'; }, 8000);
 }
 
-function searchRequests(){ mostrarMensagem("info", "🔍 Busca em desenvolvimento"); }
+/* BUSCA */
+async function searchRequests(){
+    const q = document.getElementById('searchInput').value.trim();
+    if (!q || q.length < 3) {
+        mostrarMensagem('warning', '🔍 Digite pelo menos 3 caracteres para buscar.');
+        return;
+    }
+    const tbody = document.querySelector('#resultsTable tbody');
+    tbody.innerHTML = `<tr><td colspan="8">Buscando...</td></tr>`;
+    try {
+        const resp = await fetch(`${API_URL}?action=search_requests&query=${encodeURIComponent(q)}`);
+        if (!resp.ok) throw new Error(`Status ${resp.status}`);
+        const data = await resp.json();
+        if (data.result !== 'success') throw new Error(data.error || 'Erro na busca');
+
+        renderSearchResults(data.data || []);
+    } catch(err) {
+        console.error('Erro na busca:', err);
+        tbody.innerHTML = `<tr><td colspan="8">Erro na busca. Verifique o console.</td></tr>`;
+        mostrarMensagem('danger', '❌ Falha ao buscar pedidos. Veja console (F12).');
+    }
+}
+
+function getStatusInfo(status){
+    const s = status ? String(status).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, '_') : 'nao_encontrado';
+    switch(s){
+        case 'pendente': return { emoji:'⏳', class:'text-warning', label:'Pendente' };
+        case 'em_andamento': return { emoji:'⚙️', class:'text-info', label:'Em Andamento' };
+        case 'finalizado': return { emoji:'✅', class:'text-success', label:'Finalizado' };
+        default: return { emoji:'❓', class:'text-muted', label: status || 'Indefinido' };
+    }
+}
+
+function renderSearchResults(results){
+    const tbody = document.querySelector('#resultsTable tbody');
+    if (!results || results.length === 0){
+        tbody.innerHTML = `<tr><td colspan="8">Nenhum pedido encontrado.</td></tr>`;
+        return;
+    }
+    tbody.innerHTML = '';
+    results.forEach(item => {
+        const valorFormatado = (parseFloat(item.valorTotal) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const statusInfo = getStatusInfo(item.status);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>#${item.id}</strong></td>
+            <td>${escapeHtml(item.solicitante || '')}</td>
+            <td>${escapeHtml(item.docNumero || 'N/A')}</td>
+            <td>${escapeHtml(item.competencia || '')}</td>
+            <td>${valorFormatado}</td>
+            <td><span class="${statusInfo.class}">${statusInfo.emoji} ${statusInfo.label}</span></td>
+            <td>${escapeHtml(item.quemFaz || 'N/A')}</td>
+            <td>${escapeHtml(item.descricao || 'N/A')}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function escapeHtml(str){
+    return String(str || '').replace(/[&<>"'`]/g, s => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;', '`':'&#96;'
+    }[s]));
+}
 </script>
 </body>
 </html>
