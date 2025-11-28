@@ -78,12 +78,11 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwrJS1vjpqemqZtl3y9ZeGx-eCF1oQV486c-p01ZtXYpDMLKEpln63aOf-CoQpaBxRB/exec";
 let listas = {};
 
-window.onload = () => { carregarListas(); addRateioLinha(); };
+window.onload = () => { carregarListas(); };
 
-function carregarListas(){
- fetch(API_URL + "?action=get_options")
-   .then(r => r.json())
-   .then(data => { listas = data; carregarCompetencia(data); console.log('DATA RECEBIDA:', data); })
+function carregarListas(){ fetch(API_URL + "?action=get_options") .then(r => r.json())
+   .then(data => { listas = data; carregarCompetencia(data);
+         addRateioLinha(); console.log('DATA RECEBIDA:', data); })
    .catch(err => { console.error('Erro ao carregar listas:', err); mostrarMensagem('danger', 'Erro ao carregar opções. Veja console.'); });
 }
 
