@@ -1,185 +1,125 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Pedidos de Reclassificação</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sistema de Reclassificação</title>
 
-  <style>
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f4f6f8;
-      margin: 0;
-      padding: 0;
-    }
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
 
-    header {
-      background: #008657;
-      color: white;
-      text-align: center;
-      padding: 16px;
-      font-size: 1.4em;
-    }
-
-    .container {
-      max-width: 900px;
-      margin: 30px auto;
-      background: white;
-      padding: 25px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-top: 6px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
-
-    button {
-      margin-top: 20px;
-      background: #008657;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      font-size: 1em;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      opacity: 0.9;
-    }
-
-    .loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255,255,255,0.9);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      z-index: 9999;
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid #ccc;
-      border-top-color: #008657;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-bottom: 10px;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  </style>
+<style>
+body { background:#f2f4f3; padding:40px; font-family:Inter, sans-serif; }
+.card-custom { background:#fff; border-radius:16px; padding:32px; box-shadow:0 4px 20px rgba(0,0,0,.08); margin-bottom:40px; }
+.btn-main { background:#0f6c3f; color:#fff; border:none; padding:10px 22px; border-radius:10px; font-weight:600 }
+.btn-main:hover { background:#0c5733 }
+</style>
 </head>
 
 <body>
 
-<header>Pedidos de Reclassificação</header>
-
-<div class="loading-overlay" id="loading">
-  <div class="spinner"></div>
-  Enviando solicitação...
+<div class="card-custom">
+<h4>Rastreamento de Pedidos</h4>
+<div class="row g-3 mb-3">
+  <div class="col-md-6">
+    <input id="searchInput" class="form-control" placeholder="Pesquisar solicitações (mín. 3 chars)">
+  </div>
+  <div class="col-md-3">
+    <button class="btn-main w-100" onclick="searchRequests()">Buscar</button>
+  </div>
 </div>
 
-<div class="container">
-
-  <!-- FORMULÁRIO -->
-  <form id="rateioForm"
-        action="https://script.google.com/macros/s/AKfycbyeNkxzkyzISud0c307W8qcoxy_FC2SWezvXqjk43zknOduqpBKVV7lleNLV9Dqdi0D/exec"
-        method="POST"
-        enctype="multipart/form-data"
-        target="hidden_iframe"
-        onsubmit="enviarFormulario(event)">
-
-    <label>Solicitante</label>
-    <input name="solicitante" required>
-
-    <label>Email do solicitante</label>
-    <input name="emailSolicitante" type="email" required>
-
-    <label>Parceiro</label>
-    <input name="parceiro">
-
-    <label>Número do Documento</label>
-    <input name="docNumero">
-
-    <label>Valor Total</label>
-    <input name="valorTotal" type="number" step="0.01" required>
-
-    <label>Competência</label>
-    <input name="competencia" placeholder="MM/AAAA" required>
-
-    <label>Justificativa</label>
-    <textarea name="justificativa"></textarea>
-
-    <!-- RATEIO JSON (oculto) -->
-    <input type="hidden" name="rateioJson" id="rateioJson">
-
-    <label>Anexos</label>
-    <input type="file" name="fileUpload" multiple>
-
-    <button type="submit">Enviar Solicitação</button>
-  </form>
-
-  <!-- IFRAME OCULTO -->
-  <iframe name="hidden_iframe" style="display:none;"></iframe>
-
+<table class="table table-bordered">
+<thead>
+<tr>
+<th>ID</th><th>Solicitante</th><th>Documento</th><th>Competência</th><th>Valor</th><th>Status</th>
+</tr>
+</thead>
+<tbody id="resultsTable"></tbody>
+</table>
 </div>
+
+<div class="card-custom">
+<h4>Enviar Pedido</h4>
+
+<input id="solicitante" class="form-control mb-2" placeholder="Solicitante">
+<input id="email" class="form-control mb-2" placeholder="E-mail">
+<input id="numDocumento" class="form-control mb-2" placeholder="Nº Documento">
+<input id="valorTotal" type="number" class="form-control mb-2" placeholder="Valor Total">
+
+<button class="btn-main mt-3" onclick="enviarFormulario()">Enviar</button>
+</div>
+
+<div id="mensagem" class="alert mt-4" style="display:none"></div>
 
 <script>
-function enviarFormulario(e) {
-  e.preventDefault();
+const API_URL = "https://script.google.com/macros/s/AKfycbyeNkxzkyzISud0c307W8qcoxy_FC2SWezvXqjk43zknOduqpBKVV7lleNLV9Dqdi0D/exec";
 
-  // Exemplo simples de rateio (ajuste conforme sua lógica)
-  const rateio = [
-    {
-      nivel1: "N1",
-      nivel2: "N2",
-      nivel3: "N3",
-      nivel4: "",
-      nivel5: "",
-      centro: "CENTRO 01",
-      valorRateio: 100
-    }
-  ];
+/* ================= ENVIO (SEM CORS) ================= */
+function enviarFormulario(){
 
-  document.getElementById("rateioJson").value = JSON.stringify(rateio);
+  const payload = {
+    solicitante: document.getElementById("solicitante").value,
+    email: document.getElementById("email").value,
+    numDocumento: document.getElementById("numDocumento").value,
+    valorTotal: document.getElementById("valorTotal").value
+  };
 
-  const loading = document.getElementById("loading");
-  loading.style.display = "flex";
+  const formBody = Object.keys(payload)
+    .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(payload[k]))
+    .join("&");
 
-  // Envia normalmente o formulário (SEM FETCH)
-  e.target.submit();
+  fetch(API_URL, {
+    method: "POST",
+    body: formBody
+  })
+  .then(r => r.text())
+  .then(res => {
+    mostrarMensagem("success","✅ Pedido enviado com sucesso!");
+  })
+  .catch(err => {
+    console.error(err);
+    mostrarMensagem("danger","❌ Erro ao enviar pedido");
+  });
+}
 
-  // Feedback visual
-  setTimeout(() => {
-    loading.style.display = "none";
-    alert("✅ Solicitação enviada com sucesso!");
-    document.getElementById("rateioForm").reset();
-  }, 2500);
+/* ================= PESQUISA ================= */
+function searchRequests(){
+  const q = document.getElementById("searchInput").value.trim();
+  if(q.length < 3){ mostrarMensagem("warning","Digite ao menos 3 caracteres"); return; }
+
+  fetch(API_URL + "?action=search_requests&query=" + encodeURIComponent(q))
+    .then(r => r.json())
+    .then(data => renderSearch(data.data || []))
+    .catch(() => mostrarMensagem("danger","Erro na busca"));
+}
+
+function renderSearch(data){
+  const tbody = document.getElementById("resultsTable");
+  tbody.innerHTML = "";
+
+  if(!data.length){
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center">Nenhum resultado</td></tr>`;
+    return;
+  }
+
+  data.forEach(i=>{
+    tbody.innerHTML += `
+    <tr>
+      <td>#${i.id||""}</td>
+      <td>${i.solicitante||""}</td>
+      <td>${i.docNumero||""}</td>
+      <td>${i.competencia||""}</td>
+      <td>${i.valorTotal||""}</td>
+      <td>${i.status||""}</td>
+    </tr>`;
+  });
+}
+
+function mostrarMensagem(tipo,msg){
+  const box = document.getElementById("mensagem");
+  box.className = "alert alert-"+tipo;
+  box.innerHTML = msg;
+  box.style.display = "block";
 }
 </script>
 
