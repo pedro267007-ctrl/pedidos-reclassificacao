@@ -44,33 +44,37 @@ body { background:#f2f4f3; padding:40px; font-family:Inter,sans-serif }
 <div class="card">
 <h4>📄 Novo Pedido</h4>
 
-<input id="solicitante" class="form-control mb-2" placeholder="Solicitante">
-<input id="emailSolicitante" class="form-control mb-2" placeholder="E-mail">
-<input id="docNumero" class="form-control mb-2" placeholder="Nº Documento">
-<input id="competencia" class="form-control mb-2" placeholder="Competência (MM/AAAA)">
-<input id="valorTotal" type="number" class="form-control mb-2" placeholder="Valor Total">
+<form id="rateioForm"
+      action="https://script.google.com/macros/s/AKfycbyeNkxzkyzISud0c307W8qcoxy_FC2SWezvXqjk43zknOduqpBKVV7lleNLV9Dqdi0D/exec"
+      method="POST">
+
+<input name="solicitante" id="solicitante" class="form-control mb-2" placeholder="Solicitante">
+<input name="emailSolicitante" id="emailSolicitante" class="form-control mb-2" placeholder="E-mail">
+<input name="docNumero" id="docNumero" class="form-control mb-2" placeholder="Nº Documento">
+<input name="competencia" id="competencia" class="form-control mb-2" placeholder="Competência (MM/AAAA)">
+<input name="valorTotal" id="valorTotal" type="number" class="form-control mb-2" placeholder="Valor Total">
 
 <hr>
 <h5>📊 Rateio</h5>
 
 <div id="rateios"></div>
 
-<button class="btn btn-secondary mb-3" onclick="addRateio()">➕ Adicionar Rateio</button>
+<button type="button" class="btn btn-secondary mb-3" onclick="addRateio()">➕ Adicionar Rateio</button>
 
-<div class="alert alert-info">
-<strong>Total Rateado:</strong> R$ <span id="totalRateado">0.00</span>
+<textarea name="justificativa" id="justificativa" class="form-control mb-3" placeholder="Justificativa"></textarea>
+
+<!-- 🔑 CAMPO CRÍTICO -->
+<input type="hidden" name="rateioJson" id="rateioJson">
+
+<button type="submit" class="btn-main" onclick="prepararEnvioRateio()">Enviar Solicitação</button>
+
+</form>
 </div>
-
-<textarea id="justificativa" class="form-control mb-3" placeholder="Justificativa"></textarea>
-
-<button class="btn-main" onclick="enviar()">Enviar Solicitação</button>
-</div>
-
-<div id="msg" class="alert mt-3" style="display:none"></div>
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbyeNkxzkyzISud0c307W8qcoxy_FC2SWezvXqjk43zknOduqpBKVV7lleNLV9Dqdi0D/exec";
 
+/* ================= RATEIO ================= */
 function addRateio(){
   const div = document.createElement("div");
   div.className = "rateio-row border p-3 mb-2 rounded";
@@ -82,52 +86,37 @@ function addRateio(){
     <input class="form-control" placeholder="Nível 4">
     <input class="form-control" placeholder="Nível 5">
     <input class="form-control" placeholder="Centro">
-    <input type="number" class="form-control valor" placeholder="Valor" oninput="calcTotal()">
-    <button class="btn btn-sm btn-danger mt-2" onclick="this.parentElement.remove(); calcTotal()">Remover</button>
+    <input type="number" class="form-control" placeholder="Valor">
+    <button type="button" class="btn btn-sm btn-danger mt-2" onclick="this.parentElement.remove()">Remover</button>
   `;
   document.getElementById("rateios").appendChild(div);
 }
 
-function calcTotal(){
-  let total = 0;
-  document.querySelectorAll(".valor").forEach(i => total += Number(i.value || 0));
-  document.getElementById("totalRateado").innerText = total.toFixed(2);
-}
+/* ================= ENVIO (CORRIGIDO) ================= */
+function prepararEnvioRateio(){
 
-function enviar(){
   const rateioData = [];
-  document.querySelectorAll(".rateio-row").forEach(r=>{
-    const inputs = r.querySelectorAll("input");
+
+  document.querySelectorAll(".rateio-row").forEach(row => {
+    const campos = row.querySelectorAll("input");
     rateioData.push({
-      nivel1: inputs[0].value,
-      nivel2: inputs[1].value,
-      nivel3: inputs[2].value,
-      nivel4: inputs[3].value,
-      nivel5: inputs[4].value,
-      centro: inputs[5].value,
-      valorRateio: inputs[6].value
+      nivel1: campos[0].value || "",
+      nivel2: campos[1].value || "",
+      nivel3: campos[2].value || "",
+      nivel4: campos[3].value || "",
+      nivel5: campos[4].value || "",
+      centro: campos[5].value || "",
+      valorRateio: Number(campos[6].value || 0)
     });
   });
 
-  const payload = {
-    solicitante: solicitante.value,
-    emailSolicitante: emailSolicitante.value,
-    docNumero: docNumero.value,
-    competencia: competencia.value,
-    valorTotal: valorTotal.value,
-    justificativa: justificativa.value,
-    rateioJson: JSON.stringify(rateioData)
-  };
+  console.log("RATEIO ENVIADO:", rateioData);
 
-  const body = Object.keys(payload)
-    .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(payload[k]))
-    .join("&");
-
-  fetch(API_URL,{ method:"POST", body })
-    .then(()=>showMsg("success","✅ Solicitação enviada com sucesso"))
-    .catch(()=>showMsg("danger","❌ Erro ao enviar"));
+  document.getElementById("rateioJson").value =
+    JSON.stringify(rateioData);
 }
 
+/* ================= PESQUISA ================= */
 function buscar(){
   const q = searchInput.value.trim();
   if(q.length < 3) return;
@@ -148,12 +137,6 @@ function buscar(){
         </tr>`;
       });
     });
-}
-
-function showMsg(t,m){
-  msg.className = "alert alert-"+t;
-  msg.innerText = m;
-  msg.style.display="block";
 }
 </script>
 
