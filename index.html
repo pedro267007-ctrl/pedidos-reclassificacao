@@ -1,125 +1,159 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Sistema de Reclassificação</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedidos de Reclassificação</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-body { background:#f2f4f3; padding:40px; font-family:Inter, sans-serif; }
-.card-custom { background:#fff; border-radius:16px; padding:32px; box-shadow:0 4px 20px rgba(0,0,0,.08); margin-bottom:40px; }
-.btn-main { background:#0f6c3f; color:#fff; border:none; padding:10px 22px; border-radius:10px; font-weight:600 }
+body { background:#f2f4f3; padding:40px; font-family:Inter,sans-serif }
+.card { border-radius:16px; box-shadow:0 4px 18px rgba(0,0,0,.08); padding:32px; margin-bottom:40px }
+.btn-main { background:#0f6c3f; color:#fff; border:none; border-radius:10px; padding:10px 22px; font-weight:600 }
 .btn-main:hover { background:#0c5733 }
+.rateio-row input { margin-bottom:6px }
 </style>
 </head>
 
 <body>
 
-<div class="card-custom">
-<h4>Rastreamento de Pedidos</h4>
-<div class="row g-3 mb-3">
+<!-- ================= PESQUISA ================= -->
+<div class="card">
+<h4>🔍 Pesquisa de Solicitações</h4>
+<div class="row g-3">
   <div class="col-md-6">
-    <input id="searchInput" class="form-control" placeholder="Pesquisar solicitações (mín. 3 chars)">
+    <input id="searchInput" class="form-control" placeholder="Buscar por ID, solicitante ou documento">
   </div>
   <div class="col-md-3">
-    <button class="btn-main w-100" onclick="searchRequests()">Buscar</button>
+    <button class="btn-main w-100" onclick="buscar()">Buscar</button>
   </div>
 </div>
 
-<table class="table table-bordered">
+<table class="table table-bordered mt-4">
 <thead>
 <tr>
 <th>ID</th><th>Solicitante</th><th>Documento</th><th>Competência</th><th>Valor</th><th>Status</th>
 </tr>
 </thead>
-<tbody id="resultsTable"></tbody>
+<tbody id="resultadoBusca"></tbody>
 </table>
 </div>
 
-<div class="card-custom">
-<h4>Enviar Pedido</h4>
+<!-- ================= FORMULÁRIO ================= -->
+<div class="card">
+<h4>📄 Novo Pedido</h4>
 
 <input id="solicitante" class="form-control mb-2" placeholder="Solicitante">
-<input id="email" class="form-control mb-2" placeholder="E-mail">
-<input id="numDocumento" class="form-control mb-2" placeholder="Nº Documento">
+<input id="emailSolicitante" class="form-control mb-2" placeholder="E-mail">
+<input id="docNumero" class="form-control mb-2" placeholder="Nº Documento">
+<input id="competencia" class="form-control mb-2" placeholder="Competência (MM/AAAA)">
 <input id="valorTotal" type="number" class="form-control mb-2" placeholder="Valor Total">
 
-<button class="btn-main mt-3" onclick="enviarFormulario()">Enviar</button>
+<hr>
+<h5>📊 Rateio</h5>
+
+<div id="rateios"></div>
+
+<button class="btn btn-secondary mb-3" onclick="addRateio()">➕ Adicionar Rateio</button>
+
+<div class="alert alert-info">
+<strong>Total Rateado:</strong> R$ <span id="totalRateado">0.00</span>
 </div>
 
-<div id="mensagem" class="alert mt-4" style="display:none"></div>
+<textarea id="justificativa" class="form-control mb-3" placeholder="Justificativa"></textarea>
+
+<button class="btn-main" onclick="enviar()">Enviar Solicitação</button>
+</div>
+
+<div id="msg" class="alert mt-3" style="display:none"></div>
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbyeNkxzkyzISud0c307W8qcoxy_FC2SWezvXqjk43zknOduqpBKVV7lleNLV9Dqdi0D/exec";
 
-/* ================= ENVIO (SEM CORS) ================= */
-function enviarFormulario(){
+function addRateio(){
+  const div = document.createElement("div");
+  div.className = "rateio-row border p-3 mb-2 rounded";
+
+  div.innerHTML = `
+    <input class="form-control" placeholder="Nível 1">
+    <input class="form-control" placeholder="Nível 2">
+    <input class="form-control" placeholder="Nível 3">
+    <input class="form-control" placeholder="Nível 4">
+    <input class="form-control" placeholder="Nível 5">
+    <input class="form-control" placeholder="Centro">
+    <input type="number" class="form-control valor" placeholder="Valor" oninput="calcTotal()">
+    <button class="btn btn-sm btn-danger mt-2" onclick="this.parentElement.remove(); calcTotal()">Remover</button>
+  `;
+  document.getElementById("rateios").appendChild(div);
+}
+
+function calcTotal(){
+  let total = 0;
+  document.querySelectorAll(".valor").forEach(i => total += Number(i.value || 0));
+  document.getElementById("totalRateado").innerText = total.toFixed(2);
+}
+
+function enviar(){
+  const rateioData = [];
+  document.querySelectorAll(".rateio-row").forEach(r=>{
+    const inputs = r.querySelectorAll("input");
+    rateioData.push({
+      nivel1: inputs[0].value,
+      nivel2: inputs[1].value,
+      nivel3: inputs[2].value,
+      nivel4: inputs[3].value,
+      nivel5: inputs[4].value,
+      centro: inputs[5].value,
+      valorRateio: inputs[6].value
+    });
+  });
 
   const payload = {
-    solicitante: document.getElementById("solicitante").value,
-    email: document.getElementById("email").value,
-    numDocumento: document.getElementById("numDocumento").value,
-    valorTotal: document.getElementById("valorTotal").value
+    solicitante: solicitante.value,
+    emailSolicitante: emailSolicitante.value,
+    docNumero: docNumero.value,
+    competencia: competencia.value,
+    valorTotal: valorTotal.value,
+    justificativa: justificativa.value,
+    rateioJson: JSON.stringify(rateioData)
   };
 
-  const formBody = Object.keys(payload)
+  const body = Object.keys(payload)
     .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(payload[k]))
     .join("&");
 
-  fetch(API_URL, {
-    method: "POST",
-    body: formBody
-  })
-  .then(r => r.text())
-  .then(res => {
-    mostrarMensagem("success","✅ Pedido enviado com sucesso!");
-  })
-  .catch(err => {
-    console.error(err);
-    mostrarMensagem("danger","❌ Erro ao enviar pedido");
-  });
+  fetch(API_URL,{ method:"POST", body })
+    .then(()=>showMsg("success","✅ Solicitação enviada com sucesso"))
+    .catch(()=>showMsg("danger","❌ Erro ao enviar"));
 }
 
-/* ================= PESQUISA ================= */
-function searchRequests(){
-  const q = document.getElementById("searchInput").value.trim();
-  if(q.length < 3){ mostrarMensagem("warning","Digite ao menos 3 caracteres"); return; }
+function buscar(){
+  const q = searchInput.value.trim();
+  if(q.length < 3) return;
 
-  fetch(API_URL + "?action=search_requests&query=" + encodeURIComponent(q))
-    .then(r => r.json())
-    .then(data => renderSearch(data.data || []))
-    .catch(() => mostrarMensagem("danger","Erro na busca"));
+  fetch(API_URL+"?action=search_requests&query="+encodeURIComponent(q))
+    .then(r=>r.json())
+    .then(d=>{
+      resultadoBusca.innerHTML="";
+      d.data.forEach(i=>{
+        resultadoBusca.innerHTML += `
+        <tr>
+          <td>${i.id}</td>
+          <td>${i.solicitante}</td>
+          <td>${i.docNumero}</td>
+          <td>${i.competencia}</td>
+          <td>${i.valorTotal}</td>
+          <td>${i.status}</td>
+        </tr>`;
+      });
+    });
 }
 
-function renderSearch(data){
-  const tbody = document.getElementById("resultsTable");
-  tbody.innerHTML = "";
-
-  if(!data.length){
-    tbody.innerHTML = `<tr><td colspan="6" class="text-center">Nenhum resultado</td></tr>`;
-    return;
-  }
-
-  data.forEach(i=>{
-    tbody.innerHTML += `
-    <tr>
-      <td>#${i.id||""}</td>
-      <td>${i.solicitante||""}</td>
-      <td>${i.docNumero||""}</td>
-      <td>${i.competencia||""}</td>
-      <td>${i.valorTotal||""}</td>
-      <td>${i.status||""}</td>
-    </tr>`;
-  });
-}
-
-function mostrarMensagem(tipo,msg){
-  const box = document.getElementById("mensagem");
-  box.className = "alert alert-"+tipo;
-  box.innerHTML = msg;
-  box.style.display = "block";
+function showMsg(t,m){
+  msg.className = "alert alert-"+t;
+  msg.innerText = m;
+  msg.style.display="block";
 }
 </script>
 
