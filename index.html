@@ -13,18 +13,17 @@
  .btn-main { background:#0f6c3f; color:#fff; border:none; padding:10px 22px; border-radius:10px; font-weight:600; transition:.2s; }
  .btn-main:hover { background:#0c5733; }
  .inline-icon { height:1.2em; vertical-align:middle }
+ .rateioLinha select { font-size: 0.85rem; }
 </style>
 </head>
 <body>
 
 <div class="card-custom">
   <h2 class="section-title">Rastreamento de Pedidos </h2>
-
   <div class="row g-3 mb-3">
     <div class="col-md-6"><input id="searchInput" class="form-control" placeholder="Pesquisar Solicitações... (mín. 3 chars)" /></div>
     <div class="col-md-3"><button class="btn-main w-100" onclick="searchRequests()">Buscar</button></div>
   </div>
-
   <div class="table-responsive">
     <table class="table table-bordered" id="resultsTable">
       <thead class="table-light">
@@ -39,7 +38,6 @@
 
 <div class="card-custom">
   <h2 class="section-title">1. Dados do Solicitante </h2>
-
   <div class="row g-3 mb-4">
     <div class="col-md-4"><label>Solicitante</label><input id="solicitante" class="form-control" /></div>
     <div class="col-md-4"><label>E-mail</label><input id="email" class="form-control" /></div>
@@ -49,38 +47,33 @@
 
 <div class="card-custom">
   <h2 class="section-title">2. Dados do Documento </h2>
-
   <div class="row g-3 mb-4">
     <div class="col-md-3"><label>Nome Parceiro</label><input id="parceiro" class="form-control" /></div>
     <div class="col-md-3"><label>Nº Documento</label><input id="numDocumento" class="form-control" /></div>
     <div class="col-md-3"><label>Valor Total</label><input id="valorTotal" type="number" class="form-control" /></div>
     <div class="col-md-3"><label>Competência</label><select id="competencia" class="form-select"></select></div>
   </div>
-
   <label>Descrição do Documento</label>
   <textarea id="descricaoDocumento" class="form-control mb-3" rows="3"></textarea>
 </div>
 
 <div class="card-custom">
   <h2 class="section-title">3. Rateio </h2>
-
   <div id="rateioContainer"></div>
   <button class="btn-main w-100" onclick="addRateioLinha()">+ Adicionar Rateio</button>
 </div>
 
 <div class="text-end"><button class="btn-main" onclick="enviarFormulario()">Enviar Pedido</button></div>
-
 <div id="mensagem" class="alert mt-4" style="display:none"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 <script>
 // =================================================================================
-// ⚠️ ATENÇÃO: SUBSTITUA A URL ABAIXO PELA URL DA SUA NOVA IMPLANTAÇÃO (DEPLOY)!!!
+// ⚠️ COLE SUA URL DE DEPLOY ABAIXO
 // =================================================================================
 const API_URL = "https://script.google.com/macros/s/AKfycbwrJS1vjpqemqZtl3y9ZeGx-eCF1oQV486c-p01ZtXYpDMLKEpln63aOf-CoQpaBxRB/exec"; 
 
-let listas = {};
+let listas = { cascadingOptions: [], centroData: [], fixedLists: {} };
 
 window.onload = () => { carregarListas(); };
 
@@ -91,11 +84,10 @@ function carregarListas(){
         listas = data; 
         carregarCompetencia(data);
         addRateioLinha(); 
-        console.log('DATA RECEBIDA:', data); 
     })
     .catch(err => { 
         console.error('Erro ao carregar listas:', err); 
-        mostrarMensagem('danger', 'Erro ao carregar opções. Veja console.'); 
+        mostrarMensagem('danger', 'Erro ao carregar opções.'); 
     });
 }
 
@@ -110,138 +102,116 @@ function carregarCompetencia(data){
 }
 
 function addRateioLinha(){
+ const container = document.getElementById("rateioContainer");
  const linha = document.createElement("div");
- linha.className = "row g-3 mb-3 rateioLinha align-items-end";
+ linha.className = "row g-2 mb-3 rateioLinha align-items-end border-bottom pb-3";
  linha.innerHTML = `
-   <div class="col-md-2"><label class="form-label visually-hidden">Natureza</label><select class="form-select n1"><option value="">Natureza</option></select></div>
-   <div class="col-md-2"><label class="form-label visually-hidden">Área</label><select class="form-select n2"><option value="">Área</option></select></div>
-   <div class="col-md-2"><label class="form-label visually-hidden">N3</label><select class="form-select n3"><option value="">N3</option></select></div>
-   <div class="col-md-2"><label class="form-label visually-hidden">N4</label><select class="form-select n4"><option value="">N4</option></select></div>
-   <div class="col-md-2"><label class="form-label visually-hidden">N5</label><select class="form-select n5"><option value="">N5</option></select></div>
-   <div class="col-md-2"><label class="form-label visually-hidden">Centro</label><select class="form-select centro"><option value="">Centro</option></select></div>
-   <div class="col-md-2 mt-2"><input class="form-control valor" type="number" placeholder="Valor" /></div>
-   <div class="col-md-1 mt-2 text-end"><button class="btn btn-danger w-100" onclick="this.closest('.rateioLinha').remove()">Remover</button></div>
+   <div class="col-md-2"><label class="small">Natureza</label><select class="form-select n1"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">Área</label><select class="form-select n2"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">N3</label><select class="form-select n3"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">N4</label><select class="form-select n4"><option value="">Selecione</option></select></div>
+   <div class="col-md-1"><label class="small">N5</label><select class="form-select n5"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">Centro</label><select class="form-select centro"><option value="">Selecione</option></select></div>
+   <div class="col-md-1"><label class="small">Valor</label><input class="form-control valor" type="number" step="0.01" /></div>
+   <div class="col-md-1 text-end"><button class="btn btn-outline-danger btn-sm w-100" onclick="this.closest('.rateioLinha').remove()">X</button></div>
  `;
- document.getElementById("rateioContainer").appendChild(linha);
+ container.appendChild(linha);
  aplicarCascata(linha);
 }
 
 function aplicarCascata(linha){
-    const n1 = linha.querySelector(".n1");
-    const n2 = linha.querySelector(".n2");
-    const n3 = linha.querySelector(".n3");
-    const n4 = linha.querySelector(".n4");
-    const n5 = linha.querySelector(".n5");
-    const centro = linha.querySelector(".centro");
+    const n1 = linha.querySelector(".n1"), n2 = linha.querySelector(".n2"), n3 = linha.querySelector(".n3"),
+          n4 = linha.querySelector(".n4"), n5 = linha.querySelector(".n5"), centro = linha.querySelector(".centro");
 
     const ops = listas.cascadingOptions || [];
     const centrosLista = listas.centroData || [];
 
     function preencher(select, valores){
-        select.innerHTML = `<option value=""></option>`;
-        valores.forEach(v => { if(v) {
+        select.innerHTML = `<option value="">Selecione</option>`;
+        [...new Set(valores)].filter(Boolean).sort().forEach(v => {
             const opt = document.createElement('option'); opt.value = v; opt.textContent = v; select.appendChild(opt);
-        }});
+        });
     }
 
-    const n1Options = [...new Set(ops.map(r => r[0]).filter(Boolean))];
-    preencher(n1, n1Options);
+    // Inicializa N1
+    preencher(n1, ops.map(r => r[0]));
 
     n1.onchange = () => {
-        const n2Options = [...new Set(ops.filter(r => r[0] === n1.value).map(r => r[1]).filter(Boolean))];
-        preencher(n2, n2Options);
-        preencher(n3, []); preencher(n4, []); preencher(n5, []); preencher(centro, []);
+        const filtrados = ops.filter(r => r[0] === n1.value);
+        preencher(n2, filtrados.map(r => r[1]));
+        [n3, n4, n5, centro].forEach(s => preencher(s, []));
     };
 
     n2.onchange = () => {
-        const cents = centrosLista.filter(r => r[0] === n2.value).map(r => r[1]).filter(Boolean);
+        // Preenche Centro (Baseado na Área - Nível 2)
+        const cents = centrosLista.filter(r => r[0] === n2.value).map(r => r[1]);
         preencher(centro, cents);
 
-        const n3Options = [...new Set(ops.filter(r => r[0] === n1.value && r[1] === n2.value).map(r => r[2]).filter(Boolean))];
-        preencher(n3, n3Options);
-        preencher(n4, []);
-        preencher(n5, []);
+        const filtrados = ops.filter(r => r[0] === n1.value && r[1] === n2.value);
+        preencher(n3, filtrados.map(r => r[2]));
+        [n4, n5].forEach(s => preencher(s, []));
     };
 
     n3.onchange = () => {
-        const n4Options = [...new Set(ops.filter(r => r[0] === n1.value && r[1] === n2.value && r[2] === n3.value).map(r => r[3]).filter(Boolean))];
-        preencher(n4, n4Options);
+        const filtrados = ops.filter(r => r[0] === n1.value && r[1] === n2.value && r[2] === n3.value);
+        preencher(n4, filtrados.map(r => r[3]));
         preencher(n5, []);
     };
 
     n4.onchange = () => {
-        const n5Options = [...new Set(ops.filter(r => r[0] === n1.value && r[1] === n2.value && r[2] === n3.value && r[3] === n4.value).map(r => r[4]).filter(Boolean))];
-        preencher(n5, n5Options);
+        const filtrados = ops.filter(r => r[0] === n1.value && r[1] === n2.value && r[2] === n3.value && r[3] === n4.value);
+        preencher(n5, filtrados.map(r => r[4]));
     };
 }
 
-// ==========================================================
-// FUNÇÃO DE ENVIO CORRIGIDA (CORS + NOMES CERTOS)
-// ==========================================================
 function enviarFormulario(){
     const valores = [...document.querySelectorAll('.valor')].map(v => parseFloat(v.value) || 0);
     const soma = valores.reduce((a,b)=>a+b,0);
     const total = parseFloat(document.getElementById('valorTotal').value) || 0;
 
     if(Math.abs(soma - total) > 0.01){
-        mostrarMensagem('danger', '❌ O total dos rateios deve ser IGUAL ao valor total.');
+        mostrarMensagem('danger', `❌ O total dos rateios (${soma.toFixed(2)}) difere do total (${total.toFixed(2)}).`);
         return;
     }
 
-    mostrarMensagem('info', '⏳ Enviando pedido...');
+    mostrarMensagem('info', '⏳ Enviando...');
 
-    // Mapeamento correto para o Google Apps Script
     const payload = {
-        solicitante: document.getElementById('solicitante').value || '',
-        emailSolicitante: document.getElementById('email').value || '',
-        parceiro: document.getElementById('parceiro').value || '',
-        docNumero: document.getElementById('numDocumento').value || '',
+        solicitante: document.getElementById('solicitante').value,
+        emailSolicitante: document.getElementById('email').value,
+        parceiro: document.getElementById('parceiro').value,
+        docNumero: document.getElementById('numDocumento').value,
         valorTotal: total,
-        competencia: document.getElementById('competencia').value || '',
-        justificativa: document.getElementById('descricaoDocumento').value || '',
-        
-        // Dados de rateio formatados
+        competencia: document.getElementById('competencia').value,
+        justificativa: document.getElementById('descricaoDocumento').value,
         rateioJson: [...document.querySelectorAll('.rateioLinha')].map(row => ({
-            nivel1: row.querySelector('.n1').value || '',
-            nivel2: row.querySelector('.n2').value || '',
-            nivel3: row.querySelector('.n3').value || '',
-            nivel4: row.querySelector('.n4').value || '',
-            nivel5: row.querySelector('.n5').value || '',
-            centro: row.querySelector('.centro').value || '',
+            nivel1: row.querySelector('.n1').value,
+            nivel2: row.querySelector('.n2').value,
+            nivel3: row.querySelector('.n3').value,
+            nivel4: row.querySelector('.n4').value,
+            nivel5: row.querySelector('.n5').value,
+            centro: row.querySelector('.centro').value,
             valorRateio: parseFloat(row.querySelector('.valor').value) || 0
         }))
     };
 
-    // ENVIO COM TEXT/PLAIN PARA EVITAR CORS
     fetch(API_URL, { 
         method: 'POST', 
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Importante!
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload) 
     })
-      .then(r => r.json())
-      .then(res => {
-         if(res && res.result === 'success'){
-           mostrarMensagem('success', `✅ Sucesso! Pedido registrado. ID: <strong>#${res.id || 'ok'}</strong>`);
-           
-           // Limpar campos
-           document.getElementById('solicitante').value = '';
-           document.getElementById('email').value = '';
-           document.getElementById('descricaoSolicitante').value = '';
-           document.getElementById('parceiro').value = '';
-           document.getElementById('numDocumento').value = '';
-           document.getElementById('valorTotal').value = '';
-           document.getElementById('descricaoDocumento').value = '';
-           
-           document.getElementById('rateioContainer').innerHTML = '';
-           addRateioLinha();
-         } else {
-           mostrarMensagem('danger', `Erro no servidor: ${res.error || 'Erro desconhecido'}`);
-         }
-      })
-      .catch(err => {
-         console.error('Erro no envio:', err);
-         mostrarMensagem('danger', 'Erro de conexão. Verifique o console.');
-      });
+    .then(r => r.json())
+    .then(res => {
+        if(res.result === 'success'){
+            mostrarMensagem('success', `✅ Enviado! ID: #${res.id}`);
+            document.querySelectorAll('input, textarea, select').forEach(i => i.value = '');
+            document.getElementById('rateioContainer').innerHTML = '';
+            addRateioLinha();
+        } else {
+            mostrarMensagem('danger', 'Erro: ' + res.error);
+        }
+    })
+    .catch(err => mostrarMensagem('danger', 'Erro de conexão.'));
 }
 
 function mostrarMensagem(tipo, texto){
@@ -252,43 +222,22 @@ function mostrarMensagem(tipo, texto){
 }
 
 function searchRequests(){
-    const q = (document.getElementById('searchInput').value || '').trim();
-    if(q.length < 3){ mostrarMensagem('warning', 'Digite pelo menos 3 caracteres para buscar.'); return; }
-
-    const url = API_URL + '?action=search_requests&query=' + encodeURIComponent(q);
-    mostrarMensagem('info', '🔎 Buscando...');
-
-    fetch(url)
-      .then(r => r.json())
-      .then(data => {
-         if(data.result === 'success'){
-            renderSearchResults(data.data || []);
-            mostrarMensagem('success', `Resultados: ${ (data.data||[]).length }`);
-         } else {
-            mostrarMensagem('danger', 'Erro na busca: ' + (data.error || 'sem detalhe'));
-         }
-      })
-      .catch(err => { console.error('Erro busca:', err); mostrarMensagem('danger', 'Erro ao buscar. Veja console.'); });
+    const q = document.getElementById('searchInput').value;
+    if(q.length < 3) return;
+    fetch(API_URL + "?action=search_requests&query=" + encodeURIComponent(q))
+    .then(r => r.json())
+    .then(data => renderSearchResults(data.data || []));
 }
 
 function renderSearchResults(results){
     const tbody = document.querySelector('#resultsTable tbody');
-    tbody.innerHTML = '';
-    if(!results || results.length === 0){ tbody.innerHTML = '<tr><td colspan="8" class="text-center">Nenhum pedido encontrado</td></tr>'; return; }
-    results.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>#${item.id || ''}</td>
-          <td>${item.solicitante || ''}</td>
-          <td>${item.docNumero || ''}</td>
-          <td>${item.competencia || ''}</td>
-          <td>${(parseFloat(item.valorTotal)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</td>
-          <td>${item.status || ''}</td>
-          <td>${item.quemFaz || ''}</td>
-          <td>${item.descricao || ''}</td>
-        `;
-        tbody.appendChild(tr);
-    });
+    tbody.innerHTML = results.map(item => `
+        <tr>
+            <td>#${item.id}</td><td>${item.solicitante}</td><td>${item.docNumero}</td>
+            <td>${item.competencia}</td><td>R$ ${item.valorTotal.toFixed(2)}</td>
+            <td>${item.status}</td><td>${item.quemFaz}</td><td>${item.descricao}</td>
+        </tr>
+    `).join('') || '<tr><td colspan="8" class="text-center">Nenhum resultado</td></tr>';
 }
 </script>
 </body>
