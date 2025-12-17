@@ -12,6 +12,7 @@
  .btn-main { background:#0f6c3f; color:#fff; border:none; padding:10px 22px; border-radius:10px; font-weight:600; transition:.2s; }
  .btn-main:hover { background:#0c5733; }
  .rateioLinha select { font-size: 0.85rem; }
+ .label-suave { font-weight: 600; color: #555; margin-bottom: 5px; display: block; }
 </style>
 </head>
 <body>
@@ -37,30 +38,35 @@
 <div class="card-custom">
   <h2 class="section-title">1. Dados do Solicitante </h2>
   <div class="row g-3 mb-4">
-    <div class="col-md-6"><label>Solicitante</label><input id="solicitante" class="form-control" /></div>
-    <div class="col-md-6"><label>E-mail</label><input id="email" class="form-control" /></div>
+    <div class="col-md-6"><label class="label-suave">Solicitante</label><input id="solicitante" class="form-control" /></div>
+    <div class="col-md-6"><label class="label-suave">E-mail</label><input id="email" class="form-control" /></div>
   </div>
 </div>
 
 <div class="card-custom">
   <h2 class="section-title">2. Dados do Documento </h2>
   <div class="row g-3 mb-4">
-    <div class="col-md-3"><label>Nome Parceiro</label><input id="parceiro" class="form-control" /></div>
-    <div class="col-md-3"><label>Nº Documento</label><input id="numDocumento" class="form-control" /></div>
-    <div class="col-md-3"><label>Valor Total</label><input id="valorTotal" type="number" step="0.01" class="form-control" /></div>
-    <div class="col-md-3"><label>Competência</label><select id="competencia" class="form-select"></select></div>
+    <div class="col-md-3"><label class="label-suave">Nome Parceiro</label><input id="parceiro" class="form-control" /></div>
+    <div class="col-md-3"><label class="label-suave">Nº Documento</label><input id="numDocumento" class="form-control" /></div>
+    <div class="col-md-3"><label class="label-suave">Valor Total</label><input id="valorTotal" type="number" step="0.01" class="form-control" /></div>
+    <div class="col-md-3"><label class="label-suave">Competência</label><select id="competencia" class="form-select"></select></div>
   </div>
-  <label>Descrição do Documento</label>
-  <textarea id="descricaoDocumento" class="form-control mb-3" rows="3"></textarea>
+  <label class="label-suave">Descrição do Documento</label>
+  <textarea id="descricaoDocumento" class="form-control mb-3" rows="2" placeholder="Descreva brevemente o documento..."></textarea>
 </div>
 
 <div class="card-custom">
-  <h2 class="section-title">3. Rateio (Opcional) </h2>
+  <h2 class="section-title">3. Rateio </h2>
   <div id="rateioContainer"></div>
-  <button class="btn-main w-100" onclick="addRateioLinha()">+ Adicionar Rateio</button>
+  <button class="btn btn-outline-success w-100 mb-4" onclick="addRateioLinha()">+ Adicionar Linha de Rateio</button>
+  
+  <div class="mt-3">
+    <label class="label-suave">Explicação do Rateio / Dúvidas</label>
+    <textarea id="explicacaoRateio" class="form-control" rows="3" placeholder="Caso haja alguma dúvida sobre o rateio ou precise explicar a divisão, digite aqui..."></textarea>
+  </div>
 </div>
 
-<div class="text-end"><button class="btn-main" onclick="enviarFormulario()">Enviar Pedido</button></div>
+<div class="text-end mb-5"><button class="btn-main btn-lg" onclick="enviarFormulario()">Enviar Pedido de Reclassificação</button></div>
 <div id="mensagem" class="alert mt-4" style="display:none"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -77,7 +83,6 @@ function carregarListas(){
     .then(data => { 
         listas = data; 
         carregarCompetencia(data);
-        // Começa sem nenhuma linha de rateio por padrão
     })
     .catch(err => mostrarMensagem('danger', 'Erro ao carregar opções.'));
 }
@@ -150,14 +155,9 @@ function aplicarCascata(linha){
 function enviarFormulario(){
     const inputTotal = document.getElementById('valorTotal').value;
     const total = parseFloat(inputTotal) || 0;
-    
-    // Pega todos os valores digitados nas linhas de rateio
     const camposValor = [...document.querySelectorAll('.valor')];
-    const valoresRateio = camposValor.map(v => parseFloat(v.value) || 0);
-    const somaRateio = valoresRateio.reduce((a,b) => a + b, 0);
+    const somaRateio = camposValor.map(v => parseFloat(v.value) || 0).reduce((a,b) => a + b, 0);
 
-    // LÓGICA DE VALIDAÇÃO:
-    // Só valida a soma se existirem linhas criadas OU se a soma for maior que zero
     if (camposValor.length > 0 && somaRateio > 0) {
         if (Math.abs(somaRateio - total) > 0.01) {
             mostrarMensagem('danger', `❌ A soma do rateio (${somaRateio.toFixed(2)}) deve ser igual ao valor total (${total.toFixed(2)}).`);
@@ -167,6 +167,11 @@ function enviarFormulario(){
 
     mostrarMensagem('info', '⏳ Enviando...');
 
+    // Combinamos a descrição do documento com a explicação do rateio para enviar ao backend
+    const descDoc = document.getElementById('descricaoDocumento').value;
+    const explRateio = document.getElementById('explicacaoRateio').value;
+    const justificativaCompleta = `DOC: ${descDoc} | RATEIO: ${explRateio}`;
+
     const payload = {
         solicitante: document.getElementById('solicitante').value,
         emailSolicitante: document.getElementById('email').value,
@@ -174,7 +179,7 @@ function enviarFormulario(){
         docNumero: document.getElementById('numDocumento').value,
         valorTotal: total,
         competencia: document.getElementById('competencia').value,
-        justificativa: document.getElementById('descricaoDocumento').value,
+        justificativa: justificativaCompleta,
         rateioJson: [...document.querySelectorAll('.rateioLinha')].map(row => ({
             nivel1: row.querySelector('.n1').value,
             nivel2: row.querySelector('.n2').value,
@@ -194,14 +199,14 @@ function enviarFormulario(){
     .then(r => r.json())
     .then(res => {
         if(res.result === 'success'){
-            mostrarMensagem('success', `✅ Enviado! ID: #${res.id}`);
+            mostrarMensagem('success', `✅ Enviado com sucesso! ID: #${res.id}`);
             document.querySelectorAll('input, textarea, select').forEach(i => i.value = '');
             document.getElementById('rateioContainer').innerHTML = '';
         } else {
             mostrarMensagem('danger', 'Erro: ' + res.error);
         }
     })
-    .catch(err => mostrarMensagem('danger', 'Erro de conexão.'));
+    .catch(err => mostrarMensagem('danger', 'Erro de conexão com o servidor.'));
 }
 
 function mostrarMensagem(tipo, texto){
@@ -227,7 +232,7 @@ function renderSearchResults(results){
             <td>${item.competencia}</td><td>R$ ${item.valorTotal.toFixed(2)}</td>
             <td>${item.status}</td><td>${item.quemFaz}</td><td>${item.descricao}</td>
         </tr>
-    `).join('') || '<tr><td colspan="8" class="text-center">Nenhum resultado</td></tr>';
+    `).join('') || '<tr><td colspan="8" class="text-center">Nenhum resultado encontrado.</td></tr>';
 }
 </script>
 </body>
