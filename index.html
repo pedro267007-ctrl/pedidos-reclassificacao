@@ -8,21 +8,17 @@
 <style>
  body { background:#f2f4f3; padding:40px; font-family: "Inter", sans-serif; }
  
- /* Logo no topo esquerdo */
  .logo-topo { max-height: 60px; margin-bottom: 20px; display: block; }
 
  .card-custom { background:#fff; border-radius:16px; padding:32px; box-shadow:0 4px 20px rgba(0,0,0,0.08); margin-bottom:40px; }
  
- /* Títulos com a árvore verde */
  .section-title { font-size:22px; font-weight:700; margin-bottom:20px; display:flex; align-items:center; gap: 10px; }
  .icon-titulo { height: 26px; width: auto; }
 
- /* Botões com as árvores brancas */
  .btn-main { background:#0f6c3f; color:#fff; border:none; padding:10px 22px; border-radius:10px; font-weight:600; transition:.2s; display: inline-flex; align-items: center; gap: 10px; justify-content: center; }
  .btn-main:hover { background:#0c5733; }
  .icon-btn { height: 18px; width: auto; }
 
- /* TABELA ELEGANTE */
  .table-container { border-radius: 12px; overflow: hidden; border: 1px solid #e0e0e0; background: #fff; }
  #resultsTable { margin-bottom: 0; border-collapse: separate; border-spacing: 0; }
  #resultsTable thead { background-color: #f8f9fa; }
@@ -39,11 +35,23 @@
 
  .rateioLinha select { font-size: 0.85rem; }
  .label-suave { font-weight: 600; color: #555; margin-bottom: 5px; display: block; }
+
+ /* ESTILO DO NOVO FILTRO DE BUSCA NAS CASCATAS */
+ .search-select {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    margin-bottom: 4px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    width: 100%;
+    background-color: #fdfdfd;
+ }
+ .search-select:focus { border-color: #0f6c3f; outline: none; background-color: #fff; }
 </style>
 </head>
 <body>
 
-<img src="https://lh3.googleusercontent.com/u/0/d/1UXaibKoqKSWFomwEfPbTqtuUY05czEjZ" alt="Logo" class="logo-topo">
+<img src="https://lh3.googleusercontent.com/d/1pitTsxMUTmupu2kw5TSZkQe9O-8AcTIz" alt="Logo" class="logo-topo">
 
 <div class="card-custom">
   <h2 class="section-title">
@@ -58,7 +66,6 @@
         <button class="btn-main w-100 h-100" onclick="searchRequests()">
             <img src="https://lh3.googleusercontent.com/d/1aDlAiJdKspjMyFqzCvaPkkWJvxjSFMWo" class="icon-btn">
             Buscar
-            <img src="https://lh3.googleusercontent.com/d/1aDlAiJdKspjMyFqzCvaPkkWJvxjSFMWo" class="icon-btn">
         </button>
     </div>
   </div>
@@ -130,9 +137,7 @@
 
 <div class="text-end mb-5">
     <button class="btn-main btn-lg" onclick="enviarFormulario()">
-        <img src="https://lh3.googleusercontent.com/d/1aDlAiJdKspjMyFqzCvaPkkWJvxjSFMWo" class="icon-btn">
         Enviar Pedido de Reclassificação
-        <img src="https://lh3.googleusercontent.com/d/1aDlAiJdKspjMyFqzCvaPkkWJvxjSFMWo" class="icon-btn">
     </button>
 </div>
 
@@ -163,17 +168,28 @@ function carregarCompetencia(data){
  });
 }
 
+// NOVA FUNÇÃO PARA FILTRAR OS SELECTS
+function filterSelect(input) {
+  const filter = input.value.toLowerCase();
+  const select = input.nextElementSibling;
+  const options = select.options;
+  for (let i = 0; i < options.length; i++) {
+    const txt = options[i].text.toLowerCase();
+    options[i].style.display = (txt.indexOf(filter) > -1 || i === 0) ? "" : "none";
+  }
+}
+
 function addRateioLinha(){
  const container = document.getElementById("rateioContainer");
  const linha = document.createElement("div");
  linha.className = "row g-2 mb-3 rateioLinha align-items-end border-bottom pb-3";
  linha.innerHTML = `
-   <div class="col-md-2"><label class="small">Natureza</label><select class="form-select n1"><option value="">Selecione</option></select></div>
-   <div class="col-md-2"><label class="small">Área</label><select class="form-select n2"><option value="">Selecione</option></select></div>
-   <div class="col-md-2"><label class="small">N3</label><select class="form-select n3"><option value="">Selecione</option></select></div>
-   <div class="col-md-2"><label class="small">N4</label><select class="form-select n4"><option value="">Selecione</option></select></div>
-   <div class="col-md-1"><label class="small">N5</label><select class="form-select n5"><option value="">Selecione</option></select></div>
-   <div class="col-md-2"><label class="small">Centro</label><select class="form-select centro"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">Natureza</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select n1"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">Área</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select n2"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">N3</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select n3"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">N4</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select n4"><option value="">Selecione</option></select></div>
+   <div class="col-md-1"><label class="small">N5</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select n5"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">Centro</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select centro"><option value="">Selecione</option></select></div>
    <div class="col-md-1"><label class="small">Valor</label><input class="form-control valor" type="number" step="0.01" /></div>
    <div class="col-md-1 text-end"><button class="btn btn-outline-danger btn-sm w-100" onclick="this.closest('.rateioLinha').remove()">X</button></div>
  `;
@@ -191,6 +207,9 @@ function aplicarCascata(linha){
         [...new Set(valores)].filter(Boolean).sort().forEach(v => {
             const opt = document.createElement('option'); opt.value = v; opt.textContent = v; select.appendChild(opt);
         });
+        // Reseta o campo de busca quando o select é atualizado pela cascata
+        const inputBusca = select.previousElementSibling;
+        if(inputBusca && inputBusca.classList.contains('search-select')) inputBusca.value = '';
     }
     preencher(n1, ops.map(r => r[0]));
     n1.onchange = () => { preencher(n2, ops.filter(r => r[0] === n1.value).map(r => r[1])); [n3, n4, n5, centro].forEach(s => preencher(s, [])); };
@@ -245,7 +264,6 @@ function searchRequests(){
     .then(r => r.json()).then(data => renderSearchResults(data.data || []));
 }
 
-// FUNÇÃO DE RENDERIZAÇÃO COM CORREÇÃO DE DATA
 function renderSearchResults(results){
     const tbody = document.querySelector('#resultsTable tbody');
     if (!results || results.length === 0) {
@@ -254,10 +272,7 @@ function renderSearchResults(results){
     }
     tbody.innerHTML = results.map(item => {
         const statusClass = item.status.toLowerCase().includes('pendente') ? 'status-pendente' : 'status-concluido';
-        
-        // --- LOGICA DE CORREÇÃO DA DATA (MÊS/ANO) ---
         let compFormatada = item.competencia || 'N/A';
-        // Se a data vier no formato longo do Google (ex: Wed Dec 17...)
         if (compFormatada.toString().length > 15) {
             const dataObj = new Date(compFormatada);
             if (!isNaN(dataObj)) {
@@ -266,7 +281,6 @@ function renderSearchResults(results){
                 compFormatada = `${mes}/${ano}`;
             }
         }
-
         return `
             <tr>
                 <td><span class="fw-bold text-dark">#${item.id}</span></td>
