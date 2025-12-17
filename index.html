@@ -27,15 +27,13 @@
  .search-box:focus { border-color: #0f6c3f; box-shadow: 0 0 0 0.2rem rgba(15, 108, 63, 0.15); outline: none; }
  .rateioLinha select { font-size: 0.85rem; }
  .label-suave { font-weight: 600; color: #555; margin-bottom: 5px; display: block; }
-
- /* Estilo do campo de busca interno do rateio */
  .search-select { font-size: 0.7rem; padding: 3px 8px; margin-bottom: 4px; border: 1px solid #dee2e6; border-radius: 6px; width: 100%; background-color: #fdfdfd; }
  .search-select:focus { border-color: #0f6c3f; outline: none; box-shadow: 0 0 0 0.15rem rgba(15, 108, 63, 0.1); }
 </style>
 </head>
 <body>
 
-<img src="https://lh3.googleusercontent.com/d/1pitTsxMUTmupu2kw5TSZkQe9O-8AcTIz" alt="Logo" class="logo-topo">
+<img src="https://drive.google.com/thumbnail?id=1aDlAiJdKspjMyFqzCvaPkkWJvxjSFMWo" alt="Logo" class="logo-topo">
 
 <div class="card-custom">
   <h2 class="section-title">
@@ -116,7 +114,6 @@
 
 <div id="mensagem" class="alert mt-4" style="display:none"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwrJS1vjpqemqZtl3y9ZeGx-eCF1oQV486c-p01ZtXYpDMLKEpln63aOf-CoQpaBxRB/exec"; 
 let listas = { cascadingOptions: [], centroData: [], fixedLists: {} };
@@ -131,7 +128,7 @@ function carregarListas(){
         (data.fixedLists?.competenciaList || []).forEach(c => {
            const op = document.createElement("option"); op.value = c; op.textContent = c; select.appendChild(op);
         });
-    }).catch(() => mostrarMensagem('danger', 'Erro ao carregar listas.'));
+    });
 }
 
 function filterSelect(input) {
@@ -147,9 +144,7 @@ function preencherSelect(select, valores) {
     [...new Set(valores)].filter(Boolean).sort().forEach(v => {
         const opt = document.createElement('option'); opt.value = v; opt.textContent = v; select.appendChild(opt);
     });
-    if(select.previousElementSibling && select.previousElementSibling.classList.contains('search-select')) {
-        select.previousElementSibling.value = '';
-    }
+    if(select.previousElementSibling?.classList.contains('search-select')) select.previousElementSibling.value = '';
 }
 
 function addRateioLinha(){
@@ -194,8 +189,19 @@ function aplicarCascata(linha){
 
 function enviarFormulario(){
     const total = parseFloat(document.getElementById('valorTotal').value) || 0;
-    const soma = [...document.querySelectorAll('.valor')].reduce((a, b) => a + (parseFloat(b.value) || 0), 0);
-    if(Math.abs(soma - total) > 0.01 && total > 0) return mostrarMensagem('danger', `Erro: A soma do rateio (R$ ${soma.toFixed(2)}) não confere com o total.`);
+    const linhasRateio = document.querySelectorAll('.rateioLinha');
+    const somaRateio = [...document.querySelectorAll('.valor')].reduce((a, b) => a + (parseFloat(b.value) || 0), 0);
+    
+    // --- NOVA LÓGICA DE VALIDAÇÃO ---
+    // Se houver linhas de rateio, a soma deve ser igual ao total.
+    // Se não houver NENHUMA linha, ele deixa passar.
+    if(linhasRateio.length > 0) {
+        if(Math.abs(somaRateio - total) > 0.01) {
+            mostrarMensagem('danger', `❌ Erro: A soma do rateio (R$ ${somaRateio.toFixed(2)}) não confere com o valor total (R$ ${total.toFixed(2)}).`);
+            return;
+        }
+    }
+
     mostrarMensagem('info', '⏳ Enviando pedido...');
     const payload = {
         solicitante: document.getElementById('solicitante').value,
@@ -205,13 +211,14 @@ function enviarFormulario(){
         valorTotal: total,
         competencia: document.getElementById('competencia').value,
         justificativa: `DOC: ${document.getElementById('descricaoDocumento').value} | RATEIO: ${document.getElementById('explicacaoRateio').value}`,
-        rateioJson: [...document.querySelectorAll('.rateioLinha')].map(r => ({
+        rateioJson: [...linhasRateio].map(r => ({
             nivel1: r.querySelector('.n1').value, nivel2: r.querySelector('.n2').value,
             nivel3: r.querySelector('.n3').value, nivel4: r.querySelector('.n4').value,
             nivel5: r.querySelector('.n5').value, centro: r.querySelector('.centro').value,
             valorRateio: parseFloat(r.querySelector('.valor').value) || 0
         }))
     };
+
     fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
     .then(r => r.json()).then(res => {
         if(res.result === 'success') {
@@ -238,11 +245,7 @@ function renderSearchResults(results){
     tbody.innerHTML = results.map(item => {
         const statusClass = item.status.toLowerCase().includes('pendente') ? 'status-pendente' : 'status-concluido';
         let comp = item.competencia || 'N/A';
-        if (comp.toString().length > 15) {
-            const d = new Date(comp);
-            if (!isNaN(d)) comp = `${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
-        }
-        return `<tr><td><span class="fw-bold">#${item.id}</span></td><td>${item.solicitante}</td><td><code class="text-muted">${item.docNumero}</code></td><td>${comp}</td><td class="fw-bold text-success">R$ ${parseFloat(item.valorTotal || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td><td><span class="badge-status ${statusClass}">${item.status}</span></td><td><small>${item.quemFaz}</small></td><td><div class="text-truncate" style="max-width: 150px;" title="${item.descricao}">${item.descricao}</div></td></tr>`;
+        return `<tr><td><span class="fw-bold">#${item.id}</span></td><td>${item.solicitante}</td><td><code>${item.docNumero}</code></td><td>${comp}</td><td class="fw-bold text-success">R$ ${parseFloat(item.valorTotal || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td><td><span class="badge-status ${statusClass}">${item.status}</span></td><td><small>${item.quemFaz}</small></td><td><div class="text-truncate" style="max-width: 150px;">${item.descricao}</div></td></tr>`;
     }).join('');
 }
 
