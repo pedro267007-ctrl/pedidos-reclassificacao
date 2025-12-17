@@ -8,42 +8,36 @@
 <style>
  body { background:#f2f4f3; padding:40px; font-family: "Inter", sans-serif; }
  
- /* Estilo para o Logo no topo esquerdo */
- .logo-topo { 
-    max-height: 60px; 
-    margin-bottom: 20px; 
-    display: block;
- }
+ /* Logo no topo esquerdo */
+ .logo-topo { max-height: 60px; margin-bottom: 20px; display: block; }
 
  .card-custom { background:#fff; border-radius:16px; padding:32px; box-shadow:0 4px 20px rgba(0,0,0,0.08); margin-bottom:40px; }
  
- /* Títulos com a árvore verde ao lado */
- .section-title { 
-    font-size:22px; 
-    font-weight:700; 
-    margin-bottom:20px; 
-    display:flex; 
-    align-items:center; 
-    gap: 10px;
- }
+ /* Títulos com a árvore verde */
+ .section-title { font-size:22px; font-weight:700; margin-bottom:20px; display:flex; align-items:center; gap: 10px; }
  .icon-titulo { height: 26px; width: auto; }
 
- /* Botões com as árvores brancas dos dois lados */
- .btn-main { 
-    background:#0f6c3f; 
-    color:#fff; 
-    border:none; 
-    padding:10px 22px; 
-    border-radius:10px; 
-    font-weight:600; 
-    transition:.2s; 
-    display: inline-flex; 
-    align-items: center; 
-    gap: 10px;
-    justify-content: center;
- }
+ /* Botões com as árvores brancas */
+ .btn-main { background:#0f6c3f; color:#fff; border:none; padding:10px 22px; border-radius:10px; font-weight:600; transition:.2s; display: inline-flex; align-items: center; gap: 10px; justify-content: center; }
  .btn-main:hover { background:#0c5733; }
  .icon-btn { height: 18px; width: auto; }
+
+ /* --- TABELA ELEGANTE --- */
+ .table-container { border-radius: 12px; overflow: hidden; border: 1px solid #e0e0e0; background: #fff; }
+ #resultsTable { margin-bottom: 0; border-collapse: separate; border-spacing: 0; }
+ #resultsTable thead { background-color: #f8f9fa; }
+ #resultsTable th { border-bottom: 2px solid #dee2e6; color: #495057; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; padding: 15px; }
+ #resultsTable td { vertical-align: middle; padding: 15px; color: #333; font-size: 0.9rem; border-color: #f1f1f1; }
+ #resultsTable tbody tr:hover { background-color: #f9fdfb; transition: 0.3s; }
+ 
+ /* Status Badges */
+ .badge-status { padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 0.8rem; display: inline-block; }
+ .status-pendente { background: #fff4e5; color: #b76e00; }
+ .status-concluido { background: #e6fffa; color: #006d5b; }
+
+ .search-box { border-radius: 10px; border: 1px solid #ced4da; padding: 12px 15px; transition: 0.3s; }
+ .search-box:focus { border-color: #0f6c3f; box-shadow: 0 0 0 0.2rem rgba(15, 108, 63, 0.15); outline: none; }
+ /* ---------------------- */
 
  .rateioLinha select { font-size: 0.85rem; }
  .label-suave { font-weight: 600; color: #555; margin-bottom: 5px; display: block; }
@@ -58,8 +52,10 @@
       Rastreamento de Pedidos 
       <img src="https://lh3.googleusercontent.com/u/0/d/1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" class="icon-titulo">
   </h2>
-  <div class="row g-3 mb-3">
-    <div class="col-md-6"><input id="searchInput" class="form-control" placeholder="Pesquisar Solicitações... (mín. 3 chars)" /></div>
+  <div class="row g-3 mb-4">
+    <div class="col-md-9">
+        <input id="searchInput" class="form-control search-box" placeholder="Digite o ID, Solicitante ou Documento para buscar..." />
+    </div>
     <div class="col-md-3">
         <button class="btn-main w-100" onclick="searchRequests()">
             <img src="https://lh3.googleusercontent.com/u/0/d/1aDlAiJdKspjMyFqzCvaPkkWJvxjSFMWo" class="icon-btn">
@@ -68,15 +64,29 @@
         </button>
     </div>
   </div>
-  <div class="table-responsive">
-    <table class="table table-bordered" id="resultsTable">
-      <thead class="table-light">
-        <tr>
-          <th>ID</th><th>Solicitante</th><th>Doc Nº</th><th>Competência</th><th>Valor Total</th><th>Status</th><th>Quem Faz</th><th>Descrição</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+  
+  <div class="table-container shadow-sm">
+    <div class="table-responsive">
+        <table class="table" id="resultsTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Solicitante</th>
+              <th>Doc Nº</th>
+              <th>Competência</th>
+              <th>Valor</th>
+              <th>Status</th>
+              <th>Responsável</th>
+              <th>Descrição</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <td colspan="8" class="text-center text-muted py-4">Utilize o campo acima para pesquisar pedidos.</td>
+              </tr>
+          </tbody>
+        </table>
+    </div>
   </div>
 </div>
 
@@ -116,7 +126,7 @@
   
   <div class="mt-3">
     <label class="label-suave">Explicação do Rateio / Dúvidas</label>
-    <textarea id="explicacaoRateio" class="form-control" rows="3" placeholder="Caso haja alguma dúvida sobre o rateio ou precise explicar a divisão, digite aqui..."></textarea>
+    <textarea id="explicacaoRateio" class="form-control" rows="3" placeholder="Caso haja dúvida sobre o rateio, explique aqui..."></textarea>
   </div>
 </div>
 
@@ -286,13 +296,26 @@ function searchRequests(){
 
 function renderSearchResults(results){
     const tbody = document.querySelector('#resultsTable tbody');
-    tbody.innerHTML = results.map(item => `
-        <tr>
-            <td>#${item.id}</td><td>${item.solicitante}</td><td>${item.docNumero}</td>
-            <td>${item.competencia}</td><td>R$ ${item.valorTotal.toFixed(2)}</td>
-            <td>${item.status}</td><td>${item.quemFaz}</td><td>${item.descricao}</td>
-        </tr>
-    `).join('') || '<tr><td colspan="8" class="text-center">Nenhum resultado encontrado.</td></tr>';
+    if (results.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">Nenhum resultado encontrado.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = results.map(item => {
+        const statusClass = item.status.toLowerCase().includes('pendente') ? 'status-pendente' : 'status-concluido';
+        return `
+            <tr>
+                <td><span class="fw-bold text-dark">#${item.id}</span></td>
+                <td>${item.solicitante}</td>
+                <td><code class="text-muted">${item.docNumero}</code></td>
+                <td>${item.competencia}</td>
+                <td class="fw-bold text-success">R$ ${item.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                <td><span class="badge-status ${statusClass}">${item.status}</span></td>
+                <td><small class="text-muted">${item.quemFaz}</small></td>
+                <td><div class="text-truncate" style="max-width: 150px;" title="${item.descricao}">${item.descricao}</div></td>
+            </tr>
+        `;
+    }).join('');
 }
 </script>
 </body>
