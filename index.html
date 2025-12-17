@@ -5,14 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Sistema de Reclassificação</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-<link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet" />
 <style>
  body { background:#f2f4f3; padding:40px; font-family: "Inter", sans-serif; }
  .card-custom { background:#fff; border-radius:16px; padding:32px; box-shadow:0 4px 20px rgba(0,0,0,0.08); margin-bottom:40px; }
  h2.section-title { font-size:22px; font-weight:700; margin-bottom:20px; display:flex; align-items:center; }
  .btn-main { background:#0f6c3f; color:#fff; border:none; padding:10px 22px; border-radius:10px; font-weight:600; transition:.2s; }
  .btn-main:hover { background:#0c5733; }
- .inline-icon { height:1.2em; vertical-align:middle }
  .rateioLinha select { font-size: 0.85rem; }
 </style>
 </head>
@@ -39,9 +37,8 @@
 <div class="card-custom">
   <h2 class="section-title">1. Dados do Solicitante </h2>
   <div class="row g-3 mb-4">
-    <div class="col-md-4"><label>Solicitante</label><input id="solicitante" class="form-control" /></div>
-    <div class="col-md-4"><label>E-mail</label><input id="email" class="form-control" /></div>
-    <div class="col-md-4"><label>Descrição do Solicitante</label><textarea id="descricaoSolicitante" class="form-control" rows="2"></textarea></div>
+    <div class="col-md-6"><label>Solicitante</label><input id="solicitante" class="form-control" /></div>
+    <div class="col-md-6"><label>E-mail</label><input id="email" class="form-control" /></div>
   </div>
 </div>
 
@@ -50,7 +47,7 @@
   <div class="row g-3 mb-4">
     <div class="col-md-3"><label>Nome Parceiro</label><input id="parceiro" class="form-control" /></div>
     <div class="col-md-3"><label>Nº Documento</label><input id="numDocumento" class="form-control" /></div>
-    <div class="col-md-3"><label>Valor Total</label><input id="valorTotal" type="number" class="form-control" /></div>
+    <div class="col-md-3"><label>Valor Total</label><input id="valorTotal" type="number" step="0.01" class="form-control" /></div>
     <div class="col-md-3"><label>Competência</label><select id="competencia" class="form-select"></select></div>
   </div>
   <label>Descrição do Documento</label>
@@ -68,9 +65,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// =================================================================================
-// ⚠️ COLE SUA URL DE DEPLOY ABAIXO
-// =================================================================================
+// URL da API
 const API_URL = "https://script.google.com/macros/s/AKfycbwrJS1vjpqemqZtl3y9ZeGx-eCF1oQV486c-p01ZtXYpDMLKEpln63aOf-CoQpaBxRB/exec"; 
 
 let listas = { cascadingOptions: [], centroData: [], fixedLists: {} };
@@ -85,10 +80,7 @@ function carregarListas(){
         carregarCompetencia(data);
         addRateioLinha(); 
     })
-    .catch(err => { 
-        console.error('Erro ao carregar listas:', err); 
-        mostrarMensagem('danger', 'Erro ao carregar opções.'); 
-    });
+    .catch(err => mostrarMensagem('danger', 'Erro ao carregar opções.'));
 }
 
 function carregarCompetencia(data){
@@ -122,7 +114,6 @@ function addRateioLinha(){
 function aplicarCascata(linha){
     const n1 = linha.querySelector(".n1"), n2 = linha.querySelector(".n2"), n3 = linha.querySelector(".n3"),
           n4 = linha.querySelector(".n4"), n5 = linha.querySelector(".n5"), centro = linha.querySelector(".centro");
-
     const ops = listas.cascadingOptions || [];
     const centrosLista = listas.centroData || [];
 
@@ -133,31 +124,24 @@ function aplicarCascata(linha){
         });
     }
 
-    // Inicializa N1
     preencher(n1, ops.map(r => r[0]));
-
     n1.onchange = () => {
         const filtrados = ops.filter(r => r[0] === n1.value);
         preencher(n2, filtrados.map(r => r[1]));
         [n3, n4, n5, centro].forEach(s => preencher(s, []));
     };
-
     n2.onchange = () => {
-        // Preenche Centro (Baseado na Área - Nível 2)
         const cents = centrosLista.filter(r => r[0] === n2.value).map(r => r[1]);
         preencher(centro, cents);
-
         const filtrados = ops.filter(r => r[0] === n1.value && r[1] === n2.value);
         preencher(n3, filtrados.map(r => r[2]));
         [n4, n5].forEach(s => preencher(s, []));
     };
-
     n3.onchange = () => {
         const filtrados = ops.filter(r => r[0] === n1.value && r[1] === n2.value && r[2] === n3.value);
         preencher(n4, filtrados.map(r => r[3]));
         preencher(n5, []);
     };
-
     n4.onchange = () => {
         const filtrados = ops.filter(r => r[0] === n1.value && r[1] === n2.value && r[2] === n3.value && r[3] === n4.value);
         preencher(n5, filtrados.map(r => r[4]));
@@ -176,6 +160,7 @@ function enviarFormulario(){
 
     mostrarMensagem('info', '⏳ Enviando...');
 
+    // REMOVIDA A LINHA QUE BUSCAVA "descricaoSolicitante"
     const payload = {
         solicitante: document.getElementById('solicitante').value,
         emailSolicitante: document.getElementById('email').value,
@@ -204,7 +189,13 @@ function enviarFormulario(){
     .then(res => {
         if(res.result === 'success'){
             mostrarMensagem('success', `✅ Enviado! ID: #${res.id}`);
-            document.querySelectorAll('input, textarea, select').forEach(i => i.value = '');
+            // Limpa os campos visíveis
+            document.getElementById('solicitante').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('parceiro').value = '';
+            document.getElementById('numDocumento').value = '';
+            document.getElementById('valorTotal').value = '';
+            document.getElementById('descricaoDocumento').value = '';
             document.getElementById('rateioContainer').innerHTML = '';
             addRateioLinha();
         } else {
