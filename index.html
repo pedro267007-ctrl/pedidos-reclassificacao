@@ -27,8 +27,8 @@
  .search-box:focus { border-color: #0f6c3f; box-shadow: 0 0 0 0.2rem rgba(15, 108, 63, 0.15); outline: none; }
  .rateioLinha select { font-size: 0.85rem; }
  .label-suave { font-weight: 600; color: #555; margin-bottom: 5px; display: block; }
- 
- /* Estilo para o campo de busca dentro da cascata */
+
+ /* Estilo do campo de busca interno do rateio */
  .search-select { font-size: 0.7rem; padding: 3px 8px; margin-bottom: 4px; border: 1px solid #dee2e6; border-radius: 6px; width: 100%; background-color: #fdfdfd; }
  .search-select:focus { border-color: #0f6c3f; outline: none; box-shadow: 0 0 0 0.15rem rgba(15, 108, 63, 0.1); }
 </style>
@@ -79,18 +79,18 @@
     <div class="col-md-3"><label class="label-suave">Valor Total</label><input id="valorTotal" type="number" step="0.01" class="form-control" /></div>
     <div class="col-md-3"><label class="label-suave">Competência</label><select id="competencia" class="form-select"></select></div>
   </div>
-  <textarea id="descricaoDocumento" class="form-control" rows="2" placeholder="Descrição..."></textarea>
+  <textarea id="descricaoDocumento" class="form-control" rows="2" placeholder="Descrição do documento..."></textarea>
 </div>
 
 <div class="card-custom">
   <h2 class="section-title"> 3. Rateio </h2>
   <div id="rateioContainer"></div>
   <button class="btn btn-outline-success w-100 mb-4" onclick="addRateioLinha()">+ Adicionar Linha de Rateio</button>
-  <textarea id="explicacaoRateio" class="form-control" rows="3" placeholder="Observações do rateio..."></textarea>
+  <textarea id="explicacaoRateio" class="form-control" rows="3" placeholder="Explicação do rateio..."></textarea>
 </div>
 
 <div class="text-end mb-5">
-    <button class="btn-main btn-lg" onclick="enviarFormulario()">Enviar Pedido</button>
+    <button class="btn-main btn-lg" onclick="enviarFormulario()">Enviar Pedido de Reclassificação</button>
 </div>
 <div id="mensagem" class="alert mt-4" style="display:none"></div>
 
@@ -108,9 +108,10 @@ function carregarListas(){
         (data.fixedLists?.competenciaList || []).forEach(c => {
            const op = document.createElement("option"); op.value = c; op.textContent = c; select.appendChild(op);
         });
-    });
+    }).catch(() => mostrarMensagem('danger', 'Erro ao carregar listas.'));
 }
 
+// FUNÇÃO PARA FILTRAR OPÇÕES DO SELECT
 function filterSelect(input) {
   const filter = input.value.toLowerCase();
   const select = input.nextElementSibling;
@@ -119,13 +120,16 @@ function filterSelect(input) {
   });
 }
 
+// FUNÇÃO PARA PREENCHER SELECT E LIMPAR BUSCA
 function preencherSelect(select, valores) {
     select.innerHTML = `<option value="">Selecione</option>`;
     [...new Set(valores)].filter(Boolean).sort().forEach(v => {
         const opt = document.createElement('option'); opt.value = v; opt.textContent = v; select.appendChild(opt);
     });
-    // Limpa o campo de busca quando o select é atualizado
-    if(select.previousElementSibling?.classList.contains('search-select')) select.previousElementSibling.value = '';
+    // Limpa o campo de busca quando novas opções são carregadas
+    if(select.previousElementSibling && select.previousElementSibling.classList.contains('search-select')) {
+        select.previousElementSibling.value = '';
+    }
 }
 
 function addRateioLinha(){
@@ -133,20 +137,20 @@ function addRateioLinha(){
  const linha = document.createElement("div");
  linha.className = "row g-2 mb-3 rateioLinha align-items-end border-bottom pb-3";
  linha.innerHTML = `
-   <div class="col-md-2"><label class="small">Natureza</label><input type="text" class="search-select" placeholder="Filtrar..." onkeyup="filterSelect(this)"><select class="form-select n1"><option value="">Selecione</option></select></div>
-   <div class="col-md-2"><label class="small">Área</label><input type="text" class="search-select" placeholder="Filtrar..." onkeyup="filterSelect(this)"><select class="form-select n2"><option value="">Selecione</option></select></div>
-   <div class="col-md-2"><label class="small">N3</label><input type="text" class="search-select" placeholder="Filtrar..." onkeyup="filterSelect(this)"><select class="form-select n3"><option value="">Selecione</option></select></div>
-   <div class="col-md-2"><label class="small">N4</label><input type="text" class="search-select" placeholder="Filtrar..." onkeyup="filterSelect(this)"><select class="form-select n4"><option value="">Selecione</option></select></div>
-   <div class="col-md-1"><label class="small">N5</label><input type="text" class="search-select" placeholder="Filtrar..." onkeyup="filterSelect(this)"><select class="form-select n5"><option value="">Selecione</option></select></div>
-   <div class="col-md-2"><label class="small">Centro</label><input type="text" class="search-select" placeholder="Filtrar..." onkeyup="filterSelect(this)"><select class="form-select centro"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">Natureza</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select n1"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">Área</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select n2"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">N3</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select n3"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">N4</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select n4"><option value="">Selecione</option></select></div>
+   <div class="col-md-1"><label class="small">N5</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select n5"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">Centro</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select centro"><option value="">Selecione</option></select></div>
    <div class="col-md-1"><label class="small">Valor</label><input class="form-control valor" type="number" step="0.01" /></div>
    <div class="col-md-1 text-end"><button class="btn btn-outline-danger btn-sm w-100" onclick="this.closest('.rateioLinha').remove()">X</button></div>
  `;
  container.appendChild(linha);
- aplicarLógicaCascata(linha);
+ aplicarCascata(linha);
 }
 
-function aplicarLógicaCascata(linha){
+function aplicarCascata(linha){
     const s1 = linha.querySelector(".n1"), s2 = linha.querySelector(".n2"), s3 = linha.querySelector(".n3"),
           s4 = linha.querySelector(".n4"), s5 = linha.querySelector(".n5"), sc = linha.querySelector(".centro");
     
@@ -173,8 +177,9 @@ function aplicarLógicaCascata(linha){
 function enviarFormulario(){
     const total = parseFloat(document.getElementById('valorTotal').value) || 0;
     const soma = [...document.querySelectorAll('.valor')].reduce((a, b) => a + (parseFloat(b.value) || 0), 0);
-    if(Math.abs(soma - total) > 0.01) return alert("A soma do rateio não confere!");
+    if(Math.abs(soma - total) > 0.01 && total > 0) return mostrarMensagem('danger', `Erro: A soma do rateio (R$ ${soma.toFixed(2)}) não confere com o total.`);
 
+    mostrarMensagem('info', '⏳ Enviando pedido...');
     const payload = {
         solicitante: document.getElementById('solicitante').value,
         emailSolicitante: document.getElementById('email').value,
@@ -182,7 +187,7 @@ function enviarFormulario(){
         docNumero: document.getElementById('numDocumento').value,
         valorTotal: total,
         competencia: document.getElementById('competencia').value,
-        justificativa: document.getElementById('descricaoDocumento').value,
+        justificativa: `DOC: ${document.getElementById('descricaoDocumento').value} | RATEIO: ${document.getElementById('explicacaoRateio').value}`,
         rateioJson: [...document.querySelectorAll('.rateioLinha')].map(r => ({
             nivel1: r.querySelector('.n1').value, nivel2: r.querySelector('.n2').value,
             nivel3: r.querySelector('.n3').value, nivel4: r.querySelector('.n4').value,
@@ -190,16 +195,55 @@ function enviarFormulario(){
             valorRateio: parseFloat(r.querySelector('.valor').value) || 0
         }))
     };
-    fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }).then(() => alert("Pedido Enviado!"));
+    fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+    .then(r => r.json()).then(res => {
+        if(res.result === 'success') {
+            mostrarMensagem('success', `✅ Enviado com sucesso! ID: #${res.id}`);
+            document.querySelectorAll('input, textarea, select').forEach(i => i.value = '');
+            document.getElementById('rateioContainer').innerHTML = '';
+        } else {
+            mostrarMensagem('danger', 'Erro ao enviar: ' + res.error);
+        }
+    });
 }
 
 function searchRequests(){
     const q = document.getElementById('searchInput').value;
+    if(q.length < 3) return;
     fetch(`${API_URL}?action=search_requests&query=${encodeURIComponent(q)}`)
-    .then(r => r.json()).then(res => {
-        const tbody = document.querySelector('#resultsTable tbody');
-        tbody.innerHTML = (res.data || []).map(i => `<tr><td>#${i.id}</td><td>${i.solicitante}</td><td>${i.docNumero}</td><td>${i.competencia}</td><td>R$ ${i.valorTotal}</td><td>${i.status}</td><td>${i.quemFaz}</td><td>${i.descricao}</td></tr>`).join('');
-    });
+    .then(r => r.json()).then(data => renderSearchResults(data.data || []));
+}
+
+function renderSearchResults(results){
+    const tbody = document.querySelector('#resultsTable tbody');
+    if (!results || results.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">Nenhum pedido encontrado.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = results.map(item => {
+        const statusClass = item.status.toLowerCase().includes('pendente') ? 'status-pendente' : 'status-concluido';
+        let comp = item.competencia || 'N/A';
+        if (comp.toString().length > 15) {
+            const d = new Date(comp);
+            if (!isNaN(d)) comp = `${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+        }
+        return `
+            <tr>
+                <td><span class="fw-bold">#${item.id}</span></td>
+                <td>${item.solicitante}</td>
+                <td><code class="text-muted">${item.docNumero}</code></td>
+                <td>${comp}</td>
+                <td class="fw-bold text-success">R$ ${parseFloat(item.valorTotal || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                <td><span class="badge-status ${statusClass}">${item.status}</span></td>
+                <td><small>${item.quemFaz}</small></td>
+                <td><div class="text-truncate" style="max-width: 150px;" title="${item.descricao}">${item.descricao}</div></td>
+            </tr>`;
+    }).join('');
+}
+
+function mostrarMensagem(tipo, texto){
+    const box = document.getElementById('mensagem');
+    box.className = 'alert alert-' + tipo; box.innerHTML = texto; box.style.display = 'block';
 }
 </script>
 </body>
