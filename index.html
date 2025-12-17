@@ -55,7 +55,7 @@
 </div>
 
 <div class="card-custom">
-  <h2 class="section-title">3. Rateio </h2>
+  <h2 class="section-title">3. Rateio (Opcional) </h2>
   <div id="rateioContainer"></div>
   <button class="btn-main w-100" onclick="addRateioLinha()">+ Adicionar Rateio</button>
 </div>
@@ -65,7 +65,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// URL da API
 const API_URL = "https://script.google.com/macros/s/AKfycbwrJS1vjpqemqZtl3y9ZeGx-eCF1oQV486c-p01ZtXYpDMLKEpln63aOf-CoQpaBxRB/exec"; 
 
 let listas = { cascadingOptions: [], centroData: [], fixedLists: {} };
@@ -78,7 +77,7 @@ function carregarListas(){
     .then(data => { 
         listas = data; 
         carregarCompetencia(data);
-        addRateioLinha(); 
+        // Começa sem nenhuma linha de rateio por padrão
     })
     .catch(err => mostrarMensagem('danger', 'Erro ao carregar opções.'));
 }
@@ -149,18 +148,25 @@ function aplicarCascata(linha){
 }
 
 function enviarFormulario(){
-    const valores = [...document.querySelectorAll('.valor')].map(v => parseFloat(v.value) || 0);
-    const soma = valores.reduce((a,b)=>a+b,0);
-    const total = parseFloat(document.getElementById('valorTotal').value) || 0;
+    const inputTotal = document.getElementById('valorTotal').value;
+    const total = parseFloat(inputTotal) || 0;
+    
+    // Pega todos os valores digitados nas linhas de rateio
+    const camposValor = [...document.querySelectorAll('.valor')];
+    const valoresRateio = camposValor.map(v => parseFloat(v.value) || 0);
+    const somaRateio = valoresRateio.reduce((a,b) => a + b, 0);
 
-    if(Math.abs(soma - total) > 0.01){
-        mostrarMensagem('danger', `❌ O total dos rateios (${soma.toFixed(2)}) difere do total (${total.toFixed(2)}).`);
-        return;
+    // LÓGICA DE VALIDAÇÃO:
+    // Só valida a soma se existirem linhas criadas OU se a soma for maior que zero
+    if (camposValor.length > 0 && somaRateio > 0) {
+        if (Math.abs(somaRateio - total) > 0.01) {
+            mostrarMensagem('danger', `❌ A soma do rateio (${somaRateio.toFixed(2)}) deve ser igual ao valor total (${total.toFixed(2)}).`);
+            return;
+        }
     }
 
     mostrarMensagem('info', '⏳ Enviando...');
 
-    // REMOVIDA A LINHA QUE BUSCAVA "descricaoSolicitante"
     const payload = {
         solicitante: document.getElementById('solicitante').value,
         emailSolicitante: document.getElementById('email').value,
@@ -189,15 +195,8 @@ function enviarFormulario(){
     .then(res => {
         if(res.result === 'success'){
             mostrarMensagem('success', `✅ Enviado! ID: #${res.id}`);
-            // Limpa os campos visíveis
-            document.getElementById('solicitante').value = '';
-            document.getElementById('email').value = '';
-            document.getElementById('parceiro').value = '';
-            document.getElementById('numDocumento').value = '';
-            document.getElementById('valorTotal').value = '';
-            document.getElementById('descricaoDocumento').value = '';
+            document.querySelectorAll('input, textarea, select').forEach(i => i.value = '');
             document.getElementById('rateioContainer').innerHTML = '';
-            addRateioLinha();
         } else {
             mostrarMensagem('danger', 'Erro: ' + res.error);
         }
