@@ -75,15 +75,28 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwrJS1vjpqemqZtl3y9ZeGx-eCF1oQV486c-p01ZtXYpDMLKEpln63aOf-CoQpaBxRB/exec";
+// =================================================================================
+// ⚠️ ATENÇÃO: SUBSTITUA A URL ABAIXO PELA URL DA SUA NOVA IMPLANTAÇÃO (DEPLOY)!!!
+// =================================================================================
+const API_URL = "https://script.google.com/macros/s/AKfycbwrJS1vjpqemqZtl3y9ZeGx-eCF1oQV486c-p01ZtXYpDMLKEpln63aOf-CoQpaBxRB/exec"; 
+
 let listas = {};
 
 window.onload = () => { carregarListas(); };
 
-function carregarListas(){ fetch(API_URL + "?action=get_options") .then(r => r.json())
-   .then(data => { listas = data; carregarCompetencia(data);
-         addRateioLinha(); console.log('DATA RECEBIDA:', data); })
-   .catch(err => { console.error('Erro ao carregar listas:', err); mostrarMensagem('danger', 'Erro ao carregar opções. Veja console.'); });
+function carregarListas(){ 
+    fetch(API_URL + "?action=get_options")
+    .then(r => r.json())
+    .then(data => { 
+        listas = data; 
+        carregarCompetencia(data);
+        addRateioLinha(); 
+        console.log('DATA RECEBIDA:', data); 
+    })
+    .catch(err => { 
+        console.error('Erro ao carregar listas:', err); 
+        mostrarMensagem('danger', 'Erro ao carregar opções. Veja console.'); 
+    });
 }
 
 function carregarCompetencia(data){
@@ -162,6 +175,9 @@ function aplicarCascata(linha){
     };
 }
 
+// ==========================================================
+// FUNÇÃO DE ENVIO CORRIGIDA (CORS + NOMES CERTOS)
+// ==========================================================
 function enviarFormulario(){
     const valores = [...document.querySelectorAll('.valor')].map(v => parseFloat(v.value) || 0);
     const soma = valores.reduce((a,b)=>a+b,0);
@@ -172,49 +188,59 @@ function enviarFormulario(){
         return;
     }
 
-    // Monta payload com separação solicitante / documento
+    mostrarMensagem('info', '⏳ Enviando pedido...');
+
+    // Mapeamento correto para o Google Apps Script
     const payload = {
         solicitante: document.getElementById('solicitante').value || '',
-        email: document.getElementById('email').value || '',
-        descricaoSolicitante: document.getElementById('descricaoSolicitante').value || '',
+        emailSolicitante: document.getElementById('email').value || '',
         parceiro: document.getElementById('parceiro').value || '',
-        numDocumento: document.getElementById('numDocumento').value || '',
+        docNumero: document.getElementById('numDocumento').value || '',
         valorTotal: total,
         competencia: document.getElementById('competencia').value || '',
-        descricaoDocumento: document.getElementById('descricaoDocumento').value || '',
-        rateio: [...document.querySelectorAll('.rateioLinha')].map(row => ({
+        justificativa: document.getElementById('descricaoDocumento').value || '',
+        
+        // Dados de rateio formatados
+        rateioJson: [...document.querySelectorAll('.rateioLinha')].map(row => ({
             nivel1: row.querySelector('.n1').value || '',
             nivel2: row.querySelector('.n2').value || '',
             nivel3: row.querySelector('.n3').value || '',
             nivel4: row.querySelector('.n4').value || '',
             nivel5: row.querySelector('.n5').value || '',
             centro: row.querySelector('.centro').value || '',
-            valor: parseFloat(row.querySelector('.valor').value) || 0
+            valorRateio: parseFloat(row.querySelector('.valor').value) || 0
         }))
     };
 
-    // Envia para API (exemplo). Aqui apenas demo — substitua pela sua chamada fetch POST se quiser.
-    fetch(API_URL, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' } })
+    // ENVIO COM TEXT/PLAIN PARA EVITAR CORS
+    fetch(API_URL, { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Importante!
+        body: JSON.stringify(payload) 
+    })
       .then(r => r.json())
       .then(res => {
          if(res && res.result === 'success'){
-           mostrarMensagem('success', `✅ Sucesso! Pedido registrado. ID: <strong>#${res.id || 'não informado'}</strong>`);
-           // limpa formulário
-           document.getElementById('submission-form')?.reset();
-           // remove linhas de rateio
+           mostrarMensagem('success', `✅ Sucesso! Pedido registrado. ID: <strong>#${res.id || 'ok'}</strong>`);
+           
+           // Limpar campos
+           document.getElementById('solicitante').value = '';
+           document.getElementById('email').value = '';
+           document.getElementById('descricaoSolicitante').value = '';
+           document.getElementById('parceiro').value = '';
+           document.getElementById('numDocumento').value = '';
+           document.getElementById('valorTotal').value = '';
+           document.getElementById('descricaoDocumento').value = '';
+           
            document.getElementById('rateioContainer').innerHTML = '';
            addRateioLinha();
          } else {
-           // Caso o Apps Script retorne texto, tentamos extrair id
-           const id = (res && res.id) || 'não informado';
-           mostrarMensagem('success', `✅ Sucesso (sem JSON claro). ID: <strong>#${id}</strong>`);
-           document.getElementById('rateioContainer').innerHTML = '';
-           addRateioLinha();
+           mostrarMensagem('danger', `Erro no servidor: ${res.error || 'Erro desconhecido'}`);
          }
       })
       .catch(err => {
          console.error('Erro no envio:', err);
-         mostrarMensagem('danger', 'Erro ao enviar. Ver console para detalhes.');
+         mostrarMensagem('danger', 'Erro de conexão. Verifique o console.');
       });
 }
 
