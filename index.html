@@ -7,46 +7,30 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
 <style>
  body { background:#f2f4f3; padding:40px; font-family: "Inter", sans-serif; }
- 
  .logo-topo { max-height: 60px; margin-bottom: 20px; display: block; }
-
  .card-custom { background:#fff; border-radius:16px; padding:32px; box-shadow:0 4px 20px rgba(0,0,0,0.08); margin-bottom:40px; }
- 
  .section-title { font-size:22px; font-weight:700; margin-bottom:20px; display:flex; align-items:center; gap: 10px; }
  .icon-titulo { height: 26px; width: auto; }
-
  .btn-main { background:#0f6c3f; color:#fff; border:none; padding:10px 22px; border-radius:10px; font-weight:600; transition:.2s; display: inline-flex; align-items: center; gap: 10px; justify-content: center; }
  .btn-main:hover { background:#0c5733; }
  .icon-btn { height: 18px; width: auto; }
-
  .table-container { border-radius: 12px; overflow: hidden; border: 1px solid #e0e0e0; background: #fff; }
  #resultsTable { margin-bottom: 0; border-collapse: separate; border-spacing: 0; }
  #resultsTable thead { background-color: #f8f9fa; }
  #resultsTable th { border-bottom: 2px solid #dee2e6; color: #495057; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; padding: 15px; }
  #resultsTable td { vertical-align: middle; padding: 15px; color: #333; font-size: 0.9rem; border-color: #f1f1f1; }
  #resultsTable tbody tr:hover { background-color: #f9fdfb; transition: 0.3s; }
- 
  .badge-status { padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 0.8rem; display: inline-block; }
  .status-pendente { background: #fff4e5; color: #b76e00; }
  .status-concluido { background: #e6fffa; color: #006d5b; }
-
  .search-box { border-radius: 10px; border: 1px solid #ced4da; padding: 12px 15px; transition: 0.3s; }
  .search-box:focus { border-color: #0f6c3f; box-shadow: 0 0 0 0.2rem rgba(15, 108, 63, 0.15); outline: none; }
-
  .rateioLinha select { font-size: 0.85rem; }
  .label-suave { font-weight: 600; color: #555; margin-bottom: 5px; display: block; }
-
- /* ESTILO DO NOVO FILTRO DE BUSCA NAS CASCATAS */
- .search-select {
-    font-size: 0.7rem;
-    padding: 3px 8px;
-    margin-bottom: 4px;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-    width: 100%;
-    background-color: #fdfdfd;
- }
- .search-select:focus { border-color: #0f6c3f; outline: none; background-color: #fff; }
+ 
+ /* Estilo para o campo de busca dentro da cascata */
+ .search-select { font-size: 0.7rem; padding: 3px 8px; margin-bottom: 4px; border: 1px solid #dee2e6; border-radius: 6px; width: 100%; background-color: #fdfdfd; }
+ .search-select:focus { border-color: #0f6c3f; outline: none; box-shadow: 0 0 0 0.15rem rgba(15, 108, 63, 0.1); }
 </style>
 </head>
 <body>
@@ -54,41 +38,25 @@
 <img src="https://lh3.googleusercontent.com/d/1pitTsxMUTmupu2kw5TSZkQe9O-8AcTIz" alt="Logo" class="logo-topo">
 
 <div class="card-custom">
-  <h2 class="section-title">
-      Rastreamento de Pedidos 
-      <img src="https://lh3.googleusercontent.com/d/1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" class="icon-titulo">
-  </h2>
+  <h2 class="section-title"> Rastreamento de Pedidos <img src="https://lh3.googleusercontent.com/d/1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" class="icon-titulo"> </h2>
   <div class="row g-3 mb-4">
     <div class="col-md-9">
-        <input id="searchInput" class="form-control search-box" placeholder="Digite o ID, Solicitante ou Documento para buscar..." />
+        <input id="searchInput" class="form-control search-box" placeholder="Digite o ID, Solicitante ou Documento..." />
     </div>
     <div class="col-md-3">
-        <button class="btn-main w-100 h-100" onclick="searchRequests()">
-            <img src="https://lh3.googleusercontent.com/d/1aDlAiJdKspjMyFqzCvaPkkWJvxjSFMWo" class="icon-btn">
-            Buscar
-        </button>
+        <button class="btn-main w-100 h-100" onclick="searchRequests()">Buscar</button>
     </div>
   </div>
-  
   <div class="table-container shadow-sm">
     <div class="table-responsive">
         <table class="table" id="resultsTable">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Solicitante</th>
-              <th>Doc Nº</th>
-              <th>Competência</th>
-              <th>Valor</th>
-              <th>Status</th>
-              <th>Responsável</th>
-              <th>Descrição</th>
+              <th>ID</th><th>Solicitante</th><th>Doc Nº</th><th>Competência</th><th>Valor</th><th>Status</th><th>Responsável</th><th>Descrição</th>
             </tr>
           </thead>
           <tbody>
-              <tr>
-                  <td colspan="8" class="text-center text-muted py-4">Utilize o campo acima para pesquisar pedidos.</td>
-              </tr>
+              <tr><td colspan="8" class="text-center text-muted py-4">Utilize o campo acima para pesquisar.</td></tr>
           </tbody>
         </table>
     </div>
@@ -96,87 +64,68 @@
 </div>
 
 <div class="card-custom">
-  <h2 class="section-title">
-      1. Dados do Solicitante 
-      <img src="https://lh3.googleusercontent.com/d/1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" class="icon-titulo">
-  </h2>
-  <div class="row g-3 mb-4">
+  <h2 class="section-title"> 1. Dados do Solicitante </h2>
+  <div class="row g-3">
     <div class="col-md-6"><label class="label-suave">Solicitante</label><input id="solicitante" class="form-control" /></div>
     <div class="col-md-6"><label class="label-suave">E-mail</label><input id="email" class="form-control" /></div>
   </div>
 </div>
 
 <div class="card-custom">
-  <h2 class="section-title">
-      2. Dados do Documento 
-      <img src="https://lh3.googleusercontent.com/d/1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" class="icon-titulo">
-  </h2>
+  <h2 class="section-title"> 2. Dados do Documento </h2>
   <div class="row g-3 mb-4">
-    <div class="col-md-3"><label class="label-suave">Nome Parceiro</label><input id="parceiro" class="form-control" /></div>
-    <div class="col-md-3"><label class="label-suave">Nº Documento</label><input id="numDocumento" class="form-control" /></div>
+    <div class="col-md-3"><label class="label-suave">Parceiro</label><input id="parceiro" class="form-control" /></div>
+    <div class="col-md-3"><label class="label-suave">Nº Doc</label><input id="numDocumento" class="form-control" /></div>
     <div class="col-md-3"><label class="label-suave">Valor Total</label><input id="valorTotal" type="number" step="0.01" class="form-control" /></div>
     <div class="col-md-3"><label class="label-suave">Competência</label><select id="competencia" class="form-select"></select></div>
   </div>
-  <label class="label-suave">Descrição do Documento</label>
-  <textarea id="descricaoDocumento" class="form-control mb-3" rows="2" placeholder="Descreva brevemente o documento..."></textarea>
+  <textarea id="descricaoDocumento" class="form-control" rows="2" placeholder="Descrição..."></textarea>
 </div>
 
 <div class="card-custom">
-  <h2 class="section-title">
-      3. Rateio 
-      <img src="https://lh3.googleusercontent.com/d/1t--SL4FNglQ32TBhrIsBGY31r3L2GsA8" class="icon-titulo">
-  </h2>
+  <h2 class="section-title"> 3. Rateio </h2>
   <div id="rateioContainer"></div>
   <button class="btn btn-outline-success w-100 mb-4" onclick="addRateioLinha()">+ Adicionar Linha de Rateio</button>
-  
-  <div class="mt-3">
-    <label class="label-suave">Explicação do Rateio / Dúvidas</label>
-    <textarea id="explicacaoRateio" class="form-control" rows="3" placeholder="Caso haja dúvida sobre o rateio ou precise explicar a divisão, digite aqui..."></textarea>
-  </div>
+  <textarea id="explicacaoRateio" class="form-control" rows="3" placeholder="Observações do rateio..."></textarea>
 </div>
 
 <div class="text-end mb-5">
-    <button class="btn-main btn-lg" onclick="enviarFormulario()">
-        Enviar Pedido de Reclassificação
-    </button>
+    <button class="btn-main btn-lg" onclick="enviarFormulario()">Enviar Pedido</button>
 </div>
-
 <div id="mensagem" class="alert mt-4" style="display:none"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwrJS1vjpqemqZtl3y9ZeGx-eCF1oQV486c-p01ZtXYpDMLKEpln63aOf-CoQpaBxRB/exec"; 
-
 let listas = { cascadingOptions: [], centroData: [], fixedLists: {} };
 
 window.onload = () => { carregarListas(); };
 
 function carregarListas(){ 
-    fetch(API_URL + "?action=get_options")
-    .then(r => r.json())
-    .then(data => { listas = data; carregarCompetencia(data); })
-    .catch(err => mostrarMensagem('danger', 'Erro ao carregar opções.'));
+    fetch(API_URL + "?action=get_options").then(r => r.json()).then(data => { 
+        listas = data; 
+        const select = document.getElementById("competencia");
+        select.innerHTML = '<option value="">Selecione</option>';
+        (data.fixedLists?.competenciaList || []).forEach(c => {
+           const op = document.createElement("option"); op.value = c; op.textContent = c; select.appendChild(op);
+        });
+    });
 }
 
-function carregarCompetencia(data){
- const select = document.getElementById("competencia");
- select.innerHTML = '<option value="">Selecione</option>';
- (data.fixedLists && data.fixedLists.competenciaList || []).forEach(c => {
-   const op = document.createElement("option");
-   op.value = c; op.textContent = c;
-   select.appendChild(op);
- });
-}
-
-// NOVA FUNÇÃO PARA FILTRAR OS SELECTS
 function filterSelect(input) {
   const filter = input.value.toLowerCase();
   const select = input.nextElementSibling;
-  const options = select.options;
-  for (let i = 0; i < options.length; i++) {
-    const txt = options[i].text.toLowerCase();
-    options[i].style.display = (txt.indexOf(filter) > -1 || i === 0) ? "" : "none";
-  }
+  Array.from(select.options).forEach((opt, i) => {
+    opt.style.display = (opt.text.toLowerCase().includes(filter) || i === 0) ? "" : "none";
+  });
+}
+
+function preencherSelect(select, valores) {
+    select.innerHTML = `<option value="">Selecione</option>`;
+    [...new Set(valores)].filter(Boolean).sort().forEach(v => {
+        const opt = document.createElement('option'); opt.value = v; opt.textContent = v; select.appendChild(opt);
+    });
+    // Limpa o campo de busca quando o select é atualizado
+    if(select.previousElementSibling?.classList.contains('search-select')) select.previousElementSibling.value = '';
 }
 
 function addRateioLinha(){
@@ -184,53 +133,48 @@ function addRateioLinha(){
  const linha = document.createElement("div");
  linha.className = "row g-2 mb-3 rateioLinha align-items-end border-bottom pb-3";
  linha.innerHTML = `
-   <div class="col-md-2"><label class="small">Natureza</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select n1"><option value="">Selecione</option></select></div>
-   <div class="col-md-2"><label class="small">Área</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select n2"><option value="">Selecione</option></select></div>
-   <div class="col-md-2"><label class="small">N3</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select n3"><option value="">Selecione</option></select></div>
-   <div class="col-md-2"><label class="small">N4</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select n4"><option value="">Selecione</option></select></div>
-   <div class="col-md-1"><label class="small">N5</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select n5"><option value="">Selecione</option></select></div>
-   <div class="col-md-2"><label class="small">Centro</label><input type="text" class="search-select" placeholder="🔍" onkeyup="filterSelect(this)"><select class="form-select centro"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">Natureza</label><input type="text" class="search-select" placeholder="Filtrar..." onkeyup="filterSelect(this)"><select class="form-select n1"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">Área</label><input type="text" class="search-select" placeholder="Filtrar..." onkeyup="filterSelect(this)"><select class="form-select n2"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">N3</label><input type="text" class="search-select" placeholder="Filtrar..." onkeyup="filterSelect(this)"><select class="form-select n3"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">N4</label><input type="text" class="search-select" placeholder="Filtrar..." onkeyup="filterSelect(this)"><select class="form-select n4"><option value="">Selecione</option></select></div>
+   <div class="col-md-1"><label class="small">N5</label><input type="text" class="search-select" placeholder="Filtrar..." onkeyup="filterSelect(this)"><select class="form-select n5"><option value="">Selecione</option></select></div>
+   <div class="col-md-2"><label class="small">Centro</label><input type="text" class="search-select" placeholder="Filtrar..." onkeyup="filterSelect(this)"><select class="form-select centro"><option value="">Selecione</option></select></div>
    <div class="col-md-1"><label class="small">Valor</label><input class="form-control valor" type="number" step="0.01" /></div>
    <div class="col-md-1 text-end"><button class="btn btn-outline-danger btn-sm w-100" onclick="this.closest('.rateioLinha').remove()">X</button></div>
  `;
  container.appendChild(linha);
- aplicarCascata(linha);
+ aplicarLógicaCascata(linha);
 }
 
-function aplicarCascata(linha){
-    const n1 = linha.querySelector(".n1"), n2 = linha.querySelector(".n2"), n3 = linha.querySelector(".n3"),
-          n4 = linha.querySelector(".n4"), n5 = linha.querySelector(".n5"), centro = linha.querySelector(".centro");
-    const ops = listas.cascadingOptions || [];
-    const centrosLista = listas.centroData || [];
-    function preencher(select, valores){
-        select.innerHTML = `<option value="">Selecione</option>`;
-        [...new Set(valores)].filter(Boolean).sort().forEach(v => {
-            const opt = document.createElement('option'); opt.value = v; opt.textContent = v; select.appendChild(opt);
-        });
-        // Reseta o campo de busca quando o select é atualizado pela cascata
-        const inputBusca = select.previousElementSibling;
-        if(inputBusca && inputBusca.classList.contains('search-select')) inputBusca.value = '';
-    }
-    preencher(n1, ops.map(r => r[0]));
-    n1.onchange = () => { preencher(n2, ops.filter(r => r[0] === n1.value).map(r => r[1])); [n3, n4, n5, centro].forEach(s => preencher(s, [])); };
-    n2.onchange = () => {
-        preencher(centro, centrosLista.filter(r => r[0] === n2.value).map(r => r[1]));
-        preencher(n3, ops.filter(r => r[0] === n1.value && r[1] === n2.value).map(r => r[2]));
-        [n4, n5].forEach(s => preencher(s, []));
+function aplicarLógicaCascata(linha){
+    const s1 = linha.querySelector(".n1"), s2 = linha.querySelector(".n2"), s3 = linha.querySelector(".n3"),
+          s4 = linha.querySelector(".n4"), s5 = linha.querySelector(".n5"), sc = linha.querySelector(".centro");
+    
+    preencherSelect(s1, listas.cascadingOptions.map(r => r[0]));
+
+    s1.onchange = () => {
+        preencherSelect(s2, listas.cascadingOptions.filter(r => r[0] === s1.value).map(r => r[1]));
+        [s3, s4, s5, sc].forEach(s => preencherSelect(s, []));
     };
-    n3.onchange = () => { preencher(n4, ops.filter(r => r[0] === n1.value && r[1] === n2.value && r[2] === n3.value).map(r => r[3])); preencher(n5, []); };
-    n4.onchange = () => { preencher(n5, ops.filter(r => r[0] === n1.value && r[1] === n2.value && r[2] === n3.value && r[3] === n4.value).map(r => r[4])); };
+    s2.onchange = () => {
+        preencherSelect(sc, listas.centroData.filter(r => r[0] === s2.value).map(r => r[1]));
+        preencherSelect(s3, listas.cascadingOptions.filter(r => r[0] === s1.value && r[1] === s2.value).map(r => r[2]));
+        [s4, s5].forEach(s => preencherSelect(s, []));
+    };
+    s3.onchange = () => {
+        preencherSelect(s4, listas.cascadingOptions.filter(r => r[0] === s1.value && r[1] === s2.value && r[2] === s3.value).map(r => r[3]));
+        preencherSelect(s5, []);
+    };
+    s4.onchange = () => {
+        preencherSelect(s5, listas.cascadingOptions.filter(r => r[0] === s1.value && r[1] === s2.value && r[2] === s3.value && r[3] === s4.value).map(r => r[4]));
+    };
 }
 
 function enviarFormulario(){
-    const inputTotal = document.getElementById('valorTotal').value;
-    const total = parseFloat(inputTotal) || 0;
-    const somaRateio = [...document.querySelectorAll('.valor')].map(v => parseFloat(v.value) || 0).reduce((a,b) => a + b, 0);
-    if (Math.abs(somaRateio - total) > 0.01 && total > 0) {
-        mostrarMensagem('danger', `❌ A soma do rateio (${somaRateio.toFixed(2)}) deve ser igual ao total (${total.toFixed(2)}).`);
-        return;
-    }
-    mostrarMensagem('info', '⏳ Enviando...');
+    const total = parseFloat(document.getElementById('valorTotal').value) || 0;
+    const soma = [...document.querySelectorAll('.valor')].reduce((a, b) => a + (parseFloat(b.value) || 0), 0);
+    if(Math.abs(soma - total) > 0.01) return alert("A soma do rateio não confere!");
+
     const payload = {
         solicitante: document.getElementById('solicitante').value,
         emailSolicitante: document.getElementById('email').value,
@@ -238,62 +182,24 @@ function enviarFormulario(){
         docNumero: document.getElementById('numDocumento').value,
         valorTotal: total,
         competencia: document.getElementById('competencia').value,
-        justificativa: `DOC: ${document.getElementById('descricaoDocumento').value} | RATEIO: ${document.getElementById('explicacaoRateio').value}`,
-        rateioJson: [...document.querySelectorAll('.rateioLinha')].map(row => ({
-            nivel1: row.querySelector('.n1').value, nivel2: row.querySelector('.n2').value, nivel3: row.querySelector('.n3').value,
-            nivel4: row.querySelector('.n4').value, nivel5: row.querySelector('.n5').value, centro: row.querySelector('.centro').value,
-            valorRateio: parseFloat(row.querySelector('.valor').value) || 0
+        justificativa: document.getElementById('descricaoDocumento').value,
+        rateioJson: [...document.querySelectorAll('.rateioLinha')].map(r => ({
+            nivel1: r.querySelector('.n1').value, nivel2: r.querySelector('.n2').value,
+            nivel3: r.querySelector('.n3').value, nivel4: r.querySelector('.n4').value,
+            nivel5: r.querySelector('.n5').value, centro: r.querySelector('.centro').value,
+            valorRateio: parseFloat(r.querySelector('.valor').value) || 0
         }))
     };
-    fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
-    .then(r => r.json()).then(res => {
-        if(res.result === 'success'){ mostrarMensagem('success', `✅ Enviado! ID: #${res.id}`); document.querySelectorAll('input, textarea, select').forEach(i => i.value = ''); document.getElementById('rateioContainer').innerHTML = ''; }
-        else { mostrarMensagem('danger', 'Erro: ' + res.error); }
-    }).catch(err => mostrarMensagem('danger', 'Erro de conexão.'));
-}
-
-function mostrarMensagem(tipo, texto){
-    const box = document.getElementById('mensagem');
-    box.className = 'alert alert-' + tipo; box.innerHTML = texto; box.style.display = 'block';
+    fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }).then(() => alert("Pedido Enviado!"));
 }
 
 function searchRequests(){
     const q = document.getElementById('searchInput').value;
-    if(q.length < 3) return;
-    fetch(API_URL + "?action=search_requests&query=" + encodeURIComponent(q))
-    .then(r => r.json()).then(data => renderSearchResults(data.data || []));
-}
-
-function renderSearchResults(results){
-    const tbody = document.querySelector('#resultsTable tbody');
-    if (!results || results.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">Nenhum pedido encontrado.</td></tr>';
-        return;
-    }
-    tbody.innerHTML = results.map(item => {
-        const statusClass = item.status.toLowerCase().includes('pendente') ? 'status-pendente' : 'status-concluido';
-        let compFormatada = item.competencia || 'N/A';
-        if (compFormatada.toString().length > 15) {
-            const dataObj = new Date(compFormatada);
-            if (!isNaN(dataObj)) {
-                const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
-                const ano = dataObj.getFullYear();
-                compFormatada = `${mes}/${ano}`;
-            }
-        }
-        return `
-            <tr>
-                <td><span class="fw-bold text-dark">#${item.id}</span></td>
-                <td>${item.solicitante}</td>
-                <td><code class="text-muted">${item.docNumero}</code></td>
-                <td>${compFormatada}</td>
-                <td class="fw-bold text-success">R$ ${parseFloat(item.valorTotal || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-                <td><span class="badge-status ${statusClass}">${item.status}</span></td>
-                <td><small class="text-muted">${item.quemFaz}</small></td>
-                <td><div class="text-truncate" style="max-width: 150px;" title="${item.descricao}">${item.descricao}</div></td>
-            </tr>
-        `;
-    }).join('');
+    fetch(`${API_URL}?action=search_requests&query=${encodeURIComponent(q)}`)
+    .then(r => r.json()).then(res => {
+        const tbody = document.querySelector('#resultsTable tbody');
+        tbody.innerHTML = (res.data || []).map(i => `<tr><td>#${i.id}</td><td>${i.solicitante}</td><td>${i.docNumero}</td><td>${i.competencia}</td><td>R$ ${i.valorTotal}</td><td>${i.status}</td><td>${i.quemFaz}</td><td>${i.descricao}</td></tr>`).join('');
+    });
 }
 </script>
 </body>
